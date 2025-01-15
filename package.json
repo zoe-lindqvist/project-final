@@ -3,5 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "postinstall": "npm install --prefix backend"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "tailwindcss": "^3.4.17"
   }
 }
