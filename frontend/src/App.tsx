@@ -1,7 +1,11 @@
+import { Layout } from "./UI/Layout";
+
 export const App = () => {
   return (
     <>
-      <h1>Mood Melody</h1>
+      {" "}
+      <Layout />
+      <h1></h1>
     </>
   );
 };
