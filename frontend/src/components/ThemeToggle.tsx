@@ -1,7 +1,7 @@
 import { Moon, Sun } from "lucide-react";
-import { useThemeStore } from "../store/themeStore";
+import { useThemeStore } from "../store/useThemeStore";
 
-const ThemeToggle: React.FC = () => {
+export const ThemeToggle = () => {
   // Extract the theme state and toggle function from the Zustand store
   const { isDark, toggle } = useThemeStore();
 
@@ -26,5 +26,3 @@ const ThemeToggle: React.FC = () => {
     </button>
   );
 };
-
-export default ThemeToggle;
