@@ -1,11 +1,10 @@
-import { Logo } from "./components/Logo";
-import { Navbar } from "./UI/Navbar";
+import { Layout } from "./UI/Layout";
 
 export const App = () => {
   return (
     <>
       {" "}
-      <Navbar />
+      <Layout />
       <h1></h1>
     </>
   );
