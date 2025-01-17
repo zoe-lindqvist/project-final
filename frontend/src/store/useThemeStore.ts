@@ -8,7 +8,7 @@ interface ThemeStore {
 }
 
 // Create a Zustand store for managing theme state
-export const useThemeStore = create<ThemeStore>(
+export const useThemeStore = create<ThemeStore>()(
   // Use the persist middleware to save state to local storage
   persist(
     // Define the initial state and actions for the store
