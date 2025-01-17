@@ -35,6 +35,16 @@ export default {
         "bounce-slow": "bounce 3s infinite", // Slow bouncing animation
       },
 
+      logo: {
+        glowLight: "#d8b4fe", // Glow effect in light mode (purple-400/30 equivalent)
+        glowDark: "#a78bfa", // Glow effect in dark mode (purple-400/20 equivalent)
+        bgLightStart: "#f3e8ff", // Icon background gradient start (purple-100)
+        bgLightEnd: "#dbeafe", // Icon background gradient end (blue-100)
+        bgDarkStart: "#5b21b6", // Icon background gradient start (purple-900)
+        bgDarkEnd: "#1e3a8a", // Icon background gradient end (blue-900)
+        textLight: "#7c3aed", // Text gradient start (purple-600)
+        textDark: "#2563eb", // Text gradient end (blue-600)
+      },
       // Define custom gradients
       backgroundImage: {
         "hero-light":
