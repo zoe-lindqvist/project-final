@@ -1,5 +1,9 @@
+
 import { useEffect } from "react";
 import { useThemeStore } from "./store/useThemeStore";
+
+import { Layout } from "./UI/Layout";
+
 
 export const App = () => {
   const { isDark } = useThemeStore();
@@ -14,7 +18,9 @@ export const App = () => {
 
   return (
     <>
-      <h1>Mood Melody</h1>
+      {" "}
+      <Layout />
+      <h1></h1>
     </>
   );
 };
