@@ -5,7 +5,7 @@ export const App = () => {
     <>
       {" "}
       <Logo />
-      <h1>Mood Melody</h1>
+      <h1></h1>
     </>
   );
 };
