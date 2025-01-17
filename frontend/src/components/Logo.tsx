@@ -18,7 +18,7 @@ export const Logo = () => (
       <span className="text-xl font-bold text-primary-dark dark:text-primary-light group-hover:scale-105 transition-transform">
         MoodMelody
       </span>
-      <span className="text-sm text-gray-500 dark:text-gray-400">
+      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
         Your Emotions in Music
       </span>
     </div>
