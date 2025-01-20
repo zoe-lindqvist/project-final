@@ -4,6 +4,9 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
+      animation: {
+        "bounce-slow": "bounce-slow 3s infinite",
+      },
       colors: {
         // Purple shades used in the Logo
         primary: {
