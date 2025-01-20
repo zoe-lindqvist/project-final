@@ -1,10 +1,17 @@
-import { Routes, Route } from "react-router-dom";
-import { HeroSection } from "../components/HeroSection";
+import { Route } from "react-router-dom";
+import { Home } from "../pages/Home";
+import { Layout } from "../UI/Layout";
 
-export const AppRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<HeroSection />} />
-    </Routes>
-  );
-};
+export const routes = (
+  <>
+    <Route path="/" element={<Layout />}>
+      <Route index element={<Home />} />
+
+      {/* Route for login page */}
+
+      {/* Route for about page */}
+
+      {/* TODO: Import and Add more routes */}
+    </Route>
+  </>
+);

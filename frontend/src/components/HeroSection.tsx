@@ -6,8 +6,8 @@ export const HeroSection = () => {
     <section className="relative py-24 overflow-hidden">
       {/* Background Gradient Circles */}
 
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-logo-glow-light dark:bg-logo-glow-dark rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-logo-glow-light dark:bg-logo-glow-dark rounded-full blur-3xl -z-10" />
+      {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-logo-glow-light dark:bg-logo-glow-dark rounded-full blur-3xl -z-10" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-logo-glow-light dark:bg-logo-glow-dark rounded-full blur-3xl -z-10" /> */}
 
       <div className="text-center relative">
         <div className="inline-block animate-bounce-slow mb-8">
