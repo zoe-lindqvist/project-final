@@ -1,8 +1,7 @@
 import { useEffect } from "react";
+import { routes } from "./routes/routes";
 import { useThemeStore } from "./store/useThemeStore";
-
-import { Layout } from "./UI/Layout";
-import { Home } from "./pages/Home";
+import { BrowserRouter } from "react-router-dom";
 
 export const App = () => {
   const { isDark } = useThemeStore();
@@ -15,12 +14,5 @@ export const App = () => {
     }
   }, [isDark]);
 
-  return (
-    <>
-      {" "}
-      <Layout />
-      <Home />
-      <h1></h1>
-    </>
-  );
+  return <BrowserRouter>{routes}</BrowserRouter>;
 };
