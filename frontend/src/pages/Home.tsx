@@ -1,3 +1,4 @@
+import { HeroSection } from "../components/HeroSection";
 import { Carousel } from "../components/Carousel";
 
 export const Home: React.FC = () => {
@@ -69,6 +70,7 @@ export const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
         {/* ...Hero Section Content... */}
+        <HeroSection />
       </section>
 
       {/* Carousel Section */}
