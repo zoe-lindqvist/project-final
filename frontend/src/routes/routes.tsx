@@ -1,9 +1,9 @@
-import { Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Home } from "../pages/Home";
 import { Layout } from "../UI/Layout";
 
 export const routes = (
-  <>
+  <Routes>
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
 
@@ -13,5 +13,5 @@ export const routes = (
 
       {/* TODO: Import and Add more routes */}
     </Route>
-  </>
+  </Routes>
 );
