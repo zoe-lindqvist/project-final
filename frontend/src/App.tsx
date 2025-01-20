@@ -1,9 +1,8 @@
-
 import { useEffect } from "react";
 import { useThemeStore } from "./store/useThemeStore";
 
 import { Layout } from "./UI/Layout";
-
+import { Home } from "./pages/Home";
 
 export const App = () => {
   const { isDark } = useThemeStore();
@@ -20,6 +19,7 @@ export const App = () => {
     <>
       {" "}
       <Layout />
+      <Home />
       <h1></h1>
     </>
   );
