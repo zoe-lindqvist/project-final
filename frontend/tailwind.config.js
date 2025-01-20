@@ -4,6 +4,18 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
+      keyframes: {
+        "bounce-slow": {
+          "0%, 100%": {
+            transform: "translateY(-10%)",
+            animationTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+          },
+          "50%": {
+            transform: "translateY(0)",
+            animationTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)",
+          },
+        },
+      },
       animation: {
         "bounce-slow": "bounce-slow 3s infinite",
       },
