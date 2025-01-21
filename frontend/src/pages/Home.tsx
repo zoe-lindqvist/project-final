@@ -2,6 +2,7 @@ import { HeroSection } from "../components/HeroSection";
 import { Carousel } from "../components/Carousel";
 import { HowItWorks } from "../components/HowItWorks";
 import { Community } from "../components/Community";
+import { Footer } from "../UI/Footer";
 
 export const Home: React.FC = () => {
   const albums = [
@@ -89,7 +90,7 @@ export const Home: React.FC = () => {
         <HowItWorks />
       </section>
 
-      {/* Stats Section change py or gradient*/}
+      {/* Stats Section* backgroung issue: change py or gradient*/}
       <section className="py-24  from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-3xl">
         {/* ...Stats Section Content... */}
         <Community />
