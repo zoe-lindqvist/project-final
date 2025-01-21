@@ -4,3 +4,31 @@ export interface User {
   name: string;
   avatar?: string;
 }
+
+export interface Comment {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string;
+  createdAt: string;
+}
+export type Mood = "happy" | "sad" | "relaxed" | "energetic" | "anxious";
+
+export interface MoodEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string;
+  mood: Mood; // Change `string` to `Mood`
+  songRecommendation?: {
+    title: string;
+    artist: string;
+    genre: string;
+    spotifyUrl: string;
+    previewUrl?: string;
+  };
+  createdAt: string;
+  likes: string[];
+  comments: Comment[];
+  isPrivate: boolean;
+}
