@@ -39,7 +39,7 @@ export default {
 
         // Gray text colors used in the Logo
         text: {
-          light: "#6b7280", // Matches gray-500
+          light: "#111827", // Matches gray-900
           dark: "#9ca3af", // Matches gray-400
         },
       },
