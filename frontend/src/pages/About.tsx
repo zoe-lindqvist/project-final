@@ -37,19 +37,27 @@ export const About: React.FC = () => {
             <div className="grid grid-cols-2 gap-6">
               {[
                 {
-                  icon: <Music2 className="h-8 w-8 text-primary-accent" />,
+                  icon: (
+                    <Music2 className="h-8 w-8 text-primary-accent dark:text-primary" />
+                  ),
                   label: "Musical Expression",
                 },
                 {
-                  icon: <Heart className="h-8 w-8 text-primary-accent" />,
+                  icon: (
+                    <Heart className="h-8 w-8 text-primary-accent dark:text-primary" />
+                  ),
                   label: "Emotional Growth",
                 },
                 {
-                  icon: <Users className="h-8 w-8 text-primary-accent" />,
+                  icon: (
+                    <Users className="h-8 w-8 text-text-primary-accent dark:text-primary" />
+                  ),
                   label: "Community Connection",
                 },
                 {
-                  icon: <Sparkles className="h-8 w-8 text-primary-accent" />,
+                  icon: (
+                    <Sparkles className="h-8 w-8 text-primary-accent dark:text-primary" />
+                  ),
                   label: "Personal Discovery",
                 },
               ].map((item, index) => (
