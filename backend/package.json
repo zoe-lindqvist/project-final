@@ -13,6 +13,7 @@
     "@babel/node": "^7.16.8",
     "@babel/preset-env": "^7.16.11",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.17.3",
     "mongoose": "^8.4.0",
     "nodemon": "^3.0.1"
