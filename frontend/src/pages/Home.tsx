@@ -1,5 +1,7 @@
 import { HeroSection } from "../components/HeroSection";
 import { Carousel } from "../components/Carousel";
+import { HowItWorks } from "../components/HowItWorks";
+import { Community } from "../components/Community";
 
 export const Home: React.FC = () => {
   const albums = [
@@ -84,11 +86,13 @@ export const Home: React.FC = () => {
       {/* Features Section */}
       <section className="py-24">
         {/* ...Features Section Content... */}
+        <HowItWorks />
       </section>
 
       {/* Stats Section */}
       <section className="py-24 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-3xl">
         {/* ...Stats Section Content... */}
+        <Community />
       </section>
     </div>
   );
