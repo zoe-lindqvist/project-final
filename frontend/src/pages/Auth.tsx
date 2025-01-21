@@ -21,6 +21,7 @@ export const Auth: React.FC = () => {
   // State to store and display error messages
   const [error, setError] = useState<string | null>(null);
 
+  // Hook to navigate to different pages (/journal after successful login)
   const navigate = useNavigate();
 
   // Function to log the user in using authentication store
@@ -61,7 +62,7 @@ export const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex-col items-center bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 px-4 py-8">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 px-4 py-8">
       {/* Logo that links back to the homepage */}
       <Link to="/" className="mb-12 group" aria-label="Return to homepage">
         <div className="relative">
