@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserCircle, Menu, X, LogOut } from "lucide-react";
-import { userAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/useAuthStore";
 import { Logo } from "../components/Logo";
 import { ThemeToggle } from "../components/ThemeToggle";
 
 export const Navbar: React.FC = () => {
-  const { isAuthenticated, logout } = userAuthStore();
+  const { isAuthenticated, logout } = useAuthStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
