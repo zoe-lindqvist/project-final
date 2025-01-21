@@ -8,12 +8,12 @@ export const routes = (
   <Routes>
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
-      {/* Route for login page */}
-      {/* TODO: Add Login Page Route */}
-      <Route path="/login" element={<Auth />} />
       {/* Route for about page */}
       <Route path="about" element={<About />} /> {/* Add the About route */}
       {/* TODO: Import and Add more routes */}
     </Route>
+
+    {/* Route for login page */}
+    <Route path="/login" element={<Auth />} />
   </Routes>
 );
