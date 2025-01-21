@@ -3,6 +3,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
+import userRoutes from "./routes/userRoutes.js";
+import moodRoutes from "./routes/moodRoutes.js";
+
 dotenv.config();
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/final-project";
@@ -18,6 +21,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Hello Technigo!");
 });
+
+app.use("/api/users", userRoutes);
+app.use("/api/moods", moodRoutes);
 
 // Start the server
 app.listen(port, () => {
