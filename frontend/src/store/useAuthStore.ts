@@ -15,7 +15,7 @@ interface AuthState {
 }
 
 // Zustand store with persistence enabled
-export const userAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       // Initial state
