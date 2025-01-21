@@ -26,6 +26,7 @@ export default {
           DEFAULT: "#a855f7", // Matches purple-400
           dark: "#7e22ce", // Matches purple-900
           accent: "#9333ea", // Matches purple-600
+          dim: "#c084fc", // Custom color for dark:text-purple-400
         },
 
         // Blue shades used in the Logo

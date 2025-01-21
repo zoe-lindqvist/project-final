@@ -38,25 +38,25 @@ export const About: React.FC = () => {
               {[
                 {
                   icon: (
-                    <Music2 className="h-8 w-8 text-primary-accent dark:text-primary" />
+                    <Music2 className="h-8 w-8 text-primary-accent dark:text-primary-dim" />
                   ),
                   label: "Musical Expression",
                 },
                 {
                   icon: (
-                    <Heart className="h-8 w-8 text-primary-accent dark:text-primary" />
+                    <Heart className="h-8 w-8 text-primary-accent dark:text-primary-dim" />
                   ),
                   label: "Emotional Growth",
                 },
                 {
                   icon: (
-                    <Users className="h-8 w-8 text-text-primary-accent dark:text-primary" />
+                    <Users className="h-8 w-8 text-text-primary-accent dark:text-primary-dim" />
                   ),
                   label: "Community Connection",
                 },
                 {
                   icon: (
-                    <Sparkles className="h-8 w-8 text-primary-accent dark:text-primary" />
+                    <Sparkles className="h-8 w-8 text-primary-accent dark:text-primary-dim" />
                   ),
                   label: "Personal Discovery",
                 },
