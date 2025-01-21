@@ -89,8 +89,8 @@ export const Home: React.FC = () => {
         <HowItWorks />
       </section>
 
-      {/* Stats Section */}
-      <section className="py-24 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-3xl">
+      {/* Stats Section change py or gradient*/}
+      <section className="py-24  from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-3xl">
         {/* ...Stats Section Content... */}
         <Community />
       </section>
