@@ -4,6 +4,7 @@ import { About } from "../pages/About";
 import { Layout } from "../UI/Layout";
 import { Auth } from "../pages/Auth";
 import { FAQ } from "../pages/FAQ";
+import { Journal } from "../pages/Journal";
 
 export const routes = (
   <Routes>
@@ -12,6 +13,7 @@ export const routes = (
       {/* Route for about page */}
       <Route path="about" element={<About />} />
       <Route path="faq" element={<FAQ />} />
+      <Route path="journal" element={<Journal />} />
       {/* TODO: Import and Add more routes */}
     </Route>
 
