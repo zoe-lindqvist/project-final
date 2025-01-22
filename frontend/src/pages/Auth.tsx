@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 import {
   LogIn,
   UserPlus,
@@ -9,7 +10,6 @@ import {
   Loader2,
   Music2,
 } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
 
 export const Auth: React.FC = () => {
   // State to track if user is signing up or logging in
@@ -24,7 +24,7 @@ export const Auth: React.FC = () => {
   // Hook to navigate to different pages (/journal after successful login)
   const navigate = useNavigate();
 
-  // Function to log the user in using authentication store
+  const register = useAuthStore((state) => state.register);
   const login = useAuthStore((state) => state.login);
 
   // Form submission handler
@@ -37,27 +37,20 @@ export const Auth: React.FC = () => {
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const username = formData.get("username") as string;
 
     try {
-      // Simulated authentication delay
-      // (TO DO: replace with actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (isSignUp) {
+        await register(username, email, password);
+      } else {
+        await login(email, password);
+      }
 
-      // Simulated login function
-      // (TO DO: replace with real authentication)
-      login({
-        id: "1",
-        email,
-        name: email.split("@")[0], // Extracting username from email
-      });
-
-      // Navigate to the journal page after successful login
-      navigate("/journal");
-    } catch (error) {
-      // Set error message if authentication fails
-      setError("Authentication failed. Please try again.");
+      navigate("/journal"); // Navigate after successful login/signup
+    } catch (err: any) {
+      setError(err.message || "Authentication failed. Please try again.");
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 

@@ -3,67 +3,160 @@ import { User } from "../types";
 import { persist } from "zustand/middleware";
 
 interface AuthState {
-  user: User | null; // Holds currently logged-in user or null if not authenticated
-  isAuthenticated: boolean; // Tracks whether user is authenticated
-  users: User[]; // List of users (mocked for demo purposes)
-  following: string[]; // List of user IDs that the current user is following
-  login: (user: User) => void; // Function to log in a user
-  logout: () => void; // Function to log out a user
-  followUser: (userId: string) => void; // Function to follow a user
-  unfollowUser: (userId: string) => void; // Function to unfollow a user
-  searchUsers: (query: string) => User[]; // Function to search for users by name
+  user: User | null;
+  isAuthenticated: boolean;
+  accessToken: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
+  logout: () => void;
 }
 
-// Zustand store with persistence enabled
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
-      // Initial state
+    (set) => ({
       user: null,
       isAuthenticated: false,
-      users: [],
-      following: [],
+      accessToken: null,
 
-      // Function to log in a user
-      login: (user) => {
-        // Mock user data
-        const mockUsers = [
-          { id: "2", email: "elton@rocketman.com", name: "Elton John" },
-          { id: "3", email: "stevie@wonder.com", name: "Stevie Wonder" },
-          { id: "4", email: "taylor@swiftie.com", name: "Taylor Swift" },
-        ];
-        set({ user, isAuthenticated: true, users: mockUsers }); // Update state with logged-inuser and mock users
+      // Login function that interacts with the backend API
+      login: async (email, password) => {
+        try {
+          const response = await fetch(
+            "http://localhost:8080/api/users/login",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Failed to login");
+          }
+
+          set({
+            user: { id: data.id, email: data.email },
+            isAuthenticated: true,
+            accessToken: data.accessToken,
+          });
+
+          // Save token to local storage
+          localStorage.setItem("accessToken", data.accessToken);
+        } catch (error) {
+          throw error;
+        }
       },
 
-      // Function to log out the user
-      logout: () =>
-        set({ user: null, isAuthenticated: false, users: [], following: [] }),
+      // Register function that interacts with the backend API
+      register: async (username, email, password) => {
+        try {
+          const response = await fetch(
+            "http://localhost:8080/api/users/register",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, email, password }),
+            }
+          );
 
-      // Function to follow a user by adding their ID to the following list
-      followUser: (userId) =>
-        set((state) => ({
-          following: [...state.following, userId], // Append the new User ID to the list
-        })),
+          const data = await response.json();
 
-      // Function to unfollow a user by removing their ID from the following list
-      unfollowUser: (userId) =>
-        set((state) => ({
-          following: state.following.filter((id) => id !== userId), // Remove the user ID from the list
-        })),
+          if (!response.ok) {
+            throw new Error(data.message || "Failed to register");
+          }
 
-      // Function to search for users by name
-      searchUsers: (query) => {
-        const state = get(); // Get the current state
-        if (!query.trim()) return []; // If the query is empty, return an empty array
-        return state.users.filter(
-          (user) =>
-            user.name.toLowerCase().includes(query.toLowerCase()) && // Check if name matches query
-            user.id !== state.user?.id // Exclude the current user from the search results
-        );
+          set({
+            user: { id: data.id, email },
+            isAuthenticated: true,
+            accessToken: data.accessToken,
+          });
+
+          localStorage.setItem("accessToken", data.accessToken);
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      // Logout function to clear the state
+      logout: () => {
+        set({ user: null, isAuthenticated: false, accessToken: null });
+        localStorage.removeItem("accessToken");
       },
     }),
     {
-      name: "auth-storage", // Key used for persisting state in local storage
+      name: "auth-storage",
     }
   )
 );
+
+// interface AuthState {
+//   user: User | null; // Holds currently logged-in user or null if not authenticated
+//   isAuthenticated: boolean; // Tracks whether user is authenticated
+//   users: User[]; // List of users (mocked for demo purposes)
+//   following: string[]; // List of user IDs that the current user is following
+//   login: (user: User) => void; // Function to log in a user
+//   logout: () => void; // Function to log out a user
+//   followUser: (userId: string) => void; // Function to follow a user
+//   unfollowUser: (userId: string) => void; // Function to unfollow a user
+//   searchUsers: (query: string) => User[]; // Function to search for users by name
+// }
+
+// // Zustand store with persistence enabled
+// export const useAuthStore = create<AuthState>()(
+//   persist(
+//     (set, get) => ({
+//       // Initial state
+//       user: null,
+//       isAuthenticated: false,
+//       users: [],
+//       following: [],
+
+//       // Function to log in a user
+//       login: (user) => {
+//         // Mock user data
+//         const mockUsers = [
+//           { id: "2", email: "elton@rocketman.com", name: "Elton John" },
+//           { id: "3", email: "stevie@wonder.com", name: "Stevie Wonder" },
+//           { id: "4", email: "taylor@swiftie.com", name: "Taylor Swift" },
+//         ];
+//         set({ user, isAuthenticated: true, users: mockUsers }); // Update state with logged-inuser and mock users
+//       },
+
+//       // Function to log out the user
+//       logout: () =>
+//         set({ user: null, isAuthenticated: false, users: [], following: [] }),
+
+//       // Function to follow a user by adding their ID to the following list
+//       followUser: (userId) =>
+//         set((state) => ({
+//           following: [...state.following, userId], // Append the new User ID to the list
+//         })),
+
+//       // Function to unfollow a user by removing their ID from the following list
+//       unfollowUser: (userId) =>
+//         set((state) => ({
+//           following: state.following.filter((id) => id !== userId), // Remove the user ID from the list
+//         })),
+
+//       // Function to search for users by name
+//       searchUsers: (query) => {
+//         const state = get(); // Get the current state
+//         if (!query.trim()) return []; // If the query is empty, return an empty array
+//         return state.users.filter(
+//           (user) =>
+//             user.name.toLowerCase().includes(query.toLowerCase()) && // Check if name matches query
+//             user.id !== state.user?.id // Exclude the current user from the search results
+//         );
+//       },
+//     }),
+//     {
+//       name: "auth-storage", // Key used for persisting state in local storage
+//     }
+//   )
+// );
