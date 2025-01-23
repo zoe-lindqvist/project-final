@@ -14,8 +14,17 @@ mongoose.Promise = Promise;
 
 const port = process.env.PORT || 8080;
 const app = express();
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // For local development
+      "https://mood-melody.netlify.app", // For deployed frontend
+    ],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Allow cookies and credentials
+  })
+);
 
-app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
