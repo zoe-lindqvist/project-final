@@ -27,6 +27,11 @@ app.use(
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.url}`);
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send("Hello Technigo!");
 });
