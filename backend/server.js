@@ -18,6 +18,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware (add it here)
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.url}`, req.body);
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send("Hello Technigo!");
 });
