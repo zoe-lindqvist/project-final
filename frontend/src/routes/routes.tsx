@@ -5,6 +5,7 @@ import { Layout } from "../UI/Layout";
 import { Auth } from "../pages/Auth";
 import { FAQ } from "../pages/FAQ";
 import { Journal } from "../pages/Journal";
+import { Feed } from "../pages/Feed";
 
 export const routes = (
   <Routes>
@@ -14,7 +15,7 @@ export const routes = (
       <Route path="about" element={<About />} />
       <Route path="faq" element={<FAQ />} />
       <Route path="journal" element={<Journal />} />
-      {/* TODO: Import and Add more routes */}
+      <Route path="feed" element={<Feed />} />
     </Route>
 
     {/* Route for login page */}
