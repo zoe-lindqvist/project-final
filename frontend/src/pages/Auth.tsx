@@ -35,9 +35,9 @@ export const Auth: React.FC = () => {
 
     // Get form data
     const formData = new FormData(e.currentTarget);
+    const username = formData.get("username") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const username = formData.get("username") as string;
 
     try {
       if (isSignUp) {
