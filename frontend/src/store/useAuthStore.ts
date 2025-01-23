@@ -14,6 +14,7 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
 }
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -25,14 +26,11 @@ export const useAuthStore = create<AuthState>()(
       // Login function that interacts with the backend API
       login: async (email, password) => {
         try {
-          const response = await fetch(
-            "http://localhost:8080/api/users/login",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, password }),
-            }
-          );
+          const response = await fetch(`${API_URL}/users/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
 
           const data = await response.json();
 
@@ -56,14 +54,11 @@ export const useAuthStore = create<AuthState>()(
       // Register function that interacts with the backend API
       register: async (username, email, password) => {
         try {
-          const response = await fetch(
-            "http://localhost:8080/api/users/register",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, email, password }),
-            }
-          );
+          const response = await fetch(`${API_URL}/users/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+          });
 
           const data = await response.json();
 

@@ -18,7 +18,7 @@ import TextareaAutosize from "react-textarea-autosize";
 export const Feed: React.FC = () => {
   const { user } = useAuthStore();
   const { entries, toggleLike, addComment } = useMoodStore();
-  const { following, searchUsers } = useAuthStore();
+  // const { following, searchUsers } = useAuthStore();
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
