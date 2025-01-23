@@ -17,14 +17,14 @@ export type Mood = "happy" | "sad" | "relaxed" | "energetic" | "anxious";
 export interface MoodEntry {
   id: string;
   userId: string;
-  userName: string;
+  userName?: string;
   content: string;
   mood: Mood; // Change `string` to `Mood`
   songRecommendation?: {
     title: string;
     artist: string;
-    genre: string;
-    spotifyUrl: string;
+    genre?: string;
+    spotifyUrl?: string;
     previewUrl?: string;
   };
   createdAt: string;
