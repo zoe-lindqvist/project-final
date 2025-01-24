@@ -150,22 +150,6 @@ router.post("/unfollow/:id", authenticateUser, async (req, res) => {
   }
 });
 
-// Get user's feed (posts from followed users)
-router.get("/feed", authenticateUser, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).populate("following");
-    const followingIds = user.following.map((user) => user._id);
-
-    const feedEntries = await Entry.find({ userId: { $in: followingIds } })
-      .sort({ createdAt: -1 }) // Show most recent first
-      .populate("userId", "username");
-
-    res.json(feedEntries);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // Route to get all users
 router.get("/users", async (req, res) => {
   try {

@@ -1,6 +1,9 @@
 import express from "express";
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import Mood from "../models/Mood.js";
+
+import { authenticateUser } from "../middleware/authMiddleware.js";
 
 dotenv.config();
 
@@ -52,6 +55,43 @@ router.post("/analyze", async (req, res) => {
   } catch (error) {
     console.error("Error with OpenAI API:", error);
     res.status(500).json({ error: "Failed to analyze mood" });
+  }
+});
+
+// POST route to add a new mood entry (when user clicks "Share to Feed")
+router.post("/add", authenticateUser, async (req, res) => {
+  try {
+    const { userInput, moodAnalysis, suggestedSong } = req.body;
+
+    if (!userInput || !moodAnalysis || !suggestedSong) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const newMood = new Mood({
+      userId: req.user._id,
+      userInput,
+      moodAnalysis,
+      suggestedSong,
+    });
+
+    await newMood.save();
+    res.status(201).json({ message: "Mood shared successfully!", newMood });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET route to fetch the latest mood entries for the feed
+router.get("/feed", async (req, res) => {
+  try {
+    const moods = await Mood.find()
+      .sort({ createdAt: -1 }) // Show most recent first
+      .limit(20)
+      .populate("userId", "username")
+      .populate("comments.userId", "username");
+    res.json(moods);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

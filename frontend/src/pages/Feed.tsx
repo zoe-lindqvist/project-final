@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Play, Pause, User, Search } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
 export const Feed: React.FC = () => {
   const [entries, setEntries] = useState<any[]>([]); // Store entries from API
-  const [user, setUser] = useState<any>(null); // Replace with actual user context/store if applicable
+  const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
@@ -19,141 +20,162 @@ export const Feed: React.FC = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [following, setFollowing] = useState<string[]>([]); // Store the following list
 
-  // Fetch user details
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchFeed = async () => {
       try {
-        const response = await axios.get("/api/user/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        setUser(response.data.user);
+        const response = await axios.get(
+          "http://localhost:8080/api/moods/feed",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        setFeed(response.data);
       } catch (error) {
-        console.error("Error fetching user:", error);
+        console.error("Error fetching feed:", error);
       }
     };
 
-    fetchUser();
+    fetchFeed();
   }, []);
 
-  // Fetch entries from the API
-  useEffect(() => {
-    const fetchEntries = async () => {
-      try {
-        const response = await axios.get("/api/entries", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        setEntries(response.data);
-      } catch (error) {
-        console.error("Error fetching entries:", error);
-      }
-    };
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         "http://localhost:8080/api/users/profile",
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //           },
+  //         }
+  //       );
+  //       setUser(response.data.user);
+  //     } catch (error) {
+  //       console.error("Error fetching user:", error);
+  //     }
+  //   };
 
-    if (user) fetchEntries();
-  }, [user]);
+  //   fetchUser();
+  // }, []);
 
-  // Fetch the following list from the API
-  useEffect(() => {
-    const fetchFollowing = async () => {
-      try {
-        const response = await axios.get("/api/user/following", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        setFollowing(response.data); // Assuming response.data is an array of user IDs
-      } catch (error) {
-        console.error("Error fetching following list:", error);
-      }
-    };
+  // // Fetch entries from the API
+  // useEffect(() => {
+  //   const fetchEntries = async () => {
+  //     try {
+  //       const response = await axios.get("/api/entries", {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         },
+  //       });
+  //       setEntries(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching entries:", error);
+  //     }
+  //   };
 
-    if (user) fetchFollowing();
-  }, [user]);
+  //   if (user) fetchEntries();
+  // }, [user]);
 
-  // Search users through the API
-  useEffect(() => {
-    const searchUsers = async () => {
-      if (!searchQuery) return setSearchResults([]);
-      try {
-        const response = await axios.get(`/api/users?search=${searchQuery}`);
-        setSearchResults(response.data); // Assuming response.data is an array of users
-      } catch (error) {
-        console.error("Error searching users:", error);
-      }
-    };
+  // // Fetch the following list from the API
+  // useEffect(() => {
+  //   const fetchFollowing = async () => {
+  //     try {
+  //       const response = await axios.get("/api/users/following", {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         },
+  //       });
+  //       setFollowing(response.data); // Assuming response.data is an array of user IDs
+  //     } catch (error) {
+  //       console.error("Error fetching following list:", error);
+  //     }
+  //   };
 
-    searchUsers();
-  }, [searchQuery]);
+  //   if (user) fetchFollowing();
+  // }, [user]);
 
-  const filteredEntries = entries.filter((entry) => {
-    if (showFollowingOnly && !following.includes(entry.userId)) {
-      return false;
-    }
-    if (moodFilter !== "all" && entry.mood !== moodFilter) {
-      return false;
-    }
-    if (
-      genreFilter !== "all" &&
-      entry.songRecommendation?.genre !== genreFilter
-    ) {
-      return false;
-    }
-    return !entry.isPrivate || entry.userId === user?.id;
-  });
+  // // Search users through the API
+  // useEffect(() => {
+  //   const searchUsers = async () => {
+  //     if (!searchQuery) return setSearchResults([]);
+  //     try {
+  //       const response = await axios.get(`/api/users?search=${searchQuery}`);
+  //       setSearchResults(response.data); // Assuming response.data is an array of users
+  //     } catch (error) {
+  //       console.error("Error searching users:", error);
+  //     }
+  //   };
 
-  const handlePlayToggle = (
-    entryId: string,
-    previewUrl: string | undefined
-  ) => {
-    if (!previewUrl) return;
+  //   searchUsers();
+  // }, [searchQuery]);
 
-    if (playingAudio[entryId]) {
-      if (isPlaying[entryId]) {
-        playingAudio[entryId].pause();
-      } else {
-        playingAudio[entryId].play();
-      }
-      setIsPlaying({ ...isPlaying, [entryId]: !isPlaying[entryId] });
-    } else {
-      Object.keys(playingAudio).forEach((key) => playingAudio[key].pause());
-      setIsPlaying(
-        Object.keys(isPlaying).reduce(
-          (acc, key) => ({ ...acc, [key]: false }),
-          {}
-        )
-      );
+  // const filteredEntries = entries.filter((entry) => {
+  //   if (showFollowingOnly && !following.includes(entry.userId)) {
+  //     return false;
+  //   }
+  //   if (moodFilter !== "all" && entry.mood !== moodFilter) {
+  //     return false;
+  //   }
+  //   if (
+  //     genreFilter !== "all" &&
+  //     entry.songRecommendation?.genre !== genreFilter
+  //   ) {
+  //     return false;
+  //   }
+  //   return !entry.isPrivate || entry.userId === user?.id;
+  // });
 
-      const audio = new Audio(previewUrl);
-      audio.addEventListener("ended", () => {
-        setIsPlaying((prev) => ({ ...prev, [entryId]: false }));
-      });
-      audio.play();
-      setPlayingAudio({ ...playingAudio, [entryId]: audio });
-      setIsPlaying({ ...isPlaying, [entryId]: true });
-    }
-  };
+  // const handlePlayToggle = (
+  //   entryId: string,
+  //   previewUrl: string | undefined
+  // ) => {
+  //   if (!previewUrl) return;
 
-  const handleComment = async (entryId: string) => {
-    if (!user || !commentText[entryId]?.trim()) return;
+  //   if (playingAudio[entryId]) {
+  //     if (isPlaying[entryId]) {
+  //       playingAudio[entryId].pause();
+  //     } else {
+  //       playingAudio[entryId].play();
+  //     }
+  //     setIsPlaying({ ...isPlaying, [entryId]: !isPlaying[entryId] });
+  //   } else {
+  //     Object.keys(playingAudio).forEach((key) => playingAudio[key].pause());
+  //     setIsPlaying(
+  //       Object.keys(isPlaying).reduce(
+  //         (acc, key) => ({ ...acc, [key]: false }),
+  //         {}
+  //       )
+  //     );
 
-    try {
-      await axios.post(
-        `/api/entries/${entryId}/comment`,
-        { content: commentText[entryId] },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      setCommentText({ ...commentText, [entryId]: "" });
-    } catch (error) {
-      console.error("Error adding comment:", error);
-    }
-  };
+  //     const audio = new Audio(previewUrl);
+  //     audio.addEventListener("ended", () => {
+  //       setIsPlaying((prev) => ({ ...prev, [entryId]: false }));
+  //     });
+  //     audio.play();
+  //     setPlayingAudio({ ...playingAudio, [entryId]: audio });
+  //     setIsPlaying({ ...isPlaying, [entryId]: true });
+  //   }
+  // };
+
+  // const handleComment = async (entryId: string) => {
+  //   if (!user || !commentText[entryId]?.trim()) return;
+
+  //   try {
+  //     await axios.post(
+  //       `/api/entries/${entryId}/comment`,
+  //       { content: commentText[entryId] },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         },
+  //       }
+  //     );
+  //     setCommentText({ ...commentText, [entryId]: "" });
+  //   } catch (error) {
+  //     console.error("Error adding comment:", error);
+  //   }
+  // };
 
   return (
     <div className="container mx-auto px-4 py-8">

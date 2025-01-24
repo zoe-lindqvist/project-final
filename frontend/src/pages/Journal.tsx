@@ -10,6 +10,7 @@ import {
   Check,
   Sparkles,
 } from "lucide-react";
+import axios from "axios";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Mood } from "../types";
@@ -74,6 +75,42 @@ export const Journal: React.FC = () => {
         audio.play();
       }
       setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleShareToFeed = async () => {
+    if (!content.trim() || !moodSuggestion || !songSuggestion) {
+      alert("Please analyze your mood before sharing.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/moods/add",
+        {
+          userInput: content,
+          moodAnalysis: moodSuggestion,
+          suggestedSong: {
+            title: songSuggestion.title,
+            artist: songSuggestion.artist,
+            genre: songSuggestion.genre,
+            spotifyLink: songSuggestion.spotifyUrl,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        alert("Mood shared successfully!");
+        setContent(""); // Clear input after sharing
+      }
+    } catch (error) {
+      console.error("Error sharing mood:", error);
+      alert("Failed to share mood.");
     }
   };
 
@@ -170,7 +207,10 @@ export const Journal: React.FC = () => {
                     <Check className="h-4 w-4" />
                     <span>Save Entry</span>
                   </button>
-                  <button className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+                  <button
+                    onClick={handleShareToFeed}
+                    className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                  >
                     <Share2 className="h-4 w-4" />
                     <span>Share to Feed</span>
                   </button>
