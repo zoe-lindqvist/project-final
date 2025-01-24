@@ -16,8 +16,6 @@ import { Mood } from "../types";
 
 export const Journal: React.FC = () => {
   const [content, setContent] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const addEntry = useMoodStore((state) => state.addEntry);
   const navigate = useNavigate();
 
@@ -30,7 +28,7 @@ export const Journal: React.FC = () => {
   console.log("Current Song Suggestion:", songSuggestion);
 
   const analyzeContent = async () => {
-    if (!content.trim() || analyzing) return; // Prevent duplicate calls during loading
+    if (!content.trim() || analyzing) return;
     await analyzeMood(content);
   };
 
@@ -52,29 +50,9 @@ export const Journal: React.FC = () => {
       },
     });
 
-    // Reset form
     setContent("");
     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
     navigate("/profile");
-  };
-
-  const togglePlay = () => {
-    if (!songSuggestion?.previewUrl) return;
-
-    if (!audio) {
-      const newAudio = new Audio(songSuggestion.previewUrl);
-      newAudio.addEventListener("ended", () => setIsPlaying(false));
-      setAudio(newAudio);
-      newAudio.play();
-      setIsPlaying(true);
-    } else {
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        audio.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
   };
 
   return (
@@ -147,13 +125,22 @@ export const Journal: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={togglePlay}
-                    className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
-                  >
-                    <Music2 className="h-6 w-6" />
-                  </button>
                 </div>
+
+                {/* Spotify Embedded Player */}
+                {songSuggestion.spotifyUrl && (
+                  <div className="mt-6">
+                    <iframe
+                      src={`https://open.spotify.com/embed/track/${songSuggestion.spotifyUrl
+                        .split("/")
+                        .pop()}`}
+                      className="w-full h-32 rounded-lg shadow-lg"
+                      frameBorder="0"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                )}
 
                 <div className="mt-6 flex items-center space-x-4">
                   <button
@@ -170,6 +157,15 @@ export const Journal: React.FC = () => {
                     <Check className="h-4 w-4" />
                     <span>Save Entry</span>
                   </button>
+                  <a
+                    href={songSuggestion.spotifyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-400 transition-transform transform hover:scale-105 rounded-full text-white px-6 py-2 text-sm font-semibold shadow-md"
+                  >
+                    <Music2 className="h-4 w-4" />
+                    <span>Listen on Spotify</span>
+                  </a>
                   <button className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
                     <Share2 className="h-4 w-4" />
                     <span>Share to Feed</span>
@@ -202,93 +198,23 @@ export const Journal: React.FC = () => {
 
 // export const Journal: React.FC = () => {
 //   const [content, setContent] = useState("");
-//   const [isAnalyzing, setIsAnalyzing] = useState(false);
-//   const [analyzedMood, setAnalyzedMood] = useState<string | null>(null);
-//   const [songRecommendation, setSongRecommendation] = useState<{
-//     title: string;
-//     artist: string;
-//     genre: string;
-//     spotifyUrl: string;
-//     previewUrl: string | null;
-//   } | null>(null);
 //   const [isPlaying, setIsPlaying] = useState(false);
 //   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 //   const addEntry = useMoodStore((state) => state.addEntry);
 //   const navigate = useNavigate();
 
-//   const { analyzeMood, moodSuggestion, songSuggestion, analyzing } =
-//     useMoodStore();
-
-//   console.log("Current Mood Suggestion:", moodSuggestion);
-//   console.log("Current Song Suggestion:", songSuggestion);
+//   const analyzeMood = useMoodStore((state) => state.analyzeMood);
+//   const moodSuggestion = useMoodStore((state) => state.moodSuggestion);
+//   const songSuggestion = useMoodStore((state) => state.songSuggestion);
+//   const analyzing = useMoodStore((state) => state.analyzing);
 
 //   const analyzeContent = async () => {
-//     if (!content.trim()) return;
-
-//     setIsAnalyzing(true);
-//     try {
-//       await analyzeMood(content);
-//     } catch (error) {
-//       console.error("Error analyzing content:", error);
-//     } finally {
-//       setIsAnalyzing(false);
-//     }
+//     if (!content.trim() || analyzing) return; // Prevent duplicate calls during loading
+//     await analyzeMood(content);
 //   };
 
-//   // const analyzeContent = async () => {
-//   //   if (!content.trim()) return;
-
-//   //   setIsAnalyzing(true);
-//   //   setAnalyzedMood(null);
-//   //   setSongRecommendation(null);
-
-//   //   try {
-//   //     // Simulated AI analysis and song recommendation
-//   //     await new Promise((resolve) => setTimeout(resolve, 1500));
-
-//   //     // Mock response - in production, this would come from your AI service
-//   //     const mockMoods = [
-//   //       "energetic",
-//   //       "relaxed",
-//   //       "happy",
-//   //       "contemplative",
-//   //       "melancholic",
-//   //     ];
-//   //     const randomMood =
-//   //       mockMoods[Math.floor(Math.random() * mockMoods.length)];
-//   //     setAnalyzedMood(randomMood);
-
-//   //     // Mock song recommendation - in production, this would come from Spotify API
-//   //     const mockSongs = [
-//   //       {
-//   //         title: "Don't Stop Believin'",
-//   //         artist: "Journey",
-//   //         genre: "Rock",
-//   //         spotifyUrl: "https://open.spotify.com/track/4bHsxqR3GMrXTxEPLuK5ue",
-//   //         previewUrl:
-//   //           "https://p.scdn.co/mp3-preview/4f110e6aa9a7b6c9c71e2f5a9a4d8c48d4c764ed",
-//   //       },
-//   //       {
-//   //         title: "Bohemian Rhapsody",
-//   //         artist: "Queen",
-//   //         genre: "Rock",
-//   //         spotifyUrl: "https://open.spotify.com/track/3z8h0TU7ReDPLIbEnYhWZb",
-//   //         previewUrl:
-//   //           "https://p.scdn.co/mp3-preview/d4e0487e565d3c89f0c66bb5f8c6c3d9ddb4112b",
-//   //       },
-//   //     ];
-//   //     setSongRecommendation(
-//   //       mockSongs[Math.floor(Math.random() * mockSongs.length)]
-//   //     );
-//   //   } catch (error) {
-//   //     console.error("Error analyzing content:", error);
-//   //   } finally {
-//   //     setIsAnalyzing(false);
-//   //   }
-//   // };
-
 //   const handleSave = () => {
-//     const user = useAuthStore.getState().user; // Retrieve user from useAuthStore
+//     const user = useAuthStore.getState().user;
 //     if (!user || !moodSuggestion || !songSuggestion) return;
 
 //     addEntry({
@@ -298,27 +224,24 @@ export const Journal: React.FC = () => {
 //       userId: user.id,
 //       userName: user.name,
 //       songRecommendation: {
-//         title: songSuggestion.title,
-//         artist: songSuggestion.artist,
-//         genre: songSuggestion.genre,
-//         spotifyUrl: songSuggestion.spotifyUrl,
+//         title: songSuggestion.title || "Unknown",
+//         artist: songSuggestion.artist || "Unknown",
+//         genre: songSuggestion.genre || "Unknown",
+//         spotifyUrl: songSuggestion.spotifyUrl || "#",
 //       },
 //     });
 
 //     // Reset form
 //     setContent("");
-//     setAnalyzedMood(null);
-//     setSongRecommendation(null);
-
-//     // Navigate to profile to see the entry
+//     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
 //     navigate("/profile");
 //   };
 
 //   const togglePlay = () => {
-//     if (!songRecommendation?.previewUrl) return;
+//     if (!songSuggestion?.previewUrl) return;
 
 //     if (!audio) {
-//       const newAudio = new Audio(songRecommendation.previewUrl);
+//       const newAudio = new Audio(songSuggestion.previewUrl);
 //       newAudio.addEventListener("ended", () => setIsPlaying(false));
 //       setAudio(newAudio);
 //       newAudio.play();
@@ -331,29 +254,6 @@ export const Journal: React.FC = () => {
 //       }
 //       setIsPlaying(!isPlaying);
 //     }
-//   };
-
-//   const shareToFeed = () => {
-//     const user = useAuthStore.getState().user; // Retrieve user from useAuthStore
-//     if (!user || !analyzedMood || !songRecommendation) return; // Check if user exists
-
-//     addEntry({
-//       content,
-//       mood: analyzedMood as Mood, // Ensure `Mood` type matches
-//       isPrivate: false,
-//       userId: user.id, // Add userId
-//       userName: user.name, // Add userName
-//       songRecommendation: {
-//         title: songRecommendation.title,
-//         artist: songRecommendation.artist,
-//         genre: songRecommendation.genre,
-//         spotifyUrl: songRecommendation.spotifyUrl,
-//       },
-//     });
-
-//     // Reset form and navigate to feed
-//     setContent("");
-//     navigate("/feed");
 //   };
 
 //   return (
@@ -377,10 +277,10 @@ export const Journal: React.FC = () => {
 //         <div className="mt-4 flex justify-end">
 //           <button
 //             onClick={analyzeContent}
-//             disabled={!content.trim() || isAnalyzing}
+//             disabled={!content.trim() || analyzing}
 //             className="inline-flex items-center space-x-2 bg-purple-600 dark:bg-purple-500 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 //           >
-//             {isAnalyzing ? (
+//             {analyzing ? (
 //               <>
 //                 <Loader2 className="h-5 w-5 animate-spin" />
 //                 <span>Analyzing...</span>
@@ -419,9 +319,11 @@ export const Journal: React.FC = () => {
 //                       <p className="text-gray-600 dark:text-gray-300">
 //                         {songSuggestion.artist}
 //                       </p>
-//                       {/* <p className="text-sm text-gray-500 dark:text-gray-400">
-//                         {songSuggestion.genre}
-//                       </p> */}
+//                       {songSuggestion.genre && (
+//                         <p className="text-sm text-gray-500 dark:text-gray-400">
+//                           {songSuggestion.genre}
+//                         </p>
+//                       )}
 //                     </div>
 //                   </div>
 //                   <button
@@ -447,10 +349,7 @@ export const Journal: React.FC = () => {
 //                     <Check className="h-4 w-4" />
 //                     <span>Save Entry</span>
 //                   </button>
-//                   <button
-//                     onClick={shareToFeed}
-//                     className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-//                   >
+//                   <button className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
 //                     <Share2 className="h-4 w-4" />
 //                     <span>Share to Feed</span>
 //                   </button>
