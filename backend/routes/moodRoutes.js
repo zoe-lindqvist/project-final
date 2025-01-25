@@ -24,7 +24,8 @@ router.post("/analyze", async (req, res) => {
         "mood": "<detected mood>",
         "songRecommendation": {
           "title": "<song title>",
-          "artist": "<song artist>"
+          "artist": "<song artist>",
+          "genre": "<song genre>"
         }
       }
 
@@ -50,6 +51,7 @@ router.post("/analyze", async (req, res) => {
       songRecommendation: aiResponse.songRecommendation || {
         title: "Unknown Title",
         artist: "Unknown Artist",
+        genre: "Unknown Genre",
       },
     });
   } catch (error) {
@@ -58,40 +60,69 @@ router.post("/analyze", async (req, res) => {
   }
 });
 
-// POST route to add a new mood entry (when user clicks "Share to Feed")
-router.post("/add", authenticateUser, async (req, res) => {
+// POST route to save a new mood entry without sharing it (when user clicks "Save")
+router.post("/save", authenticateUser, async (req, res) => {
   try {
     const { userInput, moodAnalysis, suggestedSong } = req.body;
 
-    if (!userInput || !moodAnalysis || !suggestedSong) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
-
-    const newMood = new Mood({
+    const moodEntry = new Mood({
       userId: req.user._id,
       userInput,
       moodAnalysis,
       suggestedSong,
+      shared: false, // Save as private
     });
 
-    await newMood.save();
-    res.status(201).json({ message: "Mood shared successfully!", newMood });
+    await moodEntry.save();
+    res.status(201).json({
+      success: true,
+      message: "Mood saved to profile.",
+      mood: moodEntry,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to save mood entry to profile." });
+  }
+});
+
+// POST route to share a new mood entry (when user clicks "Share to feed")
+router.post("/share", authenticateUser, async (req, res) => {
+  try {
+    const { userInput, moodAnalysis, suggestedSong } = req.body;
+
+    const moodEntry = new Mood({
+      userId: req.user._id,
+      userInput,
+      moodAnalysis,
+      suggestedSong,
+      shared: true, // Share to feed
+    });
+
+    await moodEntry.save();
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Mood shared to feed.",
+        mood: moodEntry,
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to share mood entry to feed." });
   }
 });
 
 // GET route to fetch the latest mood entries for the feed
 router.get("/feed", async (req, res) => {
   try {
-    const moods = await Mood.find()
-      .sort({ createdAt: -1 }) // Show most recent first
-      .limit(20)
-      .populate("userId", "username")
-      .populate("comments.userId", "username");
-    res.json(moods);
+    const feedEntries = await Mood.find({ shared: true }).populate(
+      "userId",
+      "username"
+    );
+    res.status(200).json(feedEntries);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching feed:", error);
+    res.status(500).json({ error: "Failed to fetch mood feed." });
   }
 });
 
