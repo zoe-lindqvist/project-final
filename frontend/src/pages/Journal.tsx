@@ -19,7 +19,7 @@ export const Journal: React.FC = () => {
   const [content, setContent] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const addEntry = useMoodStore((state) => state.addEntry);
+  const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
   const navigate = useNavigate();
 
   const analyzeMood = useMoodStore((state) => state.analyzeMood);
@@ -35,17 +35,18 @@ export const Journal: React.FC = () => {
     await analyzeMood(content);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const user = useAuthStore.getState().user;
-    if (!user || !moodSuggestion || !songSuggestion) return;
+    if (!user || !moodSuggestion || !songSuggestion) {
+      alert("Please analyze your mood before saving.");
+      return;
+    }
 
-    addEntry({
-      content,
-      mood: moodSuggestion as Mood,
-      isPrivate: true,
+    await useMoodStore.getState().saveMoodEntry({
       userId: user.id,
-      userName: user.name,
-      songRecommendation: {
+      userInput: content,
+      moodAnalysis: moodSuggestion as Mood,
+      suggestedSong: {
         title: songSuggestion.title || "Unknown",
         artist: songSuggestion.artist || "Unknown",
         genre: songSuggestion.genre || "Unknown",
@@ -53,30 +54,30 @@ export const Journal: React.FC = () => {
       },
     });
 
-    // Reset form
+    // Reset form after saving
     setContent("");
     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
     navigate("/profile");
   };
 
-  const togglePlay = () => {
-    if (!songSuggestion?.previewUrl) return;
+  // const togglePlay = () => {
+  //   if (!songSuggestion?.previewUrl) return;
 
-    if (!audio) {
-      const newAudio = new Audio(songSuggestion.previewUrl);
-      newAudio.addEventListener("ended", () => setIsPlaying(false));
-      setAudio(newAudio);
-      newAudio.play();
-      setIsPlaying(true);
-    } else {
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        audio.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  //   if (!audio) {
+  //     const newAudio = new Audio(songSuggestion.previewUrl);
+  //     newAudio.addEventListener("ended", () => setIsPlaying(false));
+  //     setAudio(newAudio);
+  //     newAudio.play();
+  //     setIsPlaying(true);
+  //   } else {
+  //     if (isPlaying) {
+  //       audio.pause();
+  //     } else {
+  //       audio.play();
+  //     }
+  //     setIsPlaying(!isPlaying);
+  //   }
+  // };
 
   const handleShareToFeed = async () => {
     if (!content.trim() || !moodSuggestion || !songSuggestion) {
@@ -86,7 +87,7 @@ export const Journal: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/moods/add",
+        "http://localhost:8080/api/moods/share",
         {
           userInput: content,
           moodAnalysis: moodSuggestion,
@@ -94,7 +95,7 @@ export const Journal: React.FC = () => {
             title: songSuggestion.title,
             artist: songSuggestion.artist,
             genre: songSuggestion.genre,
-            spotifyLink: songSuggestion.spotifyUrl,
+            spotifyLink: songSuggestion.spotifyUrl || "#",
           },
         },
         {
@@ -112,6 +113,8 @@ export const Journal: React.FC = () => {
       console.error("Error sharing mood:", error);
       alert("Failed to share mood.");
     }
+
+    navigate("/feed");
   };
 
   return (
@@ -184,12 +187,13 @@ export const Journal: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <button
+
+                  {/* <button
                     onClick={togglePlay}
                     className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
                   >
                     <Music2 className="h-6 w-6" />
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className="mt-6 flex items-center space-x-4">

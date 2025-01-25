@@ -99,16 +99,18 @@ router.post("/share", authenticateUser, async (req, res) => {
     });
 
     await moodEntry.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Mood shared to feed.",
-        mood: moodEntry,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Mood shared to feed.",
+      mood: moodEntry,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
-    res.status(500).json({ error: "Failed to share mood entry to feed." });
+    console.error("Error sharing mood:", error);
+    if (!res.headersSent) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
   }
 });
 
