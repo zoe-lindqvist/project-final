@@ -117,10 +117,10 @@ router.post("/share", authenticateUser, async (req, res) => {
 // GET route to fetch the latest mood entries for the feed
 router.get("/feed", async (req, res) => {
   try {
-    const feedEntries = await Mood.find({ shared: true }).populate(
-      "userId",
-      "username"
-    );
+    const feedEntries = await Mood.find({ shared: true })
+      .populate("userId", "username")
+      .sort({ createdAt: -1 });
+
     res.status(200).json(feedEntries);
   } catch (error) {
     console.error("Error fetching feed:", error);

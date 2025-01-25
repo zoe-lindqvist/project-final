@@ -27,11 +27,14 @@ export const Feed: React.FC = () => {
           "http://localhost:8080/api/moods/feed",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${
+                accessToken || localStorage.getItem("accessToken")
+              }`,
             },
           }
         );
-        setFeed(response.data);
+
+        setEntries(response.data);
       } catch (error) {
         console.error("Error fetching feed:", error);
       }
@@ -177,6 +180,13 @@ export const Feed: React.FC = () => {
   //   }
   // };
 
+  const filteredEntries = entries.filter((entry) => {
+    if (moodFilter !== "all" && entry.moodAnalysis !== moodFilter) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Search and Filter Bar */}
@@ -237,32 +247,54 @@ export const Feed: React.FC = () => {
 
       {/* Feed Entries */}
       <div className="space-y-6">
-        {filteredEntries.map((entry) => (
-          <div
-            key={entry.id}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <Link
-                to={`/profile/${entry.userId}`}
-                className="flex items-center space-x-3 group"
-              >
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
-                  <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">
-                    {entry.userName}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(entry.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </Link>
+        {entries.length > 0 ? (
+          entries.map((entry) => (
+            <div
+              key={entry._id}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <Link
+                  to={`/profile/${entry.userId._id}`}
+                  className="flex items-center space-x-3 group"
+                >
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale.110">
+                    <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                      {entry.userId.username || "Unknown User"}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(entry.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize">
+                  {entry.moodAnalysis}
+                </span>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {entry.userInput}
+              </p>
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between"></div>
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  {entry.suggestedSong.title}
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {entry.suggestedSong.artist}
+                </p>
+              </div>
             </div>
-            <p className="text-gray-600 dark:text-gray-300">{entry.content}</p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-center text-gray-600 dark:text-gray-400">
+            No moods shared yet.
+          </p>
+        )}
       </div>
     </div>
   );
