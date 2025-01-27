@@ -5,8 +5,18 @@ import type { MoodEntry } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
+interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt: string;
+}
+
 interface MoodState {
   entries: MoodEntry[];
+  badges: Badge[];
+  streak: number;
   analyzing: boolean;
   moodSuggestion: string | null;
   songSuggestion: {
@@ -19,15 +29,20 @@ interface MoodState {
   saveMoodEntry: (
     entry: Omit<MoodEntry, "id" | "createdAt" | "likes" | "comments">
   ) => Promise<void>;
+  unlockBadge: (badge: Badge) => void; // Add this to dynamically unlock badges
+  fetchBadges: () => Promise<void>; // Add this for fetching badges
+  getMoodStats: (days: number) => { [key: string]: number };
 }
 
 export const useMoodStore = create<MoodState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       entries: [],
+      streak: 0, // Initialize streak here
       analyzing: false,
       moodSuggestion: null,
       songSuggestion: null,
+      badges: [], // Initialize badges here
 
       // Analyze mood by calling the backend API
       analyzeMood: async (userInput: string) => {
@@ -111,6 +126,58 @@ export const useMoodStore = create<MoodState>()(
         } catch (error) {
           console.error("Error saving mood entry:", error);
         }
+      },
+
+      // Unlock a new badge dynamically
+      unlockBadge: (badge) =>
+        set((state) => ({
+          badges: [...state.badges, badge],
+        })),
+
+      // Fetch badges from the backend API
+      fetchBadges: async () => {
+        try {
+          const response = await fetch(`${API_URL}/badges`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch badges.");
+          }
+          const data = await response.json();
+          set({ badges: data });
+        } catch (error) {
+          console.error("Error fetching badges:", error);
+        }
+      },
+
+      getMoodStats: (days: number) => {
+        const entries = get().entries; // Access the current entries
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+
+        // Filter entries from the last `days`
+        const recentEntries = entries.filter(
+          (entry) => new Date(entry.createdAt) >= cutoffDate
+        );
+
+        // Count occurrences of each mood
+        const moodCounts = recentEntries.reduce((acc, entry) => {
+          acc[entry.mood] = (acc[entry.mood] || 0) + 1;
+          return acc;
+        }, {} as { [key: string]: number });
+
+        const totalEntries = recentEntries.length;
+
+        if (totalEntries === 0) {
+          return {}; // Return an empty object if there are no entries
+        }
+
+        // Calculate percentages for each mood
+        Object.keys(moodCounts).forEach((mood) => {
+          moodCounts[mood] = Math.round(
+            (moodCounts[mood] / totalEntries) * 100
+          );
+        });
+
+        return moodCounts;
       },
     }),
     {

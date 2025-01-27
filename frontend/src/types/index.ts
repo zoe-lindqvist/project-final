@@ -18,6 +18,9 @@ export interface MoodEntry {
   id: string;
   userId: string;
   userInput: string;
+  mood: string; // Add this property
+  isPrivate: boolean; // For privacy setting
+  content: string; // Assuming content is the journal entry text
   moodAnalysis: string;
   suggestedSong: {
     title: string;
@@ -27,6 +30,7 @@ export interface MoodEntry {
     previewUrl?: string;
   };
   createdAt: string;
+
   likes: string[];
   comments: Comment[];
 }
