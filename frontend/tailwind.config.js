@@ -4,48 +4,64 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
-      colors: {
-        primary: {
-          light: "#a855f7", // Used for hover or lighter accents
-          DEFAULT: "#9333ea", // Main purple
-          dark: "#7e22ce", // Darker variant for strong emphasis
-        },
-        secondary: {
-          light: "#3b82f6", // Used for lighter blue accents
-          DEFAULT: "#2563eb", // Main blue
-          dark: "#1d4ed8", // Darker blue for emphasis
-        },
-        accent: {
-          light: "#f43f5e", // Used for lighter red/pink accents
-          DEFAULT: "#e11d48", // Main red/pink
-          dark: "#be123c", // Darker red/pink
-        },
-        background: {
-          light: "#f8fafc", // Light background color
-          dark: "#1e293b", // Dark background color for dark mode
-        },
-        text: {
-          light: "#1f2937", // Light text color
-          dark: "#f8fafc", // Light text for dark mode
+      keyframes: {
+        "bounce-slow": {
+          "0%, 100%": {
+            transform: "translateY(-10%)",
+            animationTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+          },
+          "50%": {
+            transform: "translateY(0)",
+            animationTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)",
+          },
         },
       },
-
-      // Define custom animations
       animation: {
-        "bounce-slow": "bounce 3s infinite", // Slow bouncing animation
+        "bounce-slow": "bounce-slow 3s infinite",
+      },
+      colors: {
+        // Purple shades used in the Logo
+        primary: {
+          light: "#e9d5ff", // Matches purple-100
+          DEFAULT: "#a855f7", // Matches purple-400
+          dark: "#7e22ce", // Matches purple-900
+          accent: "#9333ea", // Matches purple-600
+          dim: "#c084fc", // Custom color for dark:text-purple-400
+        },
+
+        // Blue shades used in the Logo
+        secondary: {
+          light: "#dbeafe", // Matches blue-100
+          DEFAULT: "#60a5fa", // Matches blue-400
+          dark: "#1e3a8a", // Matches blue-900
+          accent: "#2563eb", // Matches blue-600
+        },
+
+        // Gray text colors used in the Logo
+        text: {
+          light: "#111827", // Matches gray-900
+          dark: "#9ca3af", // Matches gray-400
+        },
       },
 
-      // Define custom gradients
+      // Custom background gradients for Logo effects
       backgroundImage: {
-        "hero-light":
-          "radial-gradient(circle, rgba(167,85,247,0.3) 0%, rgba(59,130,246,0.3) 100%)",
-        "hero-dark":
-          "radial-gradient(circle, rgba(126,34,206,0.3) 0%, rgba(29,78,216,0.3) 100%)",
-        "secondary-light": "linear-gradient(to right, #a855f7, #3b82f6)",
-        "secondary-dark": "linear-gradient(to right, #7e22ce, #1d4ed8)",
+        // Glow effect behind the icon
+        "logo-glow-light":
+          "linear-gradient(to right, rgba(168, 85, 247, 0.3), rgba(96, 165, 250, 0.3))", // purple-400/30 to blue-400/30
+        "logo-glow-dark":
+          "linear-gradient(to right, rgba(168, 85, 247, 0.2), rgba(96, 165, 250, 0.2))", // purple-400/20 to blue-400/20
+
+        // Icon background gradient
+        "logo-icon-light": "linear-gradient(to right, #e9d5ff, #dbeafe)", // purple-100 to blue-100
+        "logo-icon-dark":
+          "linear-gradient(to right, rgba(126, 34, 206, 0.5), rgba(30, 64, 175, 0.5))", // purple-900/50 to blue-900/50
+
+        // Text gradient
+        "logo-text-light": "linear-gradient(to right, #9333ea, #2563eb)", // purple-600 to blue-600
+        "logo-text-dark": "linear-gradient(to right, #a855f7, #60a5fa)", // purple-400 to blue-400
       },
     },
   },
-
   plugins: [],
 };
