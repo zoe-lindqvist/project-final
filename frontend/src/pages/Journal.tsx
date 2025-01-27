@@ -23,8 +23,8 @@ export const Journal: React.FC = () => {
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
 
-  // Dev branch 
-  const addEntry = useMoodStore((state) => state.addEntry);
+  // Dev branch
+  // const addEntry = useMoodStore((state) => state.addEntry);
 
   const navigate = useNavigate();
 
@@ -40,9 +40,8 @@ export const Journal: React.FC = () => {
     await analyzeMood(content);
   };
 
-
   const handleSave = async () => {
-  // Function to save the journal entry to the store
+    // Function to save the journal entry to the store
 
     const user = useAuthStore.getState().user;
     if (!user || !moodSuggestion || !songSuggestion) {
@@ -124,12 +123,11 @@ export const Journal: React.FC = () => {
 
     navigate("/feed");
 
-// Dev branch
-//     // Reset input and state after saving
-//     setContent("");
-//     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
-//     navigate("/profile"); // Redirect to profile page
-
+    // Dev branch
+    //     // Reset input and state after saving
+    //     setContent("");
+    //     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
+    //     navigate("/profile"); // Redirect to profile page
   };
 
   return (
@@ -251,12 +249,11 @@ export const Journal: React.FC = () => {
 
                   <button
                     onClick={handleShareToFeed}
-                    className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
-
+                    className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                  >
                     <Share2 className="h-4 w-4" />
                     <span>Share to Feed</span>
                   </button>
-                    
                 </div>
               </div>
             )}

@@ -116,19 +116,19 @@ router.post("/analyze", async (req, res) => {
     // Send the final response back to the client
     res.json({
       mood: aiResponse.mood,
-      
-// Fix/feed branch code
-//       songRecommendation: aiResponse.songRecommendation || {
-//         title: "Unknown Title",
-//         artist: "Unknown Artist",
-//         genre: "Unknown Genre",
 
-      songRecommendation: spotifyTrack || {
-        title: aiResponse.songRecommendation.title,
-        artist: aiResponse.songRecommendation.artist,
-        spotifyUrl: "#", // Default link if track isn't found
-        previewUrl: null,
-
+      songRecommendation: {
+        title:
+          spotifyTrack?.title ||
+          aiResponse.songRecommendation.title ||
+          "Unknown Title",
+        artist:
+          spotifyTrack?.artist ||
+          aiResponse.songRecommendation.artist ||
+          "Unknown Artist",
+        genre: aiResponse.songRecommendation.genre || "Unknown Genre", // Always use AI genre
+        spotifyUrl: spotifyTrack?.spotifyUrl || "#", // Default link if Spotify track isn't found
+        previewUrl: spotifyTrack?.previewUrl || null, // Use Spotify preview if available
       },
     });
   } catch (error) {
