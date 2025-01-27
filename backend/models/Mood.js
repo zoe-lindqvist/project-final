@@ -51,6 +51,10 @@ const MoodSchema = new mongoose.Schema({
       required: true,
     },
   },
+  shared: {
+    type: Boolean,
+    default: false, // False means private, true means shared to feed
+  },
   // Timestamps
   createdAt: {
     type: Date,

@@ -10,6 +10,7 @@ import {
   Check,
   Sparkles,
 } from "lucide-react";
+import axios from "axios";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Mood } from "../types";
@@ -17,7 +18,14 @@ import { Mood } from "../types";
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
   const [content, setContent] = useState("");
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
+
+  // Dev branch 
   const addEntry = useMoodStore((state) => state.addEntry);
+
   const navigate = useNavigate();
 
   // Zustand store functions for analyzing mood and fetching suggestions
@@ -32,19 +40,21 @@ export const Journal: React.FC = () => {
     await analyzeMood(content);
   };
 
-  // Function to save the journal entry to the store
-  const handleSave = () => {
-    const user = useAuthStore.getState().user;
-    if (!user || !moodSuggestion || !songSuggestion) return;
 
-    // Create and save journal entry with mood and song suggestion
-    addEntry({
-      content,
-      mood: moodSuggestion as Mood,
-      isPrivate: true,
+  const handleSave = async () => {
+  // Function to save the journal entry to the store
+
+    const user = useAuthStore.getState().user;
+    if (!user || !moodSuggestion || !songSuggestion) {
+      alert("Please analyze your mood before saving.");
+      return;
+    }
+
+    await useMoodStore.getState().saveMoodEntry({
       userId: user.id,
-      userName: user.name,
-      songRecommendation: {
+      userInput: content,
+      moodAnalysis: moodSuggestion as Mood,
+      suggestedSong: {
         title: songSuggestion.title || "Unknown",
         artist: songSuggestion.artist || "Unknown",
         genre: songSuggestion.genre || "Unknown",
@@ -52,10 +62,74 @@ export const Journal: React.FC = () => {
       },
     });
 
-    // Reset input and state after saving
+    // Reset form after saving
     setContent("");
     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
-    navigate("/profile"); // Redirect to profile page
+    navigate("/profile");
+  };
+
+  // const togglePlay = () => {
+  //   if (!songSuggestion?.previewUrl) return;
+
+  //   if (!audio) {
+  //     const newAudio = new Audio(songSuggestion.previewUrl);
+  //     newAudio.addEventListener("ended", () => setIsPlaying(false));
+  //     setAudio(newAudio);
+  //     newAudio.play();
+  //     setIsPlaying(true);
+  //   } else {
+  //     if (isPlaying) {
+  //       audio.pause();
+  //     } else {
+  //       audio.play();
+  //     }
+  //     setIsPlaying(!isPlaying);
+  //   }
+  // };
+
+  const handleShareToFeed = async () => {
+    if (!content.trim() || !moodSuggestion || !songSuggestion) {
+      alert("Please analyze your mood before sharing.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/moods/share",
+        {
+          userInput: content,
+          moodAnalysis: moodSuggestion,
+          suggestedSong: {
+            title: songSuggestion.title,
+            artist: songSuggestion.artist,
+            genre: songSuggestion.genre,
+            spotifyLink: songSuggestion.spotifyUrl || "#",
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        alert("Mood shared successfully!");
+        setContent(""); // Clear input after sharing
+      }
+    } catch (error) {
+      console.error("Error sharing mood:", error);
+      alert("Failed to share mood.");
+    }
+
+    navigate("/feed");
+
+// Dev branch
+//     // Reset input and state after saving
+//     setContent("");
+//     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
+//     navigate("/profile"); // Redirect to profile page
+
   };
 
   return (
@@ -165,7 +239,6 @@ export const Journal: React.FC = () => {
                     <Check className="h-4 w-4" />
                     <span>Save Entry</span>
                   </button>
-
                   <a
                     href={songSuggestion.spotifyUrl}
                     target="_blank"
@@ -176,10 +249,14 @@ export const Journal: React.FC = () => {
                     <span>Listen on Spotify</span>
                   </a>
 
-                  <button className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+                  <button
+                    onClick={handleShareToFeed}
+                    className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+
                     <Share2 className="h-4 w-4" />
                     <span>Share to Feed</span>
                   </button>
+                    
                 </div>
               </div>
             )}

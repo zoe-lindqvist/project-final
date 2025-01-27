@@ -17,10 +17,9 @@ export type Mood = "happy" | "sad" | "relaxed" | "energetic" | "anxious";
 export interface MoodEntry {
   id: string;
   userId: string;
-  userName?: string;
-  content: string;
-  mood: Mood; // Change `string` to `Mood`
-  songRecommendation?: {
+  userInput: string;
+  moodAnalysis: string;
+  suggestedSong: {
     title: string;
     artist: string;
     genre?: string;
@@ -30,5 +29,22 @@ export interface MoodEntry {
   createdAt: string;
   likes: string[];
   comments: Comment[];
-  isPrivate: boolean;
 }
+
+// export interface MoodEntry {
+//   id: string;
+//   userId: string;
+//   userName?: string;
+//   content: string;
+//   mood: Mood; // Change `string` to `Mood`
+//   songRecommendation?: {
+//     title: string;
+//     artist: string;
+//     genre?: string;
+//     spotifyUrl?: string;
+//   };
+//   createdAt: string;
+//   likes: string[];
+//   comments: Comment[];
+//   isPrivate: boolean;
+// }

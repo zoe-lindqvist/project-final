@@ -20,6 +20,18 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: () => crypto.randomBytes(128).toString("hex"),
   },
+  following: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // References other users they are following
+    },
+  ],
+  followers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // References users who follow them
+    },
+  ],
 });
 
 const User = mongoose.model("User", UserSchema);

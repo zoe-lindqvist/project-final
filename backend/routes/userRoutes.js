@@ -80,6 +80,76 @@ router.get("/profile", authenticateUser, (req, res) => {
   });
 });
 
+// Get a user profile by ID
+router.get("/users/:id", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      following: user.following,
+      followers: user.followers,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching user profile" });
+  }
+});
+
+// Follow a user
+router.post("/follow/:id", authenticateUser, async (req, res) => {
+  try {
+    const userToFollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!userToFollow || !currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Prevent duplicate follow
+    if (!currentUser.following.includes(userToFollow._id)) {
+      currentUser.following.push(userToFollow._id);
+      userToFollow.followers.push(currentUser._id);
+      await currentUser.save();
+      await userToFollow.save();
+      res.json({ message: `You are now following ${userToFollow.username}` });
+    } else {
+      res.status(400).json({ message: "Already following this user" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Unfollow a user
+router.post("/unfollow/:id", authenticateUser, async (req, res) => {
+  try {
+    const userToUnfollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!userToUnfollow || !currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Remove from following and followers lists
+    currentUser.following = currentUser.following.filter(
+      (id) => id.toString() !== userToUnfollow._id.toString()
+    );
+    userToUnfollow.followers = userToUnfollow.followers.filter(
+      (id) => id.toString() !== currentUser._id.toString()
+    );
+
+    await currentUser.save();
+    await userToUnfollow.save();
+    res.json({ message: `You have unfollowed ${userToUnfollow.username}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Route to get all users
 router.get("/users", async (req, res) => {
   try {
