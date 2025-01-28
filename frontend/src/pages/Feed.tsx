@@ -24,7 +24,7 @@ export const Feed: React.FC = () => {
     const fetchFeed = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/moods/feed",
+          "https://project-final-fo1y.onrender.com/api/moods/feed", // add render
           {
             headers: {
               Authorization: `Bearer ${

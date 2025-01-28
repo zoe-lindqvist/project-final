@@ -94,7 +94,7 @@ export const Journal: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/moods/share",
+        "https://project-final-fo1y.onrender.com/api/moods/share",
         {
           userInput: content,
           moodAnalysis: moodSuggestion,
