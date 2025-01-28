@@ -34,6 +34,7 @@ interface MoodState {
   unlockBadge: (badge: Badge) => void; // Add this to dynamically unlock badges
   fetchBadges: () => Promise<void>; // Add this for fetching badges
   getMoodStats: (days: number) => { [key: string]: number };
+  getUserEntries: (userId: string) => Promise<void>;
 }
 
 export const useMoodStore = create<MoodState>()(
@@ -132,6 +133,31 @@ export const useMoodStore = create<MoodState>()(
           }));
         } catch (error) {
           console.error("Error saving mood entry:", error);
+        }
+      },
+
+      getUserEntries: async (userId: string) => {
+        const token =
+          useAuthStore.getState().accessToken ||
+          localStorage.getItem("accessToken");
+
+        try {
+          const response = await fetch(`${API_URL}/moods/profile/${userId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch moods.");
+          }
+
+          const data = await response.json(); // Parse the JSON response
+          set({ entries: data }); // Update the Zustand store with the fetched moods
+        } catch (error) {
+          console.error("Error fetching moods:", error);
         }
       },
 

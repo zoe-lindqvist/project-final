@@ -81,23 +81,23 @@ router.get("/profile", authenticateUser, (req, res) => {
 });
 
 // Get a user profile by ID
-router.get("/users/:id", authenticateUser, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json({
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      following: user.following,
-      followers: user.followers,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Error fetching user profile" });
-  }
-});
+// router.get("/users/:id", authenticateUser, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.id).select("-password");
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     res.json({
+//       id: user._id,
+//       username: user.username,
+//       email: user.email,
+//       following: user.following,
+//       followers: user.followers,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: "Error fetching user profile" });
+//   }
+// });
 
 // Follow a user
 router.post("/follow/:id", authenticateUser, async (req, res) => {

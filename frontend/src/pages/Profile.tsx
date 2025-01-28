@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Award, Calendar, Music, Play, Pause } from "lucide-react";
 
 export const Profile: React.FC = () => {
   const { user } = useAuthStore();
-  const { entries, badges, streak, getMoodStats } = useMoodStore();
+  const { entries, badges, streak, getMoodStats, getUserEntries } =
+    useMoodStore();
   const weeklyStats = getMoodStats(7);
 
+  useEffect(() => {
+    if (user?.id) {
+      getUserEntries(user.id); // Fetch mood entries for the logged-in user
+    }
+  }, [user, getUserEntries]);
+
   // Filter entries to show only the logged-in user's entries
-  const personalEntries = entries.filter((entry) => entry.userId === user?.id);
+  // const personalEntries = entries.filter((entry) => entry.userId === user?.id);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -34,7 +41,7 @@ export const Profile: React.FC = () => {
             </h3>
           </div>
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-            {personalEntries.length}
+            {entries.length}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
@@ -83,7 +90,7 @@ export const Profile: React.FC = () => {
           My Journal Entries
         </h3>
         <div className="space-y-6">
-          {personalEntries.map((entry) => (
+          {entries.map((entry) => (
             <div
               key={entry.id}
               className="border-b border-gray-100 dark:border-gray-700 last:border-0 pb-6 last:pb-0"
