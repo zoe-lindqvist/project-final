@@ -8,7 +8,7 @@ export interface User {
 export interface Comment {
   id: string;
   userId: string;
-  userName: string;
+  username: string;
   content: string;
   createdAt: string;
 }
@@ -35,20 +35,7 @@ export interface MoodEntry {
   comments: Comment[];
 }
 
-// export interface MoodEntry {
-//   id: string;
-//   userId: string;
-//   userName?: string;
-//   content: string;
-//   mood: Mood; // Change `string` to `Mood`
-//   songRecommendation?: {
-//     title: string;
-//     artist: string;
-//     genre?: string;
-//     spotifyUrl?: string;
-//   };
-//   createdAt: string;
-//   likes: string[];
-//   comments: Comment[];
-//   isPrivate: boolean;
-// }
+export interface SearchResult {
+  id: string;
+  userName: string;
+}
