@@ -13,14 +13,13 @@ import {
 import axios from "axios";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { Mood } from "../types";
+import { MoodCategory } from "../types";
+import { mapToCategory } from "../utils/moodUtils";
 
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
   const [content, setContent] = useState("");
 
-  // const [isPlaying, setIsPlaying] = useState(false);
-  // const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
 
   // Dev branch
@@ -35,8 +34,12 @@ export const Journal: React.FC = () => {
   const analyzing = useMoodStore((state) => state.analyzing);
 
   // Function to analyze user's input
-  const analyzeContent = async () => {
-    if (!content.trim() || analyzing) return; // Prevent empty input or duplicate requests
+  // const analyzeContent = async () => {
+  //   if (!content.trim() || analyzing) return; // Prevent empty input or duplicate requests
+  //   await analyzeMood(content);
+  // };
+
+  const handleAnalyze = async () => {
     await analyzeMood(content);
   };
 
@@ -55,6 +58,7 @@ export const Journal: React.FC = () => {
       moodAnalysis: moodSuggestion,
       mood: moodSuggestion,
       content: content,
+      category: mapToCategory(moodSuggestion),
 
       shared: false,
 
@@ -72,25 +76,6 @@ export const Journal: React.FC = () => {
     navigate("/profile");
   };
 
-  // const togglePlay = () => {
-  //   if (!songSuggestion?.previewUrl) return;
-
-  //   if (!audio) {
-  //     const newAudio = new Audio(songSuggestion.previewUrl);
-  //     newAudio.addEventListener("ended", () => setIsPlaying(false));
-  //     setAudio(newAudio);
-  //     newAudio.play();
-  //     setIsPlaying(true);
-  //   } else {
-  //     if (isPlaying) {
-  //       audio.pause();
-  //     } else {
-  //       audio.play();
-  //     }
-  //     setIsPlaying(!isPlaying);
-  //   }
-  // };
-
   const handleShareToFeed = async () => {
     if (!content.trim() || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before sharing.");
@@ -103,6 +88,8 @@ export const Journal: React.FC = () => {
         {
           userInput: content,
           moodAnalysis: moodSuggestion,
+          category: mapToCategory(moodSuggestion),
+          shared: true,
           suggestedSong: {
             title: songSuggestion.title,
             artist: songSuggestion.artist,
@@ -121,12 +108,14 @@ export const Journal: React.FC = () => {
         alert("Mood shared successfully!");
         setContent(""); // Clear input after sharing
       }
+      const sharedMoodEntry = response.data;
+      useMoodStore.getState().saveMoodEntry(sharedMoodEntry);
+
+      navigate("/feed");
     } catch (error) {
       console.error("Error sharing mood:", error);
       alert("Failed to share mood.");
     }
-
-    navigate("/feed");
 
     // Dev branch
     //     // Reset input and state after saving
@@ -158,7 +147,7 @@ export const Journal: React.FC = () => {
         {/* Analyze Mood Button */}
         <div className="mt-4 flex justify-end">
           <button
-            onClick={analyzeContent}
+            onClick={handleAnalyze}
             disabled={!content.trim() || analyzing}
             className="inline-flex items-center space-x-2 bg-purple-600 dark:bg-purple-500 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -228,7 +217,7 @@ export const Journal: React.FC = () => {
                 {/* Action Buttons */}
                 <div className="mt-6 flex items-center space-x-4">
                   <button
-                    onClick={analyzeContent}
+                    onClick={handleAnalyze}
                     className="inline-flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   >
                     <RefreshCcw className="h-4 w-4" />

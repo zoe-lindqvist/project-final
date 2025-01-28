@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useAuthStore } from "./useAuthStore";
 import type { MoodEntry } from "../types";
+import { mapToCategory } from "../utils/moodUtils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -25,6 +26,7 @@ interface MoodState {
     genre?: string;
     spotifyUrl?: string;
   } | null;
+
   analyzeMood: (userInput: string) => Promise<void>;
   saveMoodEntry: (
     entry: Omit<MoodEntry, "id" | "createdAt" | "likes" | "comments">
@@ -46,6 +48,8 @@ export const useMoodStore = create<MoodState>()(
 
       // Analyze mood by calling the backend API
       analyzeMood: async (userInput: string) => {
+        if (!userInput.trim() || get().analyzing) return; // Prevent invalid input or duplicate requests
+
         set({ analyzing: true });
 
         try {
@@ -91,6 +95,8 @@ export const useMoodStore = create<MoodState>()(
             useAuthStore.getState().accessToken ||
             localStorage.getItem("accessToken");
 
+          const category = mapToCategory(entry.moodAnalysis);
+
           console.log("Authorization Header:", `Bearer ${token}`);
 
           const response = await fetch(`${API_URL}/moods/save`, {
@@ -119,6 +125,7 @@ export const useMoodStore = create<MoodState>()(
 
           const savedEntry = await response.json();
           console.log("Saved Entry:", savedEntry);
+          console.log("Mapped Category:", category);
 
           set((state) => ({
             entries: [savedEntry.mood, ...state.entries],

@@ -94,7 +94,7 @@ export const Profile: React.FC = () => {
                     {new Date(entry.createdAt).toLocaleDateString()}
                   </p>
                   <span className="inline-block px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize mt-2">
-                    {entry.mood}
+                    {entry.moodAnalysis}
                   </span>
                 </div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">

@@ -77,7 +77,8 @@ router.post("/analyze", async (req, res) => {
     // Construct the AI prompt to analyze the mood and suggest a song
     const prompt = `
       Analyze the following user input and provide a unique and creative song suggestion each time. 
-      Provide songs from different genres and artists that fit within the given mood.
+      Ensure the recommendations vary by genre, artist, and style to avoid repetition. 
+      Provide lesser-known or unexpected suggestions alongside popular ones, focusing on the given mood.
       Format the response as follows: 
       {
         "mood": "<detected mood>",
