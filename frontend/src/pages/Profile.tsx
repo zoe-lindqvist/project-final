@@ -98,7 +98,7 @@ export const Profile: React.FC = () => {
                   </span>
                 </div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {entry.isPrivate ? "Private" : "Public"}
+                  {entry.shared ? "Private" : "Public"}
                 </span>
               </div>
 

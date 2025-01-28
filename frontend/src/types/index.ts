@@ -19,7 +19,7 @@ export interface MoodEntry {
   userId: string;
   userInput: string;
   mood: string; // Add this property
-  isPrivate: boolean; // For privacy setting
+  shared: false; // For privacy setting
   content: string; // Assuming content is the journal entry text
   moodAnalysis: string;
   suggestedSong: {

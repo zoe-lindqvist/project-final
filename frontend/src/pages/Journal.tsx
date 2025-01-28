@@ -19,8 +19,8 @@ export const Journal: React.FC = () => {
   // State to store user input in the textarea
   const [content, setContent] = useState("");
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  // const [isPlaying, setIsPlaying] = useState(false);
+  // const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
 
   // Dev branch
@@ -52,7 +52,12 @@ export const Journal: React.FC = () => {
     await useMoodStore.getState().saveMoodEntry({
       userId: user.id,
       userInput: content,
-      moodAnalysis: moodSuggestion as Mood,
+      moodAnalysis: moodSuggestion,
+      mood: moodSuggestion,
+      content: content,
+
+      shared: false,
+
       suggestedSong: {
         title: songSuggestion.title || "Unknown",
         artist: songSuggestion.artist || "Unknown",

@@ -140,7 +140,7 @@ router.post("/analyze", async (req, res) => {
 // POST route to save a new mood entry without sharing it (when user clicks "Save")
 router.post("/save", authenticateUser, async (req, res) => {
   try {
-    const { userInput, moodAnalysis, suggestedSong } = req.body;
+    const { userInput, moodAnalysis, suggestedSong, shared } = req.body;
 
     const moodEntry = new Mood({
       userId: req.user._id,
