@@ -110,7 +110,7 @@ export const Profile: React.FC = () => {
               </div>
 
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {entry.content}
+                {entry.userInput}
               </p>
 
               {entry.suggestedSong && (
