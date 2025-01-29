@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import axios from "axios";
 import dotenv from "dotenv";
 import Mood from "../models/Mood.js";
+import mongoose from "mongoose";
 
 import { authenticateUser } from "../middleware/authMiddleware.js";
 
@@ -11,6 +12,59 @@ const router = express.Router();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Get a single mood by ID
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  // Validate if ID is a proper MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
+  try {
+    const mood = await Mood.findById(id);
+
+    if (!mood) {
+      return res.status(404).json({ message: "Mood not found" });
+    }
+
+    res.status(200).json(mood);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.post("/like/:id", authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = new mongoose.Types.ObjectId(req.user._id); // ✅ Ensure it's an ObjectId
+
+    const mood = await Mood.findById(id);
+    if (!mood) {
+      return res.status(404).json({ error: "Mood entry not found" });
+    }
+
+    // Check if user has already liked the mood
+    const alreadyLiked = mood.likes.some((like) => like.equals(userId)); // ✅ Use `.equals()`
+
+    if (!alreadyLiked) {
+      mood.likes.push(userId); // ✅ Store as ObjectId
+    } else {
+      mood.likes = mood.likes.filter((like) => !like.equals(userId)); // ✅ Properly remove user
+    }
+
+    await mood.save();
+    res.json({
+      success: true,
+      message: alreadyLiked ? "Unliked the mood" : "Liked the mood",
+      likes: mood.likes.length,
+    });
+  } catch (error) {
+    console.error("Error updating like:", error);
+    res.status(500).json({ error: "Failed to update like" });
+  }
 });
 
 // Function to get Spotify access token
@@ -88,10 +142,10 @@ router.post("/analyze", async (req, res) => {
 
     // Construct the AI prompt to analyze the mood and suggest a song
     const prompt = `
-      Analyze the following user input and provide a unique and creative song suggestion each time. 
-      Ensure the recommendations vary by genre, artist, and style to avoid repetition. 
+      Analyze the following user input and provide a unique and creative song suggestion each time.
+      Ensure the recommendations vary by genre, artist, and style to avoid repetition.
       Provide lesser-known or unexpected suggestions alongside popular ones, focusing on the given mood.
-      Format the response as follows: 
+      Format the response as follows:
       {
         "mood": "<detected mood>",
         "songRecommendation": {

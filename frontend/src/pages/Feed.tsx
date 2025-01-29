@@ -8,20 +8,74 @@ import { MoodCategory } from "../types";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
+//--------------------------------------------------------
 export const Feed: React.FC = () => {
   const [entries, setEntries] = useState<any[]>([]); // Store entries from API
   const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
-  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
-  const [playingAudio, setPlayingAudio] = useState<{
-    [key: string]: HTMLAudioElement;
+  const [commentText, setCommentText] = useState<{ [key: string]: string }>({}); //store comments per entry
+  const [comments, setComments] = useState<{
+    [key: string]: { user: string; content: string }[];
   }>({});
-  const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
+  const [likes, setLikes] = useState<{ [key: string]: number }>({});
+  const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
+
+  // const [playingAudio, setPlayingAudio] = useState<{
+  //   [key: string]: HTMLAudioElement;
+  // }>({});
+  // const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState(""); // search input
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [following, setFollowing] = useState<string[]>([]); // Store the following list
+
+  // Like Functionality
+  const handleToggleLike = async (entryId: string) => {
+    if (!user) return;
+
+    try {
+      const response = await axios.post(
+        `https://project-final-fo1y.onrender.com/api/moods/${entryId}/like`,
+        { userId: user.id },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              accessToken || localStorage.getItem("accessToken")
+            }`,
+          },
+        }
+      );
+
+      // Update state to reflect the new like count and status
+      setLikes((prevLikes) => ({
+        ...prevLikes,
+        [entryId]: response.data.likesCount,
+      }));
+
+      setUserLiked((prevLiked) => ({
+        ...prevLiked,
+        [entryId]: response.data.userHasLiked, // Backend should return this
+      }));
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+
+  // Comment Functionality
+  const handleCommentSubmit = (entryId: string) => {
+    if (!user || !commentText[entryId]?.trim()) return;
+
+    setComments((prev) => ({
+      ...prev,
+      [entryId]: [
+        ...(prev[entryId] || []),
+        { user: user.username, content: commentText[entryId] },
+      ],
+    }));
+
+    setCommentText({ ...commentText, [entryId]: "" }); // Clear input field
+  };
 
   useEffect(() => {
     const fetchFeed = async () => {
@@ -74,11 +128,6 @@ export const Feed: React.FC = () => {
 
     searchUsers();
   }, [searchQuery]);
-
-  // const filteredEntries =
-  //   moodFilter === "all"
-  //     ? entries
-  //     : filterByCategory(entries, moodFilter as MoodCategory);
 
   const filteredEntries = entries.filter((entry) => {
     // Mood filtering: If a specific mood is selected, only show matching moods
@@ -173,17 +222,7 @@ export const Feed: React.FC = () => {
                 </option>
               ))}
             </select>
-            {/* <select
-              value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0"
-            >
-              <option value="all">All Genres</option>
-              <option value="Rock">Rock</option>
-              <option value="Pop">Pop</option>
-              <option value="Jazz">Jazz</option>
-              <option value="Classical">Classical</option>
-            </select> */}
+
             <button
               onClick={() => setShowFollowingOnly(!showFollowingOnly)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -253,6 +292,77 @@ export const Feed: React.FC = () => {
                   ></iframe>
                 </div>
               )}
+
+              {/* Like Button */}
+              <button
+                onClick={() => handleToggleLike(entry._id)}
+                className={`flex items-center space-x-2 text-sm ${
+                  userLiked[entry._id]
+                    ? "text-red-500"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                <Heart
+                  className={`h-5 w-5 ${
+                    userLiked[entry._id] ? "fill-current text-red-500" : ""
+                  }`}
+                />
+                <span>
+                  {Array.isArray(entry.likes) ? entry.likes.length : 0}
+                </span>
+              </button>
+
+              {/* Comments Section */}
+              <div className="mt-4">
+                {/* Display existing comments */}
+                {comments[entry._id]?.length > 0 && (
+                  <div className="space-y-2">
+                    {comments[entry._id].map((comment, index) => (
+                      <div key={index} className="flex items-start space-x-3">
+                        <div className="p-2 bg-gray-100 dark:bg-gray-700/50 rounded-full">
+                          <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-baseline space-x-2">
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              {comment.user}
+                            </h4>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              Just now
+                            </span>
+                          </div>
+                          <p className="text-gray-600 dark:text-gray-300">
+                            {comment.content}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Comment Input */}
+                {user && (
+                  <div className="relative mt-3">
+                    <TextareaAutosize
+                      value={commentText[entry._id] || ""}
+                      onChange={(e) =>
+                        setCommentText({
+                          ...commentText,
+                          [entry._id]: e.target.value,
+                        })
+                      }
+                      placeholder="Add a comment..."
+                      className="w-full min-h-[2.5rem] px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+                    />
+                    <button
+                      onClick={() => handleCommentSubmit(entry._id)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                    >
+                      <MessageCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))
         ) : (
