@@ -6,6 +6,7 @@ import { Auth } from "../pages/Auth";
 import { FAQ } from "../pages/FAQ";
 import { Journal } from "../pages/Journal";
 import { Feed } from "../pages/Feed";
+import { Profile } from "../pages/Profile";
 
 export const routes = (
   <Routes>
@@ -16,6 +17,7 @@ export const routes = (
       <Route path="faq" element={<FAQ />} />
       <Route path="journal" element={<Journal />} />
       <Route path="feed" element={<Feed />} />
+      <Route path="profile" element={<Profile />} />
     </Route>
 
     {/* Route for login page */}
