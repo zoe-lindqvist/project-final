@@ -14,28 +14,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Get a single mood by ID
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-
-  // Validate if ID is a proper MongoDB ObjectId
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid ID format" });
-  }
-
-  try {
-    const mood = await Mood.findById(id);
-
-    if (!mood) {
-      return res.status(404).json({ message: "Mood not found" });
-    }
-
-    res.status(200).json(mood);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
-
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
@@ -59,7 +37,8 @@ router.post("/like/:id", authenticateUser, async (req, res) => {
     res.json({
       success: true,
       message: alreadyLiked ? "Unliked the mood" : "Liked the mood",
-      likes: mood.likes.length,
+      likes: mood.likes.map((like) => like.toString()), // Convert ObjectId to string
+      likesCount: mood.likes.length, // Send likes count separately
     });
   } catch (error) {
     console.error("Error updating like:", error);

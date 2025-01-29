@@ -22,13 +22,12 @@ export const Feed: React.FC = () => {
   const [likes, setLikes] = useState<{ [key: string]: number }>({});
   const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
 
-  // const [playingAudio, setPlayingAudio] = useState<{
-  //   [key: string]: HTMLAudioElement;
-  // }>({});
-  // const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState(""); // search input
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [following, setFollowing] = useState<string[]>([]); // Store the following list
+
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
   // Like Functionality
   const handleToggleLike = async (entryId: string) => {
@@ -36,8 +35,8 @@ export const Feed: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `https://project-final-fo1y.onrender.com/api/moods/${entryId}/like`,
-        { userId: user.id },
+        `${API_BASE_URL}/api/moods/like/${entryId}`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${
@@ -47,16 +46,27 @@ export const Feed: React.FC = () => {
         }
       );
 
-      // Update state to reflect the new like count and status
-      setLikes((prevLikes) => ({
-        ...prevLikes,
-        [entryId]: response.data.likesCount,
-      }));
+      if (response.status === 200) {
+        console.log("Updated likes from backend:", response.data.likes); // Should now be an array
+        console.log("Likes count from backend:", response.data.likesCount); // Should be a number
 
-      setUserLiked((prevLiked) => ({
-        ...prevLiked,
-        [entryId]: response.data.userHasLiked, // Backend should return this
-      }));
+        // ✅ Ensure likes is always an array
+        const updatedLikes: string[] = Array.isArray(response.data.likes)
+          ? response.data.likes
+          : [];
+
+        setEntries((prevEntries) =>
+          prevEntries.map((entry) =>
+            entry._id === entryId ? { ...entry, likes: updatedLikes } : entry
+          )
+        );
+
+        // ✅ Update `userLiked` state correctly
+        setUserLiked((prevLiked) => ({
+          ...prevLiked,
+          [entryId]: updatedLikes.includes(user.id),
+        }));
+      }
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -78,6 +88,7 @@ export const Feed: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     const fetchFeed = async () => {
       try {
         const response = await axios.get(
@@ -92,13 +103,27 @@ export const Feed: React.FC = () => {
         );
 
         setEntries(response.data);
+
+        // Check which moods the user has already liked
+        const likedMoods = response.data.reduce(
+          (
+            acc: { [key: string]: boolean },
+            mood: { _id: string; likes: string[] }
+          ) => {
+            acc[mood._id] = mood.likes.includes(user.id); // ✅ Check if user is in the likes array
+            return acc;
+          },
+          {} // Initial value
+        );
+
+        setUserLiked(likedMoods); // Store liked moods in state
       } catch (error) {
         console.error("Error fetching feed:", error);
       }
     };
 
     fetchFeed();
-  }, []);
+  }, [user]);
 
   //Search Functionality
   useEffect(() => {
@@ -307,9 +332,7 @@ export const Feed: React.FC = () => {
                     userLiked[entry._id] ? "fill-current text-red-500" : ""
                   }`}
                 />
-                <span>
-                  {Array.isArray(entry.likes) ? entry.likes.length : 0}
-                </span>
+                <span>{entry.likes.length}</span>
               </button>
 
               {/* Comments Section */}
