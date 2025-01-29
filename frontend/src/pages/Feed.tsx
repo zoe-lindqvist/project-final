@@ -16,7 +16,7 @@ export const Feed: React.FC = () => {
     [key: string]: HTMLAudioElement;
   }>({});
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // search input
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [following, setFollowing] = useState<string[]>([]); // Store the following list
 
@@ -43,142 +43,34 @@ export const Feed: React.FC = () => {
     fetchFeed();
   }, []);
 
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         "http://localhost:8080/api/users/profile",
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //           },
-  //         }
-  //       );
-  //       setUser(response.data.user);
-  //     } catch (error) {
-  //       console.error("Error fetching user:", error);
-  //     }
-  //   };
+  //Search Functionality
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (!searchQuery) {
+        setSearchResults([]); // Clear results if input is empty
+        return;
+      }
 
-  //   fetchUser();
-  // }, []);
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/users/search?username=${searchQuery}`,
+          {
+            headers: {
+              Authorization: `Bearer ${
+                accessToken || localStorage.getItem("accessToken")
+              }`,
+            },
+          }
+        );
 
-  // // Fetch entries from the API
-  // useEffect(() => {
-  //   const fetchEntries = async () => {
-  //     try {
-  //       const response = await axios.get("/api/entries", {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //       });
-  //       setEntries(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching entries:", error);
-  //     }
-  //   };
+        setSearchResults(response.data);
+      } catch (error) {
+        console.error("Error searching users:", error);
+      }
+    };
 
-  //   if (user) fetchEntries();
-  // }, [user]);
-
-  // // Fetch the following list from the API
-  // useEffect(() => {
-  //   const fetchFollowing = async () => {
-  //     try {
-  //       const response = await axios.get("/api/users/following", {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //       });
-  //       setFollowing(response.data); // Assuming response.data is an array of user IDs
-  //     } catch (error) {
-  //       console.error("Error fetching following list:", error);
-  //     }
-  //   };
-
-  //   if (user) fetchFollowing();
-  // }, [user]);
-
-  // // Search users through the API
-  // useEffect(() => {
-  //   const searchUsers = async () => {
-  //     if (!searchQuery) return setSearchResults([]);
-  //     try {
-  //       const response = await axios.get(`/api/users?search=${searchQuery}`);
-  //       setSearchResults(response.data); // Assuming response.data is an array of users
-  //     } catch (error) {
-  //       console.error("Error searching users:", error);
-  //     }
-  //   };
-
-  //   searchUsers();
-  // }, [searchQuery]);
-
-  // const filteredEntries = entries.filter((entry) => {
-  //   if (showFollowingOnly && !following.includes(entry.userId)) {
-  //     return false;
-  //   }
-  //   if (moodFilter !== "all" && entry.mood !== moodFilter) {
-  //     return false;
-  //   }
-  //   if (
-  //     genreFilter !== "all" &&
-  //     entry.songRecommendation?.genre !== genreFilter
-  //   ) {
-  //     return false;
-  //   }
-  //   return !entry.isPrivate || entry.userId === user?.id;
-  // });
-
-  // const handlePlayToggle = (
-  //   entryId: string,
-  //   previewUrl: string | undefined
-  // ) => {
-  //   if (!previewUrl) return;
-
-  //   if (playingAudio[entryId]) {
-  //     if (isPlaying[entryId]) {
-  //       playingAudio[entryId].pause();
-  //     } else {
-  //       playingAudio[entryId].play();
-  //     }
-  //     setIsPlaying({ ...isPlaying, [entryId]: !isPlaying[entryId] });
-  //   } else {
-  //     Object.keys(playingAudio).forEach((key) => playingAudio[key].pause());
-  //     setIsPlaying(
-  //       Object.keys(isPlaying).reduce(
-  //         (acc, key) => ({ ...acc, [key]: false }),
-  //         {}
-  //       )
-  //     );
-
-  //     const audio = new Audio(previewUrl);
-  //     audio.addEventListener("ended", () => {
-  //       setIsPlaying((prev) => ({ ...prev, [entryId]: false }));
-  //     });
-  //     audio.play();
-  //     setPlayingAudio({ ...playingAudio, [entryId]: audio });
-  //     setIsPlaying({ ...isPlaying, [entryId]: true });
-  //   }
-  // };
-
-  // const handleComment = async (entryId: string) => {
-  //   if (!user || !commentText[entryId]?.trim()) return;
-
-  //   try {
-  //     await axios.post(
-  //       `/api/entries/${entryId}/comment`,
-  //       { content: commentText[entryId] },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //       }
-  //     );
-  //     setCommentText({ ...commentText, [entryId]: "" });
-  //   } catch (error) {
-  //     console.error("Error adding comment:", error);
-  //   }
-  // };
+    searchUsers();
+  }, [searchQuery]);
 
   const filteredEntries = entries.filter((entry) => {
     if (moodFilter !== "all" && entry.moodAnalysis !== moodFilter) {
@@ -194,7 +86,7 @@ export const Feed: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search Users */}
           <div className="relative flex-1">
-            <div className="flex items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
+            <div className="flex items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-2 relative">
               <Search className="h-5 w-5 text-gray-400 ml-2" />
               <input
                 type="text"
@@ -204,6 +96,36 @@ export const Feed: React.FC = () => {
                 className="w-full px-4 py-2 bg-transparent focus:outline-none text-gray-900 dark:text-white"
               />
             </div>
+
+            {/* Search Results Dropdown */}
+            {searchResults && searchQuery && (
+              <div className="absolute w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50">
+                {searchResults.length > 0 ? (
+                  searchResults.map((user) => (
+                    <Link
+                      key={user.id}
+                      to={`/profile/${user.id}`}
+                      className="flex items-center space-x-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchResults([]); // ✅ Clears search results properly
+                      }}
+                    >
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
+                        <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {user.username}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="p-4 text-gray-500 dark:text-gray-400">
+                    No users found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Filters */}
