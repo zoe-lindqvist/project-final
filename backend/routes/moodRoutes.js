@@ -69,6 +69,18 @@ const searchSpotifyTrack = async (title, artist) => {
   }
 };
 
+router.get("/profile/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const userEntries = await Mood.find({ userId }).sort({ createdAt: -1 });
+    res.status(200).json(userEntries);
+  } catch (error) {
+    console.error("Error fetching user entries:", error.message);
+    res.status(500).json({ error: "Failed to fetch mood entries" });
+  }
+});
+
 // POST route to analyze user input and provide mood-based song suggestions
 router.post("/analyze", async (req, res) => {
   try {
@@ -77,7 +89,8 @@ router.post("/analyze", async (req, res) => {
     // Construct the AI prompt to analyze the mood and suggest a song
     const prompt = `
       Analyze the following user input and provide a unique and creative song suggestion each time. 
-      Provide songs from different genres and artists that fit within the given mood.
+      Ensure the recommendations vary by genre, artist, and style to avoid repetition. 
+      Provide lesser-known or unexpected suggestions alongside popular ones, focusing on the given mood.
       Format the response as follows: 
       {
         "mood": "<detected mood>",

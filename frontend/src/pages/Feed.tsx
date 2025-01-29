@@ -24,7 +24,7 @@ export const Feed: React.FC = () => {
     const fetchFeed = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/moods/feed",
+          "https://project-final-fo1y.onrender.com/api/moods/feed", // add render
           {
             headers: {
               Authorization: `Bearer ${
@@ -168,7 +168,7 @@ export const Feed: React.FC = () => {
       </div>
 
       {/* Feed Entries */}
-      <div className="space-y-6">
+      {/* <div className="space-y-6">
         {entries.length > 0 ? (
           entries.map((entry) => (
             <div
@@ -210,6 +210,72 @@ export const Feed: React.FC = () => {
                   {entry.suggestedSong.artist}
                 </p>
               </div>
+
+              
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-600 dark:text-gray-400">
+            No moods shared yet.
+          </p>
+        )}
+      </div> */}
+
+      <div className="space-y-6">
+        {filteredEntries.length > 0 ? (
+          filteredEntries.map((entry) => (
+            <div
+              key={entry._id}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <Link
+                  to={`/profile/${entry.userId._id}`}
+                  className="flex items-center space-x-3 group"
+                >
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale.110">
+                    <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                      {entry.userId.username || "Unknown User"}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(entry.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize">
+                  {entry.moodAnalysis}
+                </span>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {entry.userInput}
+              </p>
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  {entry.suggestedSong.title}
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {entry.suggestedSong.artist}
+                </p>
+              </div>
+
+              {/* Spotify Embedded Player */}
+              {entry.suggestedSong.spotifyLink && (
+                <div className="mt-6">
+                  <iframe
+                    src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
+                      .split("/")
+                      .pop()}`}
+                    className="w-full h-32 rounded-lg shadow-lg"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  ></iframe>
+                </div>
+              )}
             </div>
           ))
         ) : (

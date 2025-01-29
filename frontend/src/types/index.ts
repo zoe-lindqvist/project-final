@@ -12,14 +12,14 @@ export interface Comment {
   content: string;
   createdAt: string;
 }
-export type Mood = "happy" | "sad" | "relaxed" | "energetic" | "anxious";
 
 export interface MoodEntry {
   id: string;
   userId: string;
   userInput: string;
   mood: string; // Add this property
-  shared: false; // For privacy setting
+  category: string;
+  shared: boolean; // For privacy setting
   content: string; // Assuming content is the journal entry text
   moodAnalysis: string;
   suggestedSong: {
@@ -35,7 +35,27 @@ export interface MoodEntry {
   comments: Comment[];
 }
 
+
 export interface SearchResult {
   id: string;
   userName: string;
 }
+
+export type MoodCategory =
+  | "happy"
+  | "sad"
+  | "angry"
+  | "excited"
+  | "calm"
+  | "anxious"
+  | "hopeful"
+  | "frustrated"
+  | "confident"
+  | "tired"
+  | "lonely"
+  | "grateful"
+  | "nervous"
+  | "relaxed"
+  | "motivated";
+
+
