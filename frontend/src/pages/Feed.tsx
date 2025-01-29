@@ -321,15 +321,17 @@ export const Feed: React.FC = () => {
               {/* Like Button */}
               <button
                 onClick={() => handleToggleLike(entry._id)}
-                className={`flex items-center space-x-2 text-sm ${
-                  userLiked[entry._id]
-                    ? "text-red-500"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
+                className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+                // className={`flex items-center space-x-2 text-sm
+                //   ${
+                //   userLiked[entry._id]
+                //     ? "text-purple-500"
+                //     : "text-gray-500 dark:text-gray-400"
+                // }`}
               >
                 <Heart
                   className={`h-5 w-5 ${
-                    userLiked[entry._id] ? "fill-current text-red-500" : ""
+                    userLiked[entry._id] ? "fill-current text-purple-600" : ""
                   }`}
                 />
                 <span>{entry.likes.length}</span>
