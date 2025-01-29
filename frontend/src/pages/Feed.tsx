@@ -53,7 +53,7 @@ export const Feed: React.FC = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/users/search?username=${searchQuery}`,
+          `https://project-final-fo1y.onrender.com/api/users/search?username=${searchQuery}`,
           {
             headers: {
               Authorization: `Bearer ${
