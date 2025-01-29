@@ -218,28 +218,4 @@ router.get("/feed", async (req, res) => {
   }
 });
 
-// router.get("/profile/:userId", authenticateUser, async (req, res) => {
-//   const { userId } = req.params;
-
-//   console.log("Received userId:", userId);
-
-//   try {
-//     // Query the Mood collection
-//     const userEntries = await Mood.find({ userId }).sort({ createdAt: -1 });
-
-//     console.log("Query result:", userEntries);
-
-//     if (!userEntries || userEntries.length === 0) {
-//       return res
-//         .status(404)
-//         .json({ message: "No entries found for this user." });
-//     }
-
-//     res.status(200).json(userEntries);
-//   } catch (error) {
-//     console.error("Error fetching mood entries:", error.message);
-//     res.status(500).json({ error: "Failed to fetch mood entries" });
-//   }
-// });
-
 export default router;
