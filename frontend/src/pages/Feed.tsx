@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Play, Pause, User, Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { moodCategories, filterByCategory } from "../utils/moodUtils";
+import { genreCategories, mapToGenreCategory } from "../utils/genreUtils";
 import { MoodCategory } from "../types";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
@@ -74,10 +75,26 @@ export const Feed: React.FC = () => {
     searchUsers();
   }, [searchQuery]);
 
-  const filteredEntries =
-    moodFilter === "all"
-      ? entries
-      : filterByCategory(entries, moodFilter as MoodCategory);
+  // const filteredEntries =
+  //   moodFilter === "all"
+  //     ? entries
+  //     : filterByCategory(entries, moodFilter as MoodCategory);
+
+  const filteredEntries = entries.filter((entry) => {
+    // Mood filtering: If a specific mood is selected, only show matching moods
+    const matchesMood =
+      moodFilter === "all"
+        ? entries
+        : filterByCategory(entries, moodFilter as MoodCategory);
+
+    // Genre filtering: If a specific genre is selected, only show matching genres
+    const entryGenre = entry.suggestedSong?.genre || "mixed"; // Get genre from API
+    const mappedGenre = mapToGenreCategory(entryGenre); // Map it to main category
+    const matchesGenre = genreFilter === "all" || mappedGenre === genreFilter;
+
+    // Show the entry only if it matches BOTH filters
+    return matchesMood && matchesGenre;
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -150,11 +167,23 @@ export const Feed: React.FC = () => {
               className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0"
             >
               <option value="all">All Genres</option>
+              {Object.keys(genreCategories).map((genre) => (
+                <option key={genre} value={genre}>
+                  {genre.charAt(0).toUpperCase() + genre.slice(1)}
+                </option>
+              ))}
+            </select>
+            {/* <select
+              value={genreFilter}
+              onChange={(e) => setGenreFilter(e.target.value)}
+              className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0"
+            >
+              <option value="all">All Genres</option>
               <option value="Rock">Rock</option>
               <option value="Pop">Pop</option>
               <option value="Jazz">Jazz</option>
               <option value="Classical">Classical</option>
-            </select>
+            </select> */}
             <button
               onClick={() => setShowFollowingOnly(!showFollowingOnly)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
