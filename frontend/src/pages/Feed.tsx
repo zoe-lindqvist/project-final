@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Play, Pause, User, Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import { moodCategories, filterByCategory } from "../utils/moodUtils";
+import { MoodCategory } from "../types";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
@@ -72,12 +74,10 @@ export const Feed: React.FC = () => {
     searchUsers();
   }, [searchQuery]);
 
-  const filteredEntries = entries.filter((entry) => {
-    if (moodFilter !== "all" && entry.moodAnalysis !== moodFilter) {
-      return false;
-    }
-    return true;
-  });
+  const filteredEntries =
+    moodFilter === "all"
+      ? entries
+      : filterByCategory(entries, moodFilter as MoodCategory);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -136,10 +136,18 @@ export const Feed: React.FC = () => {
               className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0"
             >
               <option value="all">All Moods</option>
-              <option value="happy">Happy</option>
+
+              {Object.keys(moodCategories).map((category) => (
+                <option key={category} value={category}>
+                  {" "}
+                  {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
+                </option>
+              ))}
+
+              {/* <option value="happy">Happy</option>
               <option value="relaxed">Relaxed</option>
               <option value="energetic">Energetic</option>
-              <option value="melancholic">Melancholic</option>
+              <option value="melancholic">Melancholic</option> */}
             </select>
             <select
               value={genreFilter}

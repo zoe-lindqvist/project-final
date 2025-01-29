@@ -35,7 +35,6 @@ export interface MoodEntry {
   comments: Comment[];
 }
 
-
 export interface SearchResult {
   id: string;
   userName: string;
@@ -56,6 +55,5 @@ export type MoodCategory =
   | "grateful"
   | "nervous"
   | "relaxed"
-  | "motivated";
-
-
+  | "motivated"
+  | "mixed";

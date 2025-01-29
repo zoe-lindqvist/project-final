@@ -1,32 +1,40 @@
 import { MoodEntry, MoodCategory } from "../types";
 
-// Predefined mood categories and keywords
+// Predefined mood categories and keywords (sorted alphabetically)
 export const moodCategories: Record<MoodCategory, string[]> = {
-  happy: ["happy", "joyful", "ecstatic", "content", "cheerful", "overjoyed"],
-  sad: ["sad", "depressed", "heartbroken", "melancholy", "blue"],
-  angry: ["angry", "mad", "frustrated", "furious", "irritated"],
-  excited: ["excited", "thrilled", "elated", "ecstatic"],
-  calm: ["calm", "peaceful", "relaxed", "serene"],
   anxious: ["anxious", "nervous", "worried", "stressed"],
-  hopeful: ["hopeful", "optimistic", "encouraged", "positive"],
-  frustrated: ["frustrated", "annoyed", "disheartened", "stuck"],
+  angry: ["angry", "mad", "frustrated", "furious", "irritated"],
+  calm: ["calm", "peaceful", "relaxed", "serene"],
   confident: ["confident", "self-assured"],
-  tired: ["tired", "exhausted", "drained", "weary"],
-  lonely: ["lonely", "isolated", "alone"],
+  excited: ["excited", "thrilled", "elated", "ecstatic"],
+  frustrated: [
+    "frustrated",
+    "annoyed",
+    "disheartened",
+    "stuck",
+    "conflicted",
+    "confused",
+  ],
   grateful: ["grateful", "thankful", "appreciative"],
+  happy: ["happy", "joyful", "ecstatic", "content", "cheerful", "overjoyed"],
+  hopeful: ["hopeful", "optimistic", "encouraged", "positive"],
+  lonely: ["lonely", "isolated", "alone"],
+  motivated: ["motivated", "driven", "determined", "focused"],
   nervous: ["nervous", "anxious", "jittery"],
   relaxed: ["relaxed", "calm", "serene"],
-  motivated: ["motivated", "driven", "determined", "focused"],
+  sad: ["sad", "depressed", "heartbroken", "melancholy", "blue"],
+  tired: ["tired", "exhausted", "drained", "weary"],
+  mixed: ["mixed", "unsettled"],
 };
 
 // Function to map AI-generated mood to a category
-export const mapToCategory = (aiMood: string): string => {
+export const mapToCategory = (aiMood: string): MoodCategory => {
   for (const [category, keywords] of Object.entries(moodCategories)) {
     if (keywords.some((keyword) => aiMood.toLowerCase().includes(keyword))) {
-      return category; // Return the first matching category
+      return category as MoodCategory; // Return the first matching category
     }
   }
-  return "uncategorized"; // Fallback if no match
+  return "mixed"; // Fallback if no match
 };
 
 // Function to filter entries by category
