@@ -17,7 +17,7 @@ const openai = new OpenAI({
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = new mongoose.Types.ObjectId(req.user._id); // ✅ Ensure it's an ObjectId
+    const userId = new mongoose.Types.ObjectId(req.user._id); // Ensure it's an ObjectId
 
     const mood = await Mood.findById(id);
     if (!mood) {
@@ -25,12 +25,12 @@ router.post("/like/:id", authenticateUser, async (req, res) => {
     }
 
     // Check if user has already liked the mood
-    const alreadyLiked = mood.likes.some((like) => like.equals(userId)); // ✅ Use `.equals()`
+    const alreadyLiked = mood.likes.some((like) => like.equals(userId));
 
     if (!alreadyLiked) {
-      mood.likes.push(userId); // ✅ Store as ObjectId
+      mood.likes.push(userId); // Store as ObjectId
     } else {
-      mood.likes = mood.likes.filter((like) => !like.equals(userId)); // ✅ Properly remove user
+      mood.likes = mood.likes.filter((like) => !like.equals(userId)); //  Properly remove user
     }
 
     await mood.save();
@@ -50,23 +50,31 @@ router.post("/like/:id", authenticateUser, async (req, res) => {
 router.post("/:moodId/comments", authenticateUser, async (req, res) => {
   const { moodId } = req.params;
   const { text } = req.body;
-  const userId = new mongoose.Types.ObjectId(req.user._id);
+  const userId = req.user._id; // Get authenticated user
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(moodId)) {
-      return res.status(400).json({ message: "Invalid mood ID format" });
-    }
-
-    const mood = await Mood.findById(new mongoose.Types.ObjectId(moodId));
+    const mood = await Mood.findById(moodId);
     if (!mood) {
       return res.status(404).json({ message: "Mood entry not found" });
     }
 
-    const newComment = { userId, comment: text, createdAt: new Date() };
+    // Create the new comment
+    const newComment = {
+      userId: userId,
+      comment: text,
+      createdAt: new Date(),
+    };
+
+    // Add the comment to the mood entry
     mood.comments.push(newComment);
     await mood.save();
 
-    res.status(201).json({ message: "Comment added successfully", mood });
+    // Re-fetch mood with populated `userId.username`
+    const updatedMood = await Mood.findById(moodId)
+      .populate("comments.userId", "username") // Ensure username is populated
+      .exec();
+
+    res.status(201).json({ comments: updatedMood.comments }); // Return comments with usernames
   } catch (error) {
     console.error("Error adding comment:", error);
     res
@@ -297,6 +305,7 @@ router.get("/feed", async (req, res) => {
   try {
     const feedEntries = await Mood.find({ shared: true })
       .populate("userId", "username")
+      .populate("comments.userId", "username")
       .sort({ createdAt: -1 });
 
     res.status(200).json(feedEntries);

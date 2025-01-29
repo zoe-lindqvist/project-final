@@ -4,7 +4,7 @@ import { Heart, MessageCircle, Play, Pause, User, Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { moodCategories, filterByCategory } from "../utils/moodUtils";
 import { genreCategories, mapToGenreCategory } from "../utils/genreUtils";
-import { MoodCategory } from "../types";
+import { MoodCategory, Comment } from "../types";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
@@ -16,10 +16,8 @@ export const Feed: React.FC = () => {
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({}); //store comments per entry
-  const [comments, setComments] = useState<{
-    [key: string]: { user: string; content: string }[];
-  }>({});
-  const [likes, setLikes] = useState<{ [key: string]: number }>({});
+  const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
+  const [likes, setLikes] = useState<{ [key: string]: Comment[] }>({});
   const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
 
   const [searchQuery, setSearchQuery] = useState(""); // search input
@@ -45,16 +43,13 @@ export const Feed: React.FC = () => {
           },
         }
       );
-
       if (response.status === 200) {
         console.log("Updated likes from backend:", response.data.likes); // Should now be an array
         console.log("Likes count from backend:", response.data.likesCount); // Should be a number
-
         // ✅ Ensure likes is always an array
         const updatedLikes: string[] = Array.isArray(response.data.likes)
           ? response.data.likes
           : [];
-
         setEntries((prevEntries) =>
           prevEntries.map((entry) =>
             entry._id === entryId ? { ...entry, likes: updatedLikes } : entry
@@ -73,19 +68,92 @@ export const Feed: React.FC = () => {
   };
 
   // Comment Functionality
-  const handleCommentSubmit = (entryId: string) => {
+  const handleCommentSubmit = async (entryId: string) => {
     if (!user || !commentText[entryId]?.trim()) return;
 
-    setComments((prev) => ({
-      ...prev,
-      [entryId]: [
-        ...(prev[entryId] || []),
-        { user: user.username, content: commentText[entryId] },
-      ],
-    }));
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/moods/${entryId}/comments`,
+        { text: commentText[entryId] },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              accessToken || localStorage.getItem("accessToken")
+            }`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    setCommentText({ ...commentText, [entryId]: "" }); // Clear input field
+      if (response.status === 201) {
+        const commentsArray = response.data.comments || [];
+        const lastComment =
+          commentsArray.length > 0 ? commentsArray.at(-1) : null;
+
+        if (!lastComment) return;
+
+        const newComment: Comment = {
+          _id: lastComment._id,
+          userId: {
+            _id: lastComment.userId._id,
+            username: lastComment.userId.username || "Unknown",
+          },
+          comment: lastComment.comment,
+          createdAt: lastComment.createdAt,
+        };
+
+        setComments((prev) => ({
+          ...prev,
+          [entryId]: [...(prev[entryId] || []), newComment],
+        }));
+
+        setCommentText((prev) => ({
+          ...prev,
+          [entryId]: "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
   };
+
+  // Fetch comments
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/moods/feed`, {
+          headers: {
+            Authorization: `Bearer ${
+              accessToken || localStorage.getItem("accessToken")
+            }`,
+          },
+        });
+
+        // Ensure each mood entry's comments are stored with username included
+        const commentsMap: { [key: string]: Comment[] } = {};
+
+        response.data.forEach((entry: any) => {
+          commentsMap[entry._id] = entry.comments.map((comment: any) => ({
+            _id: comment._id,
+            userId: {
+              _id: comment.userId._id,
+              username: comment.userId.username || "Unknown", // Ensure username is included
+            },
+            comment: comment.comment,
+            createdAt: comment.createdAt,
+          }));
+        });
+
+        setComments(commentsMap); // Store all comments in state
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    fetchComments();
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -338,6 +406,7 @@ export const Feed: React.FC = () => {
               {/* Comments Section */}
               <div className="mt-4">
                 {/* Display existing comments */}
+
                 {comments[entry._id]?.length > 0 && (
                   <div className="space-y-2">
                     {comments[entry._id].map((comment, index) => (
@@ -348,21 +417,20 @@ export const Feed: React.FC = () => {
                         <div className="flex-1">
                           <div className="flex items-baseline space-x-2">
                             <h4 className="font-medium text-gray-900 dark:text-white">
-                              {comment.user}
+                              {comment.userId?.username || "Anonymous"}
                             </h4>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
-                              Just now
+                              {new Date(comment.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                           <p className="text-gray-600 dark:text-gray-300">
-                            {comment.content}
+                            {comment.comment}
                           </p>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
-
                 {/* Comment Input */}
                 {user && (
                   <div className="relative mt-3">
@@ -378,7 +446,9 @@ export const Feed: React.FC = () => {
                       className="w-full min-h-[2.5rem] px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
                     />
                     <button
-                      onClick={() => handleCommentSubmit(entry._id)}
+                      onClick={() => {
+                        handleCommentSubmit(entry._id);
+                      }}
                       className="absolute right-2 top-1/2 -translate-y-1/2"
                     >
                       <MessageCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />

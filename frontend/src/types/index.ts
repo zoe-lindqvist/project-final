@@ -7,10 +7,12 @@ export interface User {
 }
 
 export interface Comment {
-  id: string;
-  userId: string;
-  username: string;
-  content: string;
+  _id: string;
+  userId: {
+    _id: string;
+    username: string;
+  };
+  comment: string;
   createdAt: string;
 }
 
