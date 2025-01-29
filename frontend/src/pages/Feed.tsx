@@ -75,25 +75,19 @@ export const Feed: React.FC = () => {
     searchUsers();
   }, [searchQuery]);
 
-  // const filteredEntries =
-  //   moodFilter === "all"
-  //     ? entries
-  //     : filterByCategory(entries, moodFilter as MoodCategory);
+  const moodFilteredEntries =
+    moodFilter === "all"
+      ? entries
+      : filterByCategory(entries, moodFilter as MoodCategory);
 
-  const filteredEntries = entries.filter((entry) => {
-    // Mood filtering: If a specific mood is selected, only show matching moods
-    const matchesMood =
-      moodFilter === "all"
-        ? entries
-        : filterByCategory(entries, moodFilter as MoodCategory);
-
+  const filteredEntries = moodFilteredEntries.filter((entry) => {
     // Genre filtering: If a specific genre is selected, only show matching genres
     const entryGenre = entry.suggestedSong?.genre || "mixed"; // Get genre from API
     const mappedGenre = mapToGenreCategory(entryGenre); // Map it to main category
     const matchesGenre = genreFilter === "all" || mappedGenre === genreFilter;
 
     // Show the entry only if it matches BOTH filters
-    return matchesMood && matchesGenre;
+    return matchesGenre;
   });
 
   return (
