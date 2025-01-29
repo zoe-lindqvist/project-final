@@ -2,7 +2,7 @@ import express from "express";
 import OpenAI from "openai";
 import axios from "axios";
 import dotenv from "dotenv";
-import Mood from "../models/Mood.js";
+import { Mood, Comment } from "../models/Mood.js";
 import mongoose from "mongoose";
 
 import { authenticateUser } from "../middleware/authMiddleware.js";
@@ -43,6 +43,61 @@ router.post("/like/:id", authenticateUser, async (req, res) => {
   } catch (error) {
     console.error("Error updating like:", error);
     res.status(500).json({ error: "Failed to update like" });
+  }
+});
+
+// Add a comment to a mood entry
+router.post("/:moodId/comments", authenticateUser, async (req, res) => {
+  const { moodId } = req.params;
+  const { text } = req.body;
+  const userId = new mongoose.Types.ObjectId(req.user._id);
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(moodId)) {
+      return res.status(400).json({ message: "Invalid mood ID format" });
+    }
+
+    const mood = await Mood.findById(new mongoose.Types.ObjectId(moodId));
+    if (!mood) {
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    const newComment = { userId, comment: text, createdAt: new Date() };
+    mood.comments.push(newComment);
+    await mood.save();
+
+    res.status(201).json({ message: "Comment added successfully", mood });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res
+      .status(500)
+      .json({ message: "Could not add comment", error: error.message });
+  }
+});
+
+// Get all comments for a mood entry
+router.get("/:moodId/comments", async (req, res) => {
+  const { moodId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(moodId)) {
+      return res.status(400).json({ message: "Invalid mood ID format" });
+    }
+
+    const mood = await Mood.findById(
+      new mongoose.Types.ObjectId(moodId)
+    ).populate("comments.userId", "username");
+
+    if (!mood) {
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    res.status(200).json(mood.comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res
+      .status(500)
+      .json({ message: "Could not fetch comments", error: error.message });
   }
 });
 
