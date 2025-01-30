@@ -2,13 +2,17 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Heart,
+  Filter,
   MessageCircle,
+  Music,
   Play,
   Pause,
   User,
   Search,
   ChevronUp,
   ChevronDown,
+  X,
+  Sliders,
 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { moodCategories, filterByCategory } from "../utils/moodUtils";
@@ -21,6 +25,9 @@ import axios from "axios";
 export const Feed: React.FC = () => {
   const [entries, setEntries] = useState<any[]>([]); // Store entries from API
   const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
+
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [filterType, setFilterType] = useState("");
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
@@ -297,37 +304,50 @@ export const Feed: React.FC = () => {
           </div>
 
           {/* Filters */}
-          <div className="flex gap-4">
-            <select
-              value={moodFilter}
-              onChange={(e) => setMoodFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0"
-            >
-              <option value="all">All Moods</option>
+          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+            <div className="relative w-full md:w-auto">
+              {/* Mood Filter Icon */}
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-600 dark:text-purple-400 pointer-events-none" />
 
-              {Object.keys(moodCategories).map((category) => (
-                <option key={category} value={category}>
-                  {" "}
-                  {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
-                </option>
-              ))}
-            </select>
-            <select
-              value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0"
-            >
-              <option value="all">All Genres</option>
-              {Object.keys(genreCategories).map((genre) => (
-                <option key={genre} value={genre}>
-                  {genre.charAt(0).toUpperCase() + genre.slice(1)}
-                </option>
-              ))}
-            </select>
+              {/* Mood Filter Select */}
+              <select
+                value={moodFilter}
+                onChange={(e) => setMoodFilter(e.target.value)}
+                className="pl-12 pr-6 py-3 md:py-3.5 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0 w-full md:w-auto appearance-none"
+              >
+                <option value="all">Moods</option>
+                {Object.keys(moodCategories).map((category) => (
+                  <option key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            {/* Genre Filter */}
+            <div className="relative w-full md:w-auto">
+              {/* Genre Filter Icon */}
+              <Music className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-600 dark:text-purple-400 pointer-events-none" />
+
+              {/* Genre Filter Select */}
+              <select
+                value={genreFilter}
+                onChange={(e) => setGenreFilter(e.target.value)}
+                className="pl-12 pr-6 py-3 md:py-3.5 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0 w-full md:w-auto appearance-none"
+              >
+                <option value="all">Genres</option>
+                {Object.keys(genreCategories).map((genre) => (
+                  <option key={genre} value={genre}>
+                    {genre.charAt(0).toUpperCase() + genre.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Following Button */}
             <button
               onClick={() => setShowFollowingOnly(!showFollowingOnly)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`flex items-center justify-center w-full md:w-auto space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 showFollowingOnly
                   ? "bg-purple-600 dark:bg-purple-500 text-white"
                   : "bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -368,14 +388,11 @@ export const Feed: React.FC = () => {
                   {entry.moodAnalysis}
                 </span>
               </div>
-              {/* <div className="flex justify-end w-full"></div> */}
+
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 {entry.userInput}
               </p>
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
-                {/* <h4 className="font-medium text-gray-900 dark:text-white">
-                  {entry.suggestedSong.title}
-                </h4> */}
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   {entry.suggestedSong.genre}
                 </p>
