@@ -58,9 +58,6 @@ export const Feed: React.FC = () => {
         }
       );
       if (response.status === 200) {
-        console.log("Updated likes from backend:", response.data.likes); // Should now be an array
-        console.log("Likes count from backend:", response.data.likesCount); // Should be a number
-        // ✅ Ensure likes is always an array
         const updatedLikes: string[] = Array.isArray(response.data.likes)
           ? response.data.likes
           : [];
@@ -169,12 +166,15 @@ export const Feed: React.FC = () => {
     fetchComments();
   }, [user]);
 
+  // Fetch feed
   useEffect(() => {
     if (!user) return;
+
     const fetchFeed = async () => {
       try {
+        const filterQuery = showFollowingOnly ? "?filter=following" : "";
         const response = await axios.get(
-          "https://project-final-fo1y.onrender.com/api/moods/feed", // add render
+          `${API_BASE_URL}/api/moods/feed${filterQuery}`,
           {
             headers: {
               Authorization: `Bearer ${
@@ -184,7 +184,7 @@ export const Feed: React.FC = () => {
           }
         );
 
-        setEntries(response.data);
+        setEntries([...response.data]);
 
         // Check which moods the user has already liked
         const likedMoods = response.data.reduce(
@@ -205,7 +205,7 @@ export const Feed: React.FC = () => {
     };
 
     fetchFeed();
-  }, [user]);
+  }, [user, showFollowingOnly]);
 
   //Search Functionality
   useEffect(() => {

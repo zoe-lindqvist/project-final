@@ -1,4 +1,6 @@
 import React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import {
   Music2,
@@ -21,17 +23,40 @@ export const UserProfile: React.FC = () => {
     users,
   } = useAuthStore();
   const { getUserEntries } = useMoodStore();
+  const [profileUser, setProfileUser] = useState<any>(null);
+
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const apiUrl = `${API_BASE_URL}/api/users/${userId}`;
+        const response = await axios.get(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+
+        setProfileUser(response.data);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    if (userId) fetchProfile();
+  }, [userId]);
 
   // const userEntries = getUserEntries(userId || "");
   const isOwnProfile = currentUser?.id === userId;
   const isFollowing = following.includes(userId || "");
-  const profileUser = users.find((u) => u.id === userId);
+  // const profileUser = users.find((u) => u.id === userId);
 
-  const handleFollowToggle = () => {
+  const handleFollowToggle = async () => {
     if (isFollowing) {
-      unfollowUser(userId || "");
+      await unfollowUser(userId || "");
     } else {
-      followUser(userId || "");
+      await followUser(userId || "");
     }
   };
 
@@ -51,7 +76,7 @@ export const UserProfile: React.FC = () => {
             <div className="flex items-center space-x-3">
               <Music2 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {profileUser?.name || "User"}'s Profile
+                {profileUser?.username || "User"}'s Profile
               </h3>
             </div>
             {!isOwnProfile && (
