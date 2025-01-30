@@ -80,25 +80,6 @@ router.get("/profile", authenticateUser, (req, res) => {
   });
 });
 
-// // Get a user profile by ID
-router.get("/:id", authenticateUser, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json({
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      following: user.following,
-      followers: user.followers,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Error fetching user profile" });
-  }
-});
-
 // Follow a user
 router.post("/follow/:id", authenticateUser, async (req, res) => {
   try {
@@ -164,14 +145,12 @@ router.get("/users", async (req, res) => {
 router.get("/search", async (req, res) => {
   try {
     const { username } = req.query;
-
     if (!username) {
       return res
         .status(400)
         .json({ message: "Username query parameter is required" });
     }
 
-    // Perform case-insensitive search using regex
     const users = await User.find({
       username: { $regex: new RegExp(username, "i") },
     }).select("username email");
@@ -181,6 +160,30 @@ router.get("/search", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error searching users", error: error.message });
+  }
+});
+
+// Get a user profile by ID
+router.get("/:id", authenticateUser, async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      following: user.following,
+      followers: user.followers,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching user profile" });
   }
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Award, Calendar, Music, Play, Pause } from "lucide-react";
@@ -7,13 +7,20 @@ export const Profile: React.FC = () => {
   const { user } = useAuthStore();
   const { entries, badges, streak, getMoodStats, getUserEntries } =
     useMoodStore();
-  const weeklyStats = getMoodStats(7);
+  const [weeklyStats, setWeeklyStats] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     if (user?.id) {
       getUserEntries(user.id); // Fetch mood entries for the logged-in user
     }
   }, [user, getUserEntries]);
+
+  // Calculate weekly mood stats
+  useEffect(() => {
+    if (entries.length > 0) {
+      setWeeklyStats(getMoodStats(7));
+    }
+  }, [entries, getMoodStats]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -59,6 +66,10 @@ export const Profile: React.FC = () => {
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
           Weekly Mood Summary
         </h3>
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+          {entries.length} mood entries logged in the past 7 days.
+        </p>
+
         <div className="space-y-4">
           {Object.entries(weeklyStats).map(([mood, percentage]) => (
             <div key={mood} className="space-y-2">

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useAuthStore } from "./useAuthStore";
 import type { MoodEntry } from "../types";
-import { mapToCategory } from "../utils/moodUtils";
+import { moodCategories, mapToCategory } from "../utils/moodUtils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -196,7 +196,8 @@ export const useMoodStore = create<MoodState>()(
 
         // Count occurrences of each mood
         const moodCounts = recentEntries.reduce((acc, entry) => {
-          acc[entry.mood] = (acc[entry.mood] || 0) + 1;
+          const category = mapToCategory(entry.moodAnalysis);
+          acc[category] = (acc[category] || 0) + 1;
           return acc;
         }, {} as { [key: string]: number });
 

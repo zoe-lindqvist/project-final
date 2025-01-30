@@ -18,12 +18,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // For local development
-      "https://mood-melody.netlify.app", // For deployed frontend
-    ],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true, // Allow cookies and credentials
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
