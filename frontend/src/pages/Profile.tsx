@@ -18,6 +18,7 @@ export const Profile: React.FC = () => {
   // Calculate weekly mood stats
   useEffect(() => {
     if (entries.length > 0) {
+      console.log("📊 Current User's Mood Entries:", entries);
       setWeeklyStats(getMoodStats(7));
     }
   }, [entries, getMoodStats]);

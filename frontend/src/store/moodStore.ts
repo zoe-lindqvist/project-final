@@ -185,34 +185,46 @@ export const useMoodStore = create<MoodState>()(
       },
 
       getMoodStats: (days: number) => {
-        const entries = get().entries; // Access the current entries
+        const entries = get().entries; // Access current user's mood entries
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - days);
 
-        // Filter entries from the last `days`
-        const recentEntries = entries.filter(
-          (entry) => new Date(entry.createdAt) >= cutoffDate
-        );
+        console.log("🔍 Filtering moods from the last", days, "days");
 
-        // Count occurrences of each mood
-        const moodCounts = recentEntries.reduce((acc, entry) => {
-          const category = mapToCategory(entry.moodAnalysis);
-          acc[category] = (acc[category] || 0) + 1;
-          return acc;
-        }, {} as { [key: string]: number });
+        // Filter entries from the last `days`
+        const recentEntries = entries.filter((entry) => {
+          const entryDate = new Date(entry.createdAt);
+          return entryDate >= cutoffDate;
+        });
+
+        console.log("✅ Recent Entries:", recentEntries);
+
+        // Count occurrences of each mapped mood category
+        const moodCounts: { [key: string]: number } = {};
+
+        recentEntries.forEach((entry) => {
+          const category = mapToCategory(entry.moodAnalysis); // Convert mood text to category
+          console.log("🔄 Mapping Mood:", entry.moodAnalysis, "→", category);
+
+          moodCounts[category] = (moodCounts[category] || 0) + 1;
+        });
+
+        console.log("📊 Mood Counts Before Percentage:", moodCounts);
 
         const totalEntries = recentEntries.length;
 
         if (totalEntries === 0) {
-          return {}; // Return an empty object if there are no entries
+          return {}; // Return an empty object if no moods found
         }
 
-        // Calculate percentages for each mood
+        // Convert counts to percentages
         Object.keys(moodCounts).forEach((mood) => {
           moodCounts[mood] = Math.round(
             (moodCounts[mood] / totalEntries) * 100
           );
         });
+
+        console.log("📊 Final Mood Percentages:", moodCounts);
 
         return moodCounts;
       },
