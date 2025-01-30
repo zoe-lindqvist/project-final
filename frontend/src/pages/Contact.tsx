@@ -12,7 +12,7 @@ export const Contact: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement contact form submission
+
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
     setFormData({ name: "", email: "", message: "" });

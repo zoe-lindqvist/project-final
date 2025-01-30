@@ -347,7 +347,7 @@ export const Feed: React.FC = () => {
             {/* Following Button */}
             <button
               onClick={() => setShowFollowingOnly(!showFollowingOnly)}
-              className={`flex items-center justify-center w-full md:w-auto space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`flex items-center justify-center w-full md:w-auto space-x-2 px-4 py-2 rounded-lg font-medium transition-colors mb-1 ${
                 showFollowingOnly
                   ? "bg-purple-600 dark:bg-purple-500 text-white"
                   : "bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
