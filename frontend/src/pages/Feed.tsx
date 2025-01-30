@@ -302,7 +302,7 @@ export const Feed: React.FC = () => {
               </div>
             )}
           </div>
-
+          {/* ----------------------------------------------------------------------------- */}
           {/* Filters */}
           <div className="flex flex-wrap gap-2 w-full md:w-auto">
             <div className="relative w-full md:w-auto">
@@ -343,7 +343,7 @@ export const Feed: React.FC = () => {
                 ))}
               </select>
             </div>
-
+            {/* ----------------------------------------------------------------------------------- */}
             {/* Following Button */}
             <button
               onClick={() => setShowFollowingOnly(!showFollowingOnly)}
@@ -401,7 +401,8 @@ export const Feed: React.FC = () => {
               <div className="flex flex-col space-y-4">
                 {entry.suggestedSong.spotifyLink && (
                   <iframe
-                    className="w-full h-60 self-start "
+                    className="w-full max-w-[200px] md:max-w-[400px] h-60 self-start overflow-hidden"
+                    style={{ objectFit: "cover" }}
                     src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
                       .split("/")
                       .pop()}`}
