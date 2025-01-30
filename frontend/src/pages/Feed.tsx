@@ -255,7 +255,7 @@ export const Feed: React.FC = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 md:px-8 lg:px-12 py-8">
       {/* Search and Filter Bar */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4">

@@ -5,9 +5,10 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-auto">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Centering Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {/* Contact */}
-          <div>
+          <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
               <Mail className="h-5 w-5 mr-2 text-primary-accent dark:text-primary" />
               Contact
@@ -21,7 +22,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Help */}
-          <div>
+          <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
               <HelpCircle className="h-5 w-5 mr-2 text-primary-accent dark:text-primary" />
               Help
@@ -35,7 +36,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
               <Scale className="h-5 w-5 mr-2 text-primary-accent dark:text-primary" />
               Legal
@@ -65,6 +66,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
+        {/* Footer Bottom Section */}
         <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700">
           <p className="text-center text-text-light dark:text-text-dark">
             © {new Date().getFullYear()} MoodMelody. All rights reserved.
