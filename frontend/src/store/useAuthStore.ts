@@ -20,7 +20,7 @@ interface AuthState {
   followUser: (userId: string) => void;
   unfollowUser: (userId: string) => void;
 }
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>()(
       // Login function that interacts with the backend API
       login: async (email, password) => {
         try {
-          const response = await fetch(`${API_URL}/users/login`, {
+          const response = await fetch(`${API_URL}/api/users/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -68,7 +68,7 @@ export const useAuthStore = create<AuthState>()(
       // Register function that interacts with the backend API
       register: async (username, email, password) => {
         try {
-          const response = await fetch(`${API_URL}/users/register`, {
+          const response = await fetch(`${API_URL}/api/users/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, email, password }),
@@ -96,27 +96,6 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      // Fetch user profile by ID from backend API
-      // fetchUserProfile: async (userId: string): Promise<User | null> => {
-      //   try {
-      //     const response = await fetch(`${API_URL}/users/${userId}`, {
-      //       headers: {
-      //         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      //       },
-      //     });
-
-      //     if (!response.ok) {
-      //       throw new Error("Failed to fetch user profile");
-      //     }
-
-      //     const user = await response.json();
-      //     return user;
-      //   } catch (error) {
-      //     console.error("Error fetching user profile:", error);
-      //     return null;
-      //   }
-      // },
-
       // Logout function to clear the state
       logout: () => {
         set({
@@ -139,14 +118,17 @@ export const useAuthStore = create<AuthState>()(
 
           const token = localStorage.getItem("accessToken");
 
-          const response = await fetch(`${API_URL}/users/follow/${userId}`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({}),
-          });
+          const response = await fetch(
+            `${API_URL}/api/users/follow/${userId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({}),
+            }
+          );
 
           if (!response.ok) {
             const errorData = await response.json();
@@ -170,14 +152,17 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const token = localStorage.getItem("accessToken");
-          const response = await fetch(`${API_URL}/users/unfollow/${userId}`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({}),
-          });
+          const response = await fetch(
+            `${API_URL}/api/users/unfollow/${userId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({}),
+            }
+          );
 
           if (!response.ok) {
             const errorData = await response.json();

@@ -15,9 +15,6 @@ export const Profile: React.FC = () => {
     }
   }, [user, getUserEntries]);
 
-  // Filter entries to show only the logged-in user's entries
-  // const personalEntries = entries.filter((entry) => entry.userId === user?.id);
-
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Stats Overview */}

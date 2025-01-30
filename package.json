@@ -3,12 +3,5 @@
   "version": "1.0.0",
   "scripts": {
     "postinstall": "npm install --prefix backend"
-  },
-  "dependencies": {
-    "axios": "^1.7.9",
-    "canvas-confetti": "^1.9.3"
-  },
-  "devDependencies": {
-    "@types/axios": "^0.14.4"
   }
 }

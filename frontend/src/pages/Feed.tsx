@@ -21,7 +21,6 @@ import { MoodCategory, Comment } from "../types";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
-//--------------------------------------------------------
 export const Feed: React.FC = () => {
   const [entries, setEntries] = useState<any[]>([]); // Store entries from API
   const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
@@ -224,7 +223,7 @@ export const Feed: React.FC = () => {
 
       try {
         const response = await axios.get(
-          `https://project-final-fo1y.onrender.com/api/users/search?username=${searchQuery}`,
+          `${API_BASE_URL}/api/users/search?username=${searchQuery}`,
           {
             headers: {
               Authorization: `Bearer ${
@@ -283,7 +282,7 @@ export const Feed: React.FC = () => {
                       className="flex items-center space-x-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => {
                         setSearchQuery("");
-                        setSearchResults([]); // ✅ Clears search results properly
+                        setSearchResults([]); // Clears search results properly
                       }}
                     >
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
@@ -416,12 +415,6 @@ export const Feed: React.FC = () => {
               <button
                 onClick={() => handleToggleLike(entry._id)}
                 className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
-                // className={`flex items-center space-x-2 text-sm
-                //   ${
-                //   userLiked[entry._id]
-                //     ? "text-purple-500"
-                //     : "text-gray-500 dark:text-gray-400"
-                // }`}
               >
                 <Heart
                   className={`h-5 w-5 ${
