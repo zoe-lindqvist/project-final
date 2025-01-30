@@ -32,6 +32,16 @@ const UserSchema = new mongoose.Schema({
       ref: "User", // References users who follow them
     },
   ],
+  streak: {
+    type: Number,
+    default: 0,
+  },
+  badges: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Badge",
+    },
+  ],
 });
 
 export const User = mongoose.model("User", UserSchema);

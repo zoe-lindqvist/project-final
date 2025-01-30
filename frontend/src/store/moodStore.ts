@@ -1,22 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useAuthStore } from "./useAuthStore";
-import type { MoodEntry } from "../types";
+import type { MoodEntry, Badge } from "../types";
 import { moodCategories, mapToCategory } from "../utils/moodUtils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  unlockedAt: string;
-}
-
 interface MoodState {
   entries: MoodEntry[];
-  badges: Badge[];
   streak: number;
   analyzing: boolean;
   moodSuggestion: string | null;
@@ -27,12 +18,11 @@ interface MoodState {
     spotifyUrl?: string;
   } | null;
 
+  resetMoodData: () => void;
   analyzeMood: (userInput: string) => Promise<void>;
   saveMoodEntry: (
     entry: Omit<MoodEntry, "id" | "createdAt" | "likes" | "comments">
   ) => Promise<void>;
-  unlockBadge: (badge: Badge) => void; // Add this to dynamically unlock badges
-  fetchBadges: () => Promise<void>; // Add this for fetching badges
   getMoodStats: (days: number) => { [key: string]: number };
   getUserEntries: (userId: string) => Promise<void>;
 }
@@ -45,7 +35,16 @@ export const useMoodStore = create<MoodState>()(
       analyzing: false,
       moodSuggestion: null,
       songSuggestion: null,
-      badges: [], // Initialize badges here
+
+      // Reset mood data when a new user logs in
+      resetMoodData: () => {
+        set({
+          entries: [], // ✅ Clear mood entries
+          streak: 0, // ✅ Reset streak
+          moodSuggestion: null,
+          songSuggestion: null,
+        });
+      },
 
       // Analyze mood by calling the backend API
       analyzeMood: async (userInput: string) => {
@@ -65,7 +64,6 @@ export const useMoodStore = create<MoodState>()(
           }
 
           const data = await response.json();
-          console.log("API Response:", data);
 
           set({
             moodSuggestion: data.mood,
@@ -98,8 +96,6 @@ export const useMoodStore = create<MoodState>()(
 
           const category = mapToCategory(entry.moodAnalysis);
 
-          console.log("Authorization Header:", `Bearer ${token}`);
-
           const response = await fetch(`${API_URL}/api/moods/save`, {
             method: "POST",
             headers: {
@@ -125,12 +121,13 @@ export const useMoodStore = create<MoodState>()(
           }
 
           const savedEntry = await response.json();
-          console.log("Saved Entry:", savedEntry);
-          console.log("Mapped Category:", category);
 
           set((state) => ({
             entries: [savedEntry.mood, ...state.entries],
           }));
+
+          const { fetchUser } = useAuthStore.getState();
+          await fetchUser(user.id);
         } catch (error) {
           console.error("Error saving mood entry:", error);
         }
@@ -157,30 +154,10 @@ export const useMoodStore = create<MoodState>()(
             throw new Error("Failed to fetch moods.");
           }
 
-          const data = await response.json(); // Parse the JSON response
+          const data = await response.json();
           set({ entries: data }); // Update the Zustand store with the fetched moods
         } catch (error) {
           console.error("Error fetching moods:", error);
-        }
-      },
-
-      // Unlock a new badge dynamically
-      unlockBadge: (badge) =>
-        set((state) => ({
-          badges: [...state.badges, badge],
-        })),
-
-      // Fetch badges from the backend API
-      fetchBadges: async () => {
-        try {
-          const response = await fetch(`${API_URL}/badges`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch badges.");
-          }
-          const data = await response.json();
-          set({ badges: data });
-        } catch (error) {
-          console.error("Error fetching badges:", error);
         }
       },
 

@@ -170,20 +170,36 @@ router.get("/:id", authenticateUser, async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const user = await User.findById(req.params.id).select("-password");
+    const user = await User.findById(req.params.id)
+      .select("-password")
+      .populate("badges");
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      following: user.following,
-      followers: user.followers,
-    });
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: "Error fetching user profile" });
+  }
+});
+
+//  PATCH - Unlock a badge for a user
+router.patch("/:id/badges", async (req, res) => {
+  const { badgeId } = req.body;
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.badges.includes(badgeId)) {
+      user.badges.push(badgeId); // Add badge ID to user's badges
+      await user.save();
+    }
+
+    res.status(200).json(user.badges);
+  } catch (error) {
+    console.error("Error unlocking badge:", error);
+    res.status(500).json({ message: "Failed to unlock badge." });
   }
 });
 

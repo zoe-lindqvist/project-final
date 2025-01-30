@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { User } from "../types";
 import { persist } from "zustand/middleware";
+import { useMoodStore } from "./moodStore";
 
 interface AuthState {
   user: User | null;
@@ -13,8 +14,8 @@ interface AuthState {
     email: string,
     password: string
   ) => Promise<void>;
-  // fetchUserProfile: (userId: string) => Promise<User | null>;
   logout: () => void;
+  fetchUser: (userId: string) => Promise<void>;
   following: string[];
   followers: string[];
   followUser: (userId: string) => void;
@@ -32,6 +33,31 @@ export const useAuthStore = create<AuthState>()(
       following: [],
       followers: [],
 
+      // Fetch User Profile
+      fetchUser: async (userId) => {
+        try {
+          const token =
+            get().accessToken || localStorage.getItem("accessToken");
+
+          const response = await fetch(`${API_URL}/api/users/${userId}`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch user.");
+          }
+
+          const userData = await response.json();
+          set({ user: userData }); // Store updated user data, including badges
+        } catch (error) {
+          console.error("Error fetching user:", error);
+        }
+      },
+
       // Login function that interacts with the backend API
       login: async (email, password) => {
         try {
@@ -46,6 +72,9 @@ export const useAuthStore = create<AuthState>()(
           if (!response.ok) {
             throw new Error(data.message || "Failed to login");
           }
+
+          // Clear previous user's mood data
+          useMoodStore.getState().resetMoodData();
 
           set({
             user: {
@@ -98,6 +127,7 @@ export const useAuthStore = create<AuthState>()(
 
       // Logout function to clear the state
       logout: () => {
+        useMoodStore.getState().resetMoodData();
         set({
           user: null,
           isAuthenticated: false,

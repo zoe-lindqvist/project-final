@@ -4,6 +4,8 @@ export interface User {
   name?: string;
   username: string;
   accessToken?: string;
+  badges?: Badge[];
+  streak?: number;
 }
 
 export interface Comment {
@@ -60,3 +62,11 @@ export type MoodCategory =
   | "relaxed"
   | "motivated"
   | "mixed";
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt?: string;
+}

@@ -4,16 +4,16 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Award, Calendar, Music, Play, Pause } from "lucide-react";
 
 export const Profile: React.FC = () => {
-  const { user } = useAuthStore();
-  const { entries, badges, streak, getMoodStats, getUserEntries } =
-    useMoodStore();
+  const { user, fetchUser } = useAuthStore();
+  const { entries, streak, getMoodStats, getUserEntries } = useMoodStore();
   const [weeklyStats, setWeeklyStats] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     if (user?.id) {
       getUserEntries(user.id); // Fetch mood entries for the logged-in user
+      fetchUser(user.id); // Fetch user data including badges
     }
-  }, [user, getUserEntries]);
+  }, [user, getUserEntries, fetchUser]);
 
   // Calculate weekly mood stats
   useEffect(() => {
@@ -56,7 +56,7 @@ export const Profile: React.FC = () => {
             </h3>
           </div>
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-            {badges.length}
+            {user?.badges?.length || 0}
           </p>
         </div>
       </div>
@@ -146,7 +146,7 @@ export const Profile: React.FC = () => {
           Badges
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {badges.map((badge) => (
+          {user?.badges?.map((badge) => (
             <div
               key={badge.id}
               className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
