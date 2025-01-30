@@ -318,12 +318,14 @@ router.get("/feed", authenticateUser, async (req, res) => {
       // Fetch moods from only followed users
       moods = await Mood.find({ userId: { $in: user.following } })
         .sort({ createdAt: -1 })
-        .populate("userId", "username");
+        .populate("userId", "username")
+        .populate("comments.userId", "username");
     } else {
       // Fetch all moods (default)
       moods = await Mood.find()
         .sort({ createdAt: -1 })
-        .populate("userId", "username");
+        .populate("userId", "username")
+        .populate("comments.userId", "username");
     }
 
     res.status(200).json(moods);
