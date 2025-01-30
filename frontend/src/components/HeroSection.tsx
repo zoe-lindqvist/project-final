@@ -11,12 +11,14 @@ export const HeroSection = () => {
       <div className="text-center relative">
         <div className="inline-block animate-bounce-slow mb-8">
           <div className="bg-logo-icon-light dark:bg-logo-icon-dark p-4 rounded-full">
-            <Music2 className="h-12 w-12 text-primary-accent dark:text-secondary-accent" />
+            <Music2 className="h-12 w-12 text-purple-600  dark:text-primary-light" />
           </div>
         </div>
-        <h1 className="text-6xl font-bold text-text-light dark:text-text-dark mb-6 leading-tight">
-          <span className="block">Your Emotions,</span>
-          <span className="block bg-logo-text-light dark:bg-logo-text-dark text-transparent bg-clip-text">
+
+        <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+          Your Emotions,
+          <br />
+          <span className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 text-transparent bg-clip-text">
             Transformed into Music
           </span>
         </h1>

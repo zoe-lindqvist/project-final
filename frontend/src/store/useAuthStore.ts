@@ -6,6 +6,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   accessToken: string | null;
+  users: User[]; // ✅ Add this to store all users
   login: (email: string, password: string) => Promise<void>;
   register: (
     username: string,
@@ -27,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       accessToken: null,
+      users: [], // ✅ Add this to store users
       following: [],
       followers: [],
 
@@ -46,7 +48,11 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({
-            user: { id: data.id, email: data.email },
+            user: {
+              id: data.id,
+              username: data.username, // ✅ Ensure username is included
+              email: data.email,
+            },
             isAuthenticated: true,
             accessToken: data.accessToken,
           });
@@ -74,7 +80,11 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({
-            user: { id: data.id, email },
+            user: {
+              id: data.id,
+              username: data.username, // ✅ Ensure username is included
+              email: data.email,
+            },
             isAuthenticated: true,
             accessToken: data.accessToken,
           });
