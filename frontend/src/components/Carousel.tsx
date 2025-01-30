@@ -44,12 +44,15 @@ export const Carousel: React.FC<CarouselProps> = ({ items }) => {
           className="flex transition-transform duration-300 ease-in-out"
           style={{
             transform: `translateX(-${
-              carouselIndex * (window.innerWidth >= 768 ? 25 : 50)
+              carouselIndex * (window.innerWidth >= 768 ? 25 : 100)
             }%)`,
           }}
         >
           {items.map((item, index) => (
-            <div key={index} className="min-w-[50%] md:min-w-[25%] px-4">
+            <div
+              key={index}
+              className="min-w-full sm:min-w-[50%] md:min-w-[25%] px-4"
+            >
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 transform transition-all duration-300 hover:scale-110 hover:z-10 relative border border-transparent hover:border-primary-light dark:hover:border-primary-accent">
                 <img
                   src={item.cover}

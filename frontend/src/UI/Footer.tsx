@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
+import { Mail, HelpCircle, Scale } from "lucide-react";
 
 export const Footer: React.FC = () => {
   return (
@@ -22,7 +22,8 @@ export const Footer: React.FC = () => {
 
           {/* Help */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <HelpCircle className="h-5 w-5 mr-2 text-primary-accent dark:text-primary" />
               Help
             </h3>
             <Link
@@ -35,7 +36,8 @@ export const Footer: React.FC = () => {
 
           {/* Legal */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <Scale className="h-5 w-5 mr-2 text-primary-accent dark:text-primary" />
               Legal
             </h3>
             <ul className="space-y-2">
