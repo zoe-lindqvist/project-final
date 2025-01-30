@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Play, Pause, User, Search } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Play,
+  Pause,
+  User,
+  Search,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { moodCategories, filterByCategory } from "../utils/moodUtils";
 import { genreCategories, mapToGenreCategory } from "../utils/genreUtils";
@@ -17,6 +26,11 @@ export const Feed: React.FC = () => {
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({}); //store comments per entry
   const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
+
+  const [expandedComments, setExpandedComments] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const [likes, setLikes] = useState<{ [key: string]: Comment[] }>({});
   const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
 
@@ -401,31 +415,68 @@ export const Feed: React.FC = () => {
               {/* Comments Section */}
               <div className="mt-4">
                 {/* Display existing comments */}
-
                 {comments[entry._id]?.length > 0 && (
                   <div className="space-y-2">
-                    {comments[entry._id].map((comment, index) => (
-                      <div key={index} className="flex items-start space-x-3">
-                        <div className="p-2 bg-gray-100 dark:bg-gray-700/50 rounded-full">
-                          <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-baseline space-x-2">
-                            <h4 className="font-medium text-gray-900 dark:text-white">
-                              {comment.userId?.username || "Anonymous"}
-                            </h4>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(comment.createdAt).toLocaleDateString()}
-                            </span>
+                    {/* Handle different sorting for collapsed vs. expanded */}
+                    {(expandedComments[entry._id]
+                      ? [...comments[entry._id]] // Copy array for expanded view (oldest to newest)
+                      : [...comments[entry._id]].slice(-2)
+                    ) // Copy last 2 comments and reverse them (second most recent on top)
+                      .map((comment, index) => (
+                        <div
+                          key={comment._id || index}
+                          className="flex items-start space-x-3"
+                        >
+                          <div className="p-2 bg-gray-100 dark:bg-gray-700/50 rounded-full">
+                            <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                           </div>
-                          <p className="text-gray-600 dark:text-gray-300">
-                            {comment.comment}
-                          </p>
+                          <div className="flex-1">
+                            <div className="flex items-baseline space-x-2">
+                              <h4 className="font-medium text-gray-900 dark:text-white">
+                                {comment.userId?.username || "Anonymous"}
+                              </h4>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {new Date(
+                                  comment.createdAt
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p className="text-gray-600 dark:text-gray-300">
+                              {comment.comment}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+
+                    {/* Expand/Collapse Button */}
+                    {comments[entry._id].length > 2 && (
+                      <button
+                        onClick={() =>
+                          setExpandedComments((prev) => ({
+                            ...prev,
+                            [entry._id]: !prev[entry._id], // Toggle state
+                          }))
+                        }
+                        className="flex items-center text-sm text-purple-600 dark:text-purple-400 mt-2"
+                      >
+                        {expandedComments[entry._id] ? (
+                          <>
+                            <span>Show less</span>
+                            <ChevronUp className="h-4 w-4 ml-1" />
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              Show all {comments[entry._id].length} comments
+                            </span>
+                            <ChevronDown className="h-4 w-4 ml-1" />
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 )}
+
                 {/* Comment Input */}
                 {user && (
                   <div className="relative mt-3">
@@ -437,6 +488,12 @@ export const Feed: React.FC = () => {
                           [entry._id]: e.target.value,
                         })
                       }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault(); // Prevents newline when pressing Enter
+                          handleCommentSubmit(entry._id); // Triggers comment submit
+                        }
+                      }}
                       placeholder="Add a comment..."
                       className="w-full min-h-[2.5rem] px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
                     />
