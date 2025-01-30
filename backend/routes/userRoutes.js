@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import { authenticateUser } from "../middleware/authMiddleware.js";
-
+import mongoose from "mongoose";
 const router = express.Router();
 
 // Route to register a new user
@@ -80,7 +80,7 @@ router.get("/profile", authenticateUser, (req, res) => {
   });
 });
 
-// Get a user profile by ID
+// // Get a user profile by ID
 router.get("/users/:id", authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");

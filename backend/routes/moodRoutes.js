@@ -2,7 +2,8 @@ import express from "express";
 import OpenAI from "openai";
 import axios from "axios";
 import dotenv from "dotenv";
-import Mood from "../models/Mood.js";
+import { Mood, Comment } from "../models/Mood.js";
+import mongoose from "mongoose";
 
 import { authenticateUser } from "../middleware/authMiddleware.js";
 
@@ -11,6 +12,101 @@ const router = express.Router();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+router.post("/like/:id", authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = new mongoose.Types.ObjectId(req.user._id); // Ensure it's an ObjectId
+
+    const mood = await Mood.findById(id);
+    if (!mood) {
+      return res.status(404).json({ error: "Mood entry not found" });
+    }
+
+    // Check if user has already liked the mood
+    const alreadyLiked = mood.likes.some((like) => like.equals(userId));
+
+    if (!alreadyLiked) {
+      mood.likes.push(userId); // Store as ObjectId
+    } else {
+      mood.likes = mood.likes.filter((like) => !like.equals(userId)); //  Properly remove user
+    }
+
+    await mood.save();
+    res.json({
+      success: true,
+      message: alreadyLiked ? "Unliked the mood" : "Liked the mood",
+      likes: mood.likes.map((like) => like.toString()), // Convert ObjectId to string
+      likesCount: mood.likes.length, // Send likes count separately
+    });
+  } catch (error) {
+    console.error("Error updating like:", error);
+    res.status(500).json({ error: "Failed to update like" });
+  }
+});
+
+// Add a comment to a mood entry
+router.post("/:moodId/comments", authenticateUser, async (req, res) => {
+  const { moodId } = req.params;
+  const { text } = req.body;
+  const userId = req.user._id; // Get authenticated user
+
+  try {
+    const mood = await Mood.findById(moodId);
+    if (!mood) {
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    // Create the new comment
+    const newComment = {
+      userId: userId,
+      comment: text,
+      createdAt: new Date(),
+    };
+
+    // Add the comment to the mood entry
+    mood.comments.push(newComment);
+    await mood.save();
+
+    // Re-fetch mood with populated `userId.username`
+    const updatedMood = await Mood.findById(moodId)
+      .populate("comments.userId", "username") // Ensure username is populated
+      .exec();
+
+    res.status(201).json({ comments: updatedMood.comments }); // Return comments with usernames
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res
+      .status(500)
+      .json({ message: "Could not add comment", error: error.message });
+  }
+});
+
+// Get all comments for a mood entry
+router.get("/:moodId/comments", async (req, res) => {
+  const { moodId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(moodId)) {
+      return res.status(400).json({ message: "Invalid mood ID format" });
+    }
+
+    const mood = await Mood.findById(
+      new mongoose.Types.ObjectId(moodId)
+    ).populate("comments.userId", "username");
+
+    if (!mood) {
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    res.status(200).json(mood.comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res
+      .status(500)
+      .json({ message: "Could not fetch comments", error: error.message });
+  }
 });
 
 // Function to get Spotify access token
@@ -88,10 +184,10 @@ router.post("/analyze", async (req, res) => {
 
     // Construct the AI prompt to analyze the mood and suggest a song
     const prompt = `
-      Analyze the following user input and provide a unique and creative song suggestion each time. 
-      Ensure the recommendations vary by genre, artist, and style to avoid repetition. 
+      Analyze the following user input and provide a unique and creative song suggestion each time.
+      Ensure the recommendations vary by genre, artist, and style to avoid repetition.
       Provide lesser-known or unexpected suggestions alongside popular ones, focusing on the given mood.
-      Format the response as follows: 
+      Format the response as follows:
       {
         "mood": "<detected mood>",
         "songRecommendation": {
@@ -209,6 +305,7 @@ router.get("/feed", async (req, res) => {
   try {
     const feedEntries = await Mood.find({ shared: true })
       .populate("userId", "username")
+      .populate("comments.userId", "username")
       .sort({ createdAt: -1 });
 
     res.status(200).json(feedEntries);

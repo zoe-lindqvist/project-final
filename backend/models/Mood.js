@@ -66,4 +66,5 @@ const MoodSchema = new mongoose.Schema({
   comments: [CommentSchema],
 });
 
-export default mongoose.model("Mood", MoodSchema);
+export const Comment = mongoose.model("Comment", CommentSchema);
+export const Mood = mongoose.model("Mood", MoodSchema);
