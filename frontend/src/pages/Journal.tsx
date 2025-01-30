@@ -215,7 +215,7 @@ export const Journal: React.FC = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="mt-6 flex flex-wrap justify-center sm:justify-start gap-2 w-full">
+                <div className="mt-6 flex justify-center gap-4 flex-wrap w-full">
                   {/* Try Again Button */}
                   <button
                     onClick={handleAnalyze}

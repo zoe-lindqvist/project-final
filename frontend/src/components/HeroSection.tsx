@@ -15,7 +15,7 @@ export const HeroSection = () => {
           </div>
         </div>
 
-        <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        <h1 className="text-5xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
           Your Emotions,
           <br />
           <span className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 text-transparent bg-clip-text">

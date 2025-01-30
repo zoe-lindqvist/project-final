@@ -69,15 +69,15 @@ export const Home: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-16">
       {/* Hero Section */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-12 md:py-16 overflow-hidden">
         {/* ...Hero Section Content... */}
         <HeroSection />
       </section>
 
       {/* Carousel Section */}
-      <section className="py-16 px-4 md:px-8">
+      <section className="py-10 md:py-10 px-4 md:px-6">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">
           Top 10 Mood Picks
         </h2>
@@ -85,7 +85,7 @@ export const Home: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24">
+      <section className="py-12 md:py-12">
         {/* ...Features Section Content... */}
         <HowItWorks />
       </section>
