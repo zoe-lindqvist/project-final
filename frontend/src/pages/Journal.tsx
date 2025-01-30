@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import {
+  Play,
+  PlayCircle,
   PenLine,
   Loader2,
   Music2,
@@ -15,15 +17,13 @@ import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { MoodCategory } from "../types";
 import { mapToCategory } from "../utils/moodUtils";
+import { triggerConfetti } from "../utils/confetti";
 
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
   const [content, setContent] = useState("");
 
-  const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
-
-  // Dev branch
-  // const addEntry = useMoodStore((state) => state.addEntry);
+  //const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
 
   const navigate = useNavigate();
 
@@ -32,12 +32,6 @@ export const Journal: React.FC = () => {
   const moodSuggestion = useMoodStore((state) => state.moodSuggestion);
   const songSuggestion = useMoodStore((state) => state.songSuggestion);
   const analyzing = useMoodStore((state) => state.analyzing);
-
-  // Function to analyze user's input
-  // const analyzeContent = async () => {
-  //   if (!content.trim() || analyzing) return; // Prevent empty input or duplicate requests
-  //   await analyzeMood(content);
-  // };
 
   const handleAnalyze = async () => {
     await analyzeMood(content);
@@ -69,6 +63,8 @@ export const Journal: React.FC = () => {
         spotifyUrl: songSuggestion.spotifyUrl || "#",
       },
     });
+
+    triggerConfetti();
 
     // Reset form after saving
     setContent("");
@@ -108,6 +104,8 @@ export const Journal: React.FC = () => {
         alert("Mood shared successfully!");
         setContent(""); // Clear input after sharing
       }
+
+      triggerConfetti();
       const sharedMoodEntry = response.data;
       useMoodStore.getState().saveMoodEntry(sharedMoodEntry);
 
@@ -116,30 +114,32 @@ export const Journal: React.FC = () => {
       console.error("Error sharing mood:", error);
       alert("Failed to share mood.");
     }
-
-    // Dev branch
-    //     // Reset input and state after saving
-    //     setContent("");
-    //     useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
-    //     navigate("/profile"); // Redirect to profile page
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Your Mood Journal
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">
+          Express your feelings and discover music that matches your mood
+        </p>
+      </div>
+
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8">
-        {/* Header Section */}
         <div className="flex items-center space-x-3 mb-6">
           <PenLine className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             How are you feeling?
-          </h1>
+          </h2>
         </div>
 
         {/* Textarea for user input */}
         <TextareaAutosize
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Express your thoughts and feelings..."
+          placeholder="Write your thoughts or feelings..."
           className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent resize-none"
           minRows={4}
         />
@@ -215,38 +215,43 @@ export const Journal: React.FC = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="mt-6 flex items-center space-x-4">
+                <div className="mt-6 flex flex-wrap justify-center sm:justify-start gap-2 w-full">
+                  {/* Try Again Button */}
                   <button
                     onClick={handleAnalyze}
-                    className="inline-flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 transition-transform transform hover:scale-105 rounded-full text-white px-4 sm:px-6 py-2 text-sm font-semibold shadow-md"
                   >
                     <RefreshCcw className="h-4 w-4" />
-                    <span>Try Another Song</span>
+                    <span>Try Again</span>
                   </button>
 
+                  {/* Save Button */}
                   <button
                     onClick={handleSave}
-                    className="inline-flex items-center space-x-2 bg-purple-600 dark:bg-purple-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
+                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 transition-transform transform hover:scale-105 rounded-full text-white px-4 sm:px-6 py-2 text-sm font-semibold shadow-md"
                   >
                     <Check className="h-4 w-4" />
-                    <span>Save Entry</span>
+                    <span>Save</span>
                   </button>
+
+                  {/* Spotify Link */}
                   <a
                     href={songSuggestion.spotifyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-400 transition-transform transform hover:scale-105 rounded-full text-white px-6 py-2 text-sm font-semibold shadow-md"
+                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 transition-transform transform hover:scale-105 rounded-full text-white px-4 sm:px-6 py-2 text-sm font-semibold shadow-md"
                   >
-                    <Music2 className="h-4 w-4" />
-                    <span>Listen on Spotify</span>
+                    <Play className="h-4 w-4" />
+                    <span>Spotify</span>
                   </a>
 
+                  {/* Share Button */}
                   <button
                     onClick={handleShareToFeed}
-                    className="inline-flex items-center space-x-2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 transition-transform transform hover:scale-105 rounded-full text-white px-4 sm:px-6 py-2 text-sm font-semibold shadow-md"
                   >
                     <Share2 className="h-4 w-4" />
-                    <span>Share to Feed</span>
+                    <span>Share</span>
                   </button>
                 </div>
               </div>
