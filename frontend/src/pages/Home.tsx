@@ -22,7 +22,7 @@ export const Home: React.FC = () => {
       title: "30",
       artist: "Adele",
       cover:
-        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=300&h=300&fit=crop",
     },
     {
       title: "Harry's House",
@@ -34,31 +34,31 @@ export const Home: React.FC = () => {
       title: "Un Verano Sin Ti",
       artist: "Bad Bunny",
       cover:
-        "https://images.unsplash.com/photo-1598387300105-ec5ae2ed9995?w=300&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1515261439133-0f6cfb098e04?w=300&h=300&fit=crop",
     },
     {
       title: "Planet Her",
       artist: "Doja Cat",
       cover:
-        "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=300&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1499424017184-418f6808abf9?w=300&h=300&fit=crop",
     },
     {
       title: "Honestly, Nevermind",
       artist: "Drake",
       cover:
-        "https://images.unsplash.com/photo-1598387181366-6dcb1a56a2e1?w=300&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&h=300&fit=crop",
     },
     {
       title: "Special",
       artist: "Lizzo",
       cover:
-        "https://images.unsplash.com/photo-1598387300454-6aa1a597c716?w=300&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1472196844025-f80c1d5beacd??w=300&h=300&fit=crop",
     },
     {
       title: "Motomami",
       artist: "Rosalía",
       cover:
-        "https://images.unsplash.com/photo-1598387181245-a6f43e3a2f96?w=300&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=300&h=300&fit=crop",
     },
     {
       title: "Dance Fever",
@@ -69,15 +69,15 @@ export const Home: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-16">
       {/* Hero Section */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-12 md:py-16 overflow-hidden">
         {/* ...Hero Section Content... */}
         <HeroSection />
       </section>
 
       {/* Carousel Section */}
-      <section className="py-16 px-4 md:px-8">
+      <section className="py-10 md:py-10 px-4 md:px-6">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">
           Top 10 Mood Picks
         </h2>
@@ -85,7 +85,7 @@ export const Home: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24">
+      <section className="py-12 md:py-12">
         {/* ...Features Section Content... */}
         <HowItWorks />
       </section>

@@ -2,7 +2,9 @@ import express from "express";
 import OpenAI from "openai";
 import axios from "axios";
 import dotenv from "dotenv";
-import Mood from "../models/Mood.js";
+import { Mood, Comment } from "../models/Mood.js";
+import { User } from "../models/User.js";
+import mongoose from "mongoose";
 
 import { authenticateUser } from "../middleware/authMiddleware.js";
 
@@ -11,6 +13,101 @@ const router = express.Router();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+router.post("/like/:id", authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = new mongoose.Types.ObjectId(req.user._id); // Ensure it's an ObjectId
+
+    const mood = await Mood.findById(id);
+    if (!mood) {
+      return res.status(404).json({ error: "Mood entry not found" });
+    }
+
+    // Check if user has already liked the mood
+    const alreadyLiked = mood.likes.some((like) => like.equals(userId));
+
+    if (!alreadyLiked) {
+      mood.likes.push(userId); // Store as ObjectId
+    } else {
+      mood.likes = mood.likes.filter((like) => !like.equals(userId)); //  Properly remove user
+    }
+
+    await mood.save();
+    res.json({
+      success: true,
+      message: alreadyLiked ? "Unliked the mood" : "Liked the mood",
+      likes: mood.likes.map((like) => like.toString()), // Convert ObjectId to string
+      likesCount: mood.likes.length, // Send likes count separately
+    });
+  } catch (error) {
+    console.error("Error updating like:", error);
+    res.status(500).json({ error: "Failed to update like" });
+  }
+});
+
+// Add a comment to a mood entry
+router.post("/:moodId/comments", authenticateUser, async (req, res) => {
+  const { moodId } = req.params;
+  const { text } = req.body;
+  const userId = req.user._id; // Get authenticated user
+
+  try {
+    const mood = await Mood.findById(moodId);
+    if (!mood) {
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    // Create the new comment
+    const newComment = {
+      userId: userId,
+      comment: text,
+      createdAt: new Date(),
+    };
+
+    // Add the comment to the mood entry
+    mood.comments.push(newComment);
+    await mood.save();
+
+    // Re-fetch mood with populated `userId.username`
+    const updatedMood = await Mood.findById(moodId)
+      .populate("comments.userId", "username") // Ensure username is populated
+      .exec();
+
+    res.status(201).json({ comments: updatedMood.comments }); // Return comments with usernames
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res
+      .status(500)
+      .json({ message: "Could not add comment", error: error.message });
+  }
+});
+
+// Get all comments for a mood entry
+router.get("/:moodId/comments", async (req, res) => {
+  const { moodId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(moodId)) {
+      return res.status(400).json({ message: "Invalid mood ID format" });
+    }
+
+    const mood = await Mood.findById(
+      new mongoose.Types.ObjectId(moodId)
+    ).populate("comments.userId", "username");
+
+    if (!mood) {
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    res.status(200).json(mood.comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res
+      .status(500)
+      .json({ message: "Could not fetch comments", error: error.message });
+  }
 });
 
 // Function to get Spotify access token
@@ -69,6 +166,19 @@ const searchSpotifyTrack = async (title, artist) => {
   }
 };
 
+// Get all mood entries for a specific user profile by userId
+router.get("/profile/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const userEntries = await Mood.find({ userId }).sort({ createdAt: -1 });
+    res.status(200).json(userEntries);
+  } catch (error) {
+    console.error("Error fetching user entries:", error.message);
+    res.status(500).json({ error: "Failed to fetch mood entries" });
+  }
+});
+
 // POST route to analyze user input and provide mood-based song suggestions
 router.post("/analyze", async (req, res) => {
   try {
@@ -76,9 +186,10 @@ router.post("/analyze", async (req, res) => {
 
     // Construct the AI prompt to analyze the mood and suggest a song
     const prompt = `
-      Analyze the following user input and provide a unique and creative song suggestion each time. 
-      Provide songs from different genres and artists that fit within the given mood.
-      Format the response as follows: 
+      Analyze the following user input and provide a unique and creative song suggestion each time.
+      Ensure the recommendations vary by genre, artist, and style to avoid repetition.
+      Provide lesser-known or unexpected suggestions alongside popular ones, focusing on the given mood.
+      Format the response as follows:
       {
         "mood": "<detected mood>",
         "songRecommendation": {
@@ -140,7 +251,7 @@ router.post("/analyze", async (req, res) => {
 // POST route to save a new mood entry without sharing it (when user clicks "Save")
 router.post("/save", authenticateUser, async (req, res) => {
   try {
-    const { userInput, moodAnalysis, suggestedSong } = req.body;
+    const { userInput, moodAnalysis, suggestedSong, shared } = req.body;
 
     const moodEntry = new Mood({
       userId: req.user._id,
@@ -191,17 +302,36 @@ router.post("/share", authenticateUser, async (req, res) => {
   }
 });
 
-// GET route to fetch the latest mood entries for the feed
-router.get("/feed", async (req, res) => {
+// GET route to display mood entries to feed (either all or only from followed users)
+router.get("/feed", authenticateUser, async (req, res) => {
   try {
-    const feedEntries = await Mood.find({ shared: true })
-      .populate("userId", "username")
-      .sort({ createdAt: -1 });
+    const { filter } = req.query; // Check for query parameter
+    let moods;
 
-    res.status(200).json(feedEntries);
+    if (filter === "following") {
+      // Get the logged-in user's following list
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Fetch moods from only followed users
+      moods = await Mood.find({ userId: { $in: user.following }, shared: true })
+        .sort({ createdAt: -1 })
+        .populate("userId", "username")
+        .populate("comments.userId", "username");
+    } else {
+      // Fetch all moods (default)
+      moods = await Mood.find({ shared: true })
+        .sort({ createdAt: -1 })
+        .populate("userId", "username")
+        .populate("comments.userId", "username");
+    }
+
+    res.status(200).json(moods);
   } catch (error) {
-    console.error("Error fetching feed:", error);
-    res.status(500).json({ error: "Failed to fetch mood feed." });
+    console.error("Error fetching mood feed:", error);
+    res.status(500).json({ error: "Failed to fetch mood feed" });
   }
 });
 

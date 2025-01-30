@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import { User } from "../models/User.js";
 
 // Middleware function to authenticate users based on their access token
 export const authenticateUser = async (req, res, next) => {

@@ -1,8 +1,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import User from "../models/User.js";
+import { User } from "../models/User.js";
 import { authenticateUser } from "../middleware/authMiddleware.js";
-
+import mongoose from "mongoose";
 const router = express.Router();
 
 // Route to register a new user
@@ -80,8 +80,8 @@ router.get("/profile", authenticateUser, (req, res) => {
   });
 });
 
-// Get a user profile by ID
-router.get("/users/:id", authenticateUser, async (req, res) => {
+// // Get a user profile by ID
+router.get("/:id", authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
@@ -157,6 +157,30 @@ router.get("/users", async (req, res) => {
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Search users by username
+router.get("/search", async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    if (!username) {
+      return res
+        .status(400)
+        .json({ message: "Username query parameter is required" });
+    }
+
+    // Perform case-insensitive search using regex
+    const users = await User.find({
+      username: { $regex: new RegExp(username, "i") },
+    }).select("username email");
+
+    res.json(users);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error searching users", error: error.message });
   }
 });
 

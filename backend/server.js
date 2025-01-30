@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 import userRoutes from "./routes/userRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
+import badgeRoutes from "./routes/badgeRoutes.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ mongoose.Promise = Promise;
 
 const port = process.env.PORT || 8080;
 const app = express();
+
 app.use(
   cors({
     origin: [
@@ -38,6 +40,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/moods", moodRoutes);
+app.use("/api/badges", badgeRoutes);
 
 // Start the server
 app.listen(port, () => {

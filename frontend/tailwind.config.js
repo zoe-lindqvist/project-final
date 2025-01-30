@@ -22,7 +22,8 @@ export default {
       colors: {
         // Purple shades used in the Logo
         primary: {
-          light: "#e9d5ff", // Matches purple-100
+          light: "#fbf9ff", // Matches purple-100
+
           DEFAULT: "#a855f7", // Matches purple-400
           dark: "#7e22ce", // Matches purple-900
           accent: "#9333ea", // Matches purple-600

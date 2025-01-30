@@ -9,17 +9,25 @@ interface ThemeStore {
 
 // Create a Zustand store for managing theme state
 export const useThemeStore = create<ThemeStore>()(
-  // Use the persist middleware to save state to local storage
   persist(
-    // Define the initial state and actions for the store
-    (set) => ({
-      // Initial state: default to light mode
-      isDark: false,
+    (set, get) => ({
+      // Initial state: Check localStorage, default to dark mode
+      isDark: localStorage.getItem("theme") === "light" ? false : true,
+
       // Define the toggle action to switch between light and dark mode
-      toggle: () => set((state) => ({ isDark: !state.isDark })),
+      toggle: () => {
+        set((state) => {
+          const newTheme = !state.isDark ? "dark" : "light";
+          localStorage.setItem("theme", newTheme); // Store theme preference
+          document.documentElement.classList.toggle(
+            "dark",
+            newTheme === "dark"
+          ); // Apply class to <html>
+          return { isDark: !state.isDark };
+        });
+      },
     }),
     {
-      // Configuration for the persist middleware
       name: "theme-storage", // Key under which state is saved in local storage
     }
   )

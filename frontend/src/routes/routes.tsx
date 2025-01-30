@@ -6,6 +6,8 @@ import { Auth } from "../pages/Auth";
 import { FAQ } from "../pages/FAQ";
 import { Journal } from "../pages/Journal";
 import { Feed } from "../pages/Feed";
+import { Profile } from "../pages/Profile";
+import { UserProfile } from "../pages/UserProfile";
 
 export const routes = (
   <Routes>
@@ -16,9 +18,11 @@ export const routes = (
       <Route path="faq" element={<FAQ />} />
       <Route path="journal" element={<Journal />} />
       <Route path="feed" element={<Feed />} />
+      <Route path="profile" element={<Profile />} />
+      <Route path="profile/:userId" element={<UserProfile />} />
     </Route>
 
     {/* Route for login page */}
-    <Route path="/login" element={<Auth />} />
+    <Route path="login" element={<Auth />} />
   </Routes>
 );

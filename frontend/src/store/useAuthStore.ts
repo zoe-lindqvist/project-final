@@ -6,20 +6,21 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   accessToken: string | null;
+  users: User[];
   login: (email: string, password: string) => Promise<void>;
   register: (
     username: string,
     email: string,
     password: string
   ) => Promise<void>;
-  fetchUserProfile: (userId: string) => Promise<User | null>;
+  // fetchUserProfile: (userId: string) => Promise<User | null>;
   logout: () => void;
   following: string[];
   followers: string[];
   followUser: (userId: string) => void;
   unfollowUser: (userId: string) => void;
 }
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -27,13 +28,14 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       accessToken: null,
+      users: [],
       following: [],
       followers: [],
 
       // Login function that interacts with the backend API
       login: async (email, password) => {
         try {
-          const response = await fetch(`${API_URL}/users/login`, {
+          const response = await fetch(`${API_URL}/api/users/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -46,9 +48,14 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({
-            user: { id: data.id, email: data.email },
+            user: {
+              id: data.id,
+              username: data.username, // Ensure username is included
+              email: data.email,
+            },
             isAuthenticated: true,
             accessToken: data.accessToken,
+            following: data.following || [],
           });
 
           // Save token to local storage
@@ -61,7 +68,7 @@ export const useAuthStore = create<AuthState>()(
       // Register function that interacts with the backend API
       register: async (username, email, password) => {
         try {
-          const response = await fetch(`${API_URL}/users/register`, {
+          const response = await fetch(`${API_URL}/api/users/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, email, password }),
@@ -74,7 +81,11 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({
-            user: { id: data.id, email },
+            user: {
+              id: data.id,
+              username: data.username,
+              email: data.email,
+            },
             isAuthenticated: true,
             accessToken: data.accessToken,
           });
@@ -82,27 +93,6 @@ export const useAuthStore = create<AuthState>()(
           localStorage.setItem("accessToken", data.accessToken);
         } catch (error) {
           throw error;
-        }
-      },
-
-      // Fetch user profile by ID from backend API
-      fetchUserProfile: async (userId: string): Promise<User | null> => {
-        try {
-          const response = await fetch(`${API_URL}/users/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch user profile");
-          }
-
-          const user = await response.json();
-          return user;
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-          return null;
         }
       },
 
@@ -121,20 +111,33 @@ export const useAuthStore = create<AuthState>()(
       // Follow a user by ID
       followUser: async (userId) => {
         try {
-          const response = await fetch(`${API_URL}/users/follow/${userId}`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          });
-
-          if (response.ok) {
-            set((state) => ({
-              following: [...state.following, userId],
-            }));
-          } else {
-            throw new Error("Failed to follow user");
+          const state = get();
+          if (state.following.includes(userId)) {
+            return;
           }
+
+          const token = localStorage.getItem("accessToken");
+
+          const response = await fetch(
+            `${API_URL}/api/users/follow/${userId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({}),
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to follow user");
+          }
+
+          set((state) => ({
+            following: [...state.following, userId],
+          }));
         } catch (error) {
           console.error("Error following user:", error);
         }
@@ -143,20 +146,32 @@ export const useAuthStore = create<AuthState>()(
       // Unfollow a user by ID
       unfollowUser: async (userId) => {
         try {
-          const response = await fetch(`${API_URL}/users/unfollow/${userId}`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          });
-
-          if (response.ok) {
-            set((state) => ({
-              following: state.following.filter((id) => id !== userId),
-            }));
-          } else {
-            throw new Error("Failed to unfollow user");
+          const state = get();
+          if (!state.following.includes(userId)) {
+            return;
           }
+
+          const token = localStorage.getItem("accessToken");
+          const response = await fetch(
+            `${API_URL}/api/users/unfollow/${userId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({}),
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to unfollow user");
+          }
+
+          set((state) => ({
+            following: state.following.filter((id) => id !== userId),
+          }));
         } catch (error) {
           console.error("Error unfollowing user:", error);
         }
