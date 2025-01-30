@@ -179,6 +179,32 @@ router.get("/profile/:userId", async (req, res) => {
   }
 });
 
+// Public profile for specific user
+router.get("/public-profile/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const publicEntries = await Mood.find({ userId, shared: true }).sort({
+      createdAt: -1,
+    });
+
+    // Fetch the user (excluding private info like email)
+    const user = await User.findById(userId).select("username badges");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      user, // Includes username and badges
+      publicEntries, // Only public mood entries
+    });
+  } catch (error) {
+    console.error("Error fetching public profile:", error.message);
+    res.status(500).json({ error: "Failed to fetch public profile" });
+  }
+});
+
 // POST route to analyze user input and provide mood-based song suggestions
 router.post("/analyze", async (req, res) => {
   try {
