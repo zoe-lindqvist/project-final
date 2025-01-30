@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import axios from "axios";
 import dotenv from "dotenv";
 import { Mood, Comment } from "../models/Mood.js";
+import { User } from "../models/User.js";
 import mongoose from "mongoose";
 
 import { authenticateUser } from "../middleware/authMiddleware.js";
@@ -165,6 +166,7 @@ const searchSpotifyTrack = async (title, artist) => {
   }
 };
 
+// Get all mood entries for a specific user profile by userId
 router.get("/profile/:userId", async (req, res) => {
   const { userId } = req.params;
 
@@ -300,18 +302,34 @@ router.post("/share", authenticateUser, async (req, res) => {
   }
 });
 
-// GET route to fetch the latest mood entries for the feed
-router.get("/feed", async (req, res) => {
+// GET route to display mood entries to feed (either all or only from followed users)
+router.get("/feed", authenticateUser, async (req, res) => {
   try {
-    const feedEntries = await Mood.find({ shared: true })
-      .populate("userId", "username")
-      .populate("comments.userId", "username")
-      .sort({ createdAt: -1 });
+    const { filter } = req.query; // Check for query parameter
+    let moods;
 
-    res.status(200).json(feedEntries);
+    if (filter === "following") {
+      // Get the logged-in user's following list
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Fetch moods from only followed users
+      moods = await Mood.find({ userId: { $in: user.following } })
+        .sort({ createdAt: -1 })
+        .populate("userId", "username");
+    } else {
+      // Fetch all moods (default)
+      moods = await Mood.find()
+        .sort({ createdAt: -1 })
+        .populate("userId", "username");
+    }
+
+    res.status(200).json(moods);
   } catch (error) {
-    console.error("Error fetching feed:", error);
-    res.status(500).json({ error: "Failed to fetch mood feed." });
+    console.error("Error fetching mood feed:", error);
+    res.status(500).json({ error: "Failed to fetch mood feed" });
   }
 });
 
