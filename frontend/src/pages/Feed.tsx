@@ -255,7 +255,7 @@ export const Feed: React.FC = () => {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-8 lg:px-12 py-8">
+    <div className="max-w-3xl mx-auto px-2 md:px-4 lg:px-6 py-8">
       {/* Search and Filter Bar */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4">
@@ -392,44 +392,37 @@ export const Feed: React.FC = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 {entry.userInput}
               </p>
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+              {/* <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   {entry.suggestedSong.genre}
                 </p>
-              </div>
+              </div> */}
 
-              {/* Spotify Embedded Player */}
-              {entry.suggestedSong.spotifyLink && (
-                <div className="mt-6">
+              <div className="flex flex-col space-y-4">
+                {entry.suggestedSong.spotifyLink && (
                   <iframe
+                    className="w-full h-60 self-start "
                     src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
                       .split("/")
                       .pop()}`}
-                    className="w-full h-32 rounded-lg shadow-lg"
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
-                  ></iframe>
-                </div>
-              )}
+                  />
+                )}
 
-              {/* Like Button */}
-              <button
-                onClick={() => handleToggleLike(entry._id)}
-                className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
-                // className={`flex items-center space-x-2 text-sm
-                //   ${
-                //   userLiked[entry._id]
-                //     ? "text-purple-500"
-                //     : "text-gray-500 dark:text-gray-400"
-                // }`}
-              >
-                <Heart
-                  className={`h-5 w-5 ${
-                    userLiked[entry._id] ? "fill-current text-purple-600" : ""
-                  }`}
-                />
-                <span>{entry.likes.length}</span>
-              </button>
+                {/* Like Button */}
+                <button
+                  onClick={() => handleToggleLike(entry._id)}
+                  className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+                >
+                  <Heart
+                    className={`h-5 w-5 ${
+                      userLiked[entry._id] ? "fill-current text-purple-600" : ""
+                    }`}
+                  />
+                  <span>{entry.likes.length}</span>
+                </button>
+              </div>
 
               {/* Comments Section */}
               <div className="mt-4">
