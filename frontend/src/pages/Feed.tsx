@@ -56,7 +56,7 @@ export const Feed: React.FC = () => {
           )
         );
 
-        // ✅ Update `userLiked` state correctly
+        // Update `userLiked` state
         setUserLiked((prevLiked) => ({
           ...prevLiked,
           [entryId]: updatedLikes.includes(user.id),
@@ -178,7 +178,7 @@ export const Feed: React.FC = () => {
             acc: { [key: string]: boolean },
             mood: { _id: string; likes: string[] }
           ) => {
-            acc[mood._id] = mood.likes.includes(user.id); // ✅ Check if user is in the likes array
+            acc[mood._id] = mood.likes.includes(user.id); // Check if user is in the likes array
             return acc;
           },
           {} // Initial value
@@ -223,18 +223,13 @@ export const Feed: React.FC = () => {
   }, [searchQuery]);
 
   const filteredEntries = entries.filter((entry) => {
-    // Mood filtering: If a specific mood is selected, only show matching moods
+    const entryGenre = entry.suggestedSong?.genre || "mixed";
+    const mappedGenre = mapToGenreCategory(entryGenre);
     const matchesMood =
-      moodFilter === "all"
-        ? entries
-        : filterByCategory(entries, moodFilter as MoodCategory);
-
-    // Genre filtering: If a specific genre is selected, only show matching genres
-    const entryGenre = entry.suggestedSong?.genre || "mixed"; // Get genre from API
-    const mappedGenre = mapToGenreCategory(entryGenre); // Map it to main category
+      moodFilter === "all" ||
+      filterByCategory([entry], moodFilter as MoodCategory).length > 0;
     const matchesGenre = genreFilter === "all" || mappedGenre === genreFilter;
 
-    // Show the entry only if it matches BOTH filters
     return matchesMood && matchesGenre;
   });
 
