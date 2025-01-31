@@ -305,29 +305,30 @@ router.post("/share", authenticateUser, async (req, res) => {
 // GET route to display mood entries to feed (either all or only from followed users)
 router.get("/feed", authenticateUser, async (req, res) => {
   try {
-    const { filter } = req.query; // Check for query parameter
+    const { filter } = req.query;
     let moods;
-
     if (filter === "following") {
       // Get the logged-in user's following list
       const user = await User.findById(req.user._id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      // Fetch moods from only followed users
+      // Fetch moods from followed users
       moods = await Mood.find({ userId: { $in: user.following }, shared: true })
         .sort({ createdAt: -1 })
         .populate("userId", "username")
-        .populate("comments.userId", "username");
+        .populate("comments.userId", "username")
+        .exec();
     } else {
-      // Fetch all moods (default)
+      // Fetch all moods
       moods = await Mood.find({ shared: true })
         .sort({ createdAt: -1 })
         .populate("userId", "username")
-        .populate("comments.userId", "username");
+        .populate("comments.userId", "username")
+        .exec();
     }
-
+    // :white_check_mark: Filter out moods where `userId` is null (due to deleted users)
+    moods = moods.filter((mood) => mood.userId !== null);
     res.status(200).json(moods);
   } catch (error) {
     console.error("Error fetching mood feed:", error);
