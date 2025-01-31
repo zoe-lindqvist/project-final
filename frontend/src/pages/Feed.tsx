@@ -21,7 +21,6 @@ import { MoodCategory, Comment } from "../types";
 import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
-//--------------------------------------------------------
 export const Feed: React.FC = () => {
   const [entries, setEntries] = useState<any[]>([]); // Store entries from API
   const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
@@ -64,9 +63,6 @@ export const Feed: React.FC = () => {
         }
       );
       if (response.status === 200) {
-        console.log("Updated likes from backend:", response.data.likes); // Should now be an array
-        console.log("Likes count from backend:", response.data.likesCount); // Should be a number
-        // ✅ Ensure likes is always an array
         const updatedLikes: string[] = Array.isArray(response.data.likes)
           ? response.data.likes
           : [];
@@ -175,12 +171,15 @@ export const Feed: React.FC = () => {
     fetchComments();
   }, [user]);
 
+  // Fetch feed
   useEffect(() => {
     if (!user) return;
+
     const fetchFeed = async () => {
       try {
+        const filterQuery = showFollowingOnly ? "?filter=following" : "";
         const response = await axios.get(
-          "https://project-final-fo1y.onrender.com/api/moods/feed", // add render
+          `${API_BASE_URL}/api/moods/feed${filterQuery}`,
           {
             headers: {
               Authorization: `Bearer ${
@@ -190,7 +189,7 @@ export const Feed: React.FC = () => {
           }
         );
 
-        setEntries(response.data);
+        setEntries([...response.data]);
 
         // Check which moods the user has already liked
         const likedMoods = response.data.reduce(
@@ -211,7 +210,7 @@ export const Feed: React.FC = () => {
     };
 
     fetchFeed();
-  }, [user]);
+  }, [user, showFollowingOnly]);
 
   //Search Functionality
   useEffect(() => {
@@ -223,7 +222,7 @@ export const Feed: React.FC = () => {
 
       try {
         const response = await axios.get(
-          `https://project-final-fo1y.onrender.com/api/users/search?username=${searchQuery}`,
+          `${API_BASE_URL}/api/users/search?username=${searchQuery}`,
           {
             headers: {
               Authorization: `Bearer ${
@@ -282,7 +281,7 @@ export const Feed: React.FC = () => {
                       className="flex items-center space-x-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => {
                         setSearchQuery("");
-                        setSearchResults([]); // ✅ Clears search results properly
+                        setSearchResults([]); // Clears search results properly
                       }}
                     >
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
@@ -411,6 +410,7 @@ export const Feed: React.FC = () => {
                 </div>
               )} */}
               {/* Like Button */}
+
 
               <div className="flex flex-col space-y-4">
                 {entry.suggestedSong.spotifyLink && (
