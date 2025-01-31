@@ -45,8 +45,7 @@ export const Feed: React.FC = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [following, setFollowing] = useState<string[]>([]); // Store the following list
 
-  const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   // Like Functionality
   const handleToggleLike = async (entryId: string) => {
