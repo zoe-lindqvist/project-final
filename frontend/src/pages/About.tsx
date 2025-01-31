@@ -2,7 +2,7 @@ import { Music2, Heart, Users, Sparkles } from "lucide-react";
 
 export const About: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-16 py-12">
       {/* Hero Section */}
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-text-light dark:text-white mb-6">
@@ -16,7 +16,7 @@ export const About: React.FC = () => {
 
       {/* Mission Section */}
       <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-        <div>
+        <div className="text-center md:text-left">
           <h2 className="text-3xl font-bold text-text-light dark:text-white mb-6">
             Our Mission
           </h2>

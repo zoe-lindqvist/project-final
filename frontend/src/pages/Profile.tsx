@@ -16,7 +16,7 @@ export const Profile: React.FC = () => {
   }, [user, getUserEntries]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-2 md:px-4 lg:px-6 py-8">
       {/* Stats Overview */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">

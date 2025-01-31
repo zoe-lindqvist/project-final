@@ -207,7 +207,7 @@ export const Journal: React.FC = () => {
                       src={`https://open.spotify.com/embed/track/${songSuggestion.spotifyUrl
                         .split("/")
                         .pop()}`}
-                      className="w-full h-32 rounded-lg shadow-lg"
+                      className="w-full h-60 rounded-lg"
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
                     ></iframe>
