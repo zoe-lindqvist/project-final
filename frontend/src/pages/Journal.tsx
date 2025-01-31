@@ -23,8 +23,7 @@ export const Journal: React.FC = () => {
   // State to store user input in the textarea
   const [content, setContent] = useState("");
 
-  //const saveMoodEntry = useMoodStore((state) => state.saveMoodEntry);
-
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
   const navigate = useNavigate();
 
   // Zustand store functions for analyzing mood and fetching suggestions
@@ -80,7 +79,7 @@ export const Journal: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://project-final-fo1y.onrender.com/api/moods/share",
+        `${API_BASE_URL}/api/moods/share`,
         {
           userInput: content,
           moodAnalysis: moodSuggestion,
