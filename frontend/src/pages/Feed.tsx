@@ -397,17 +397,41 @@ export const Feed: React.FC = () => {
                 </p>
               </div> */}
 
-              <div className="flex flex-col space-y-4">
-                {entry.suggestedSong.spotifyLink && (
+              {/* Spotify Embedded Player */}
+              {/* {entry.suggestedSong.spotifyLink && (
+                <div className="mt-6">
                   <iframe
-                    className="w-full max-w-[200px] md:max-w-[400px] h-60 self-start overflow-hidden"
-                    style={{ objectFit: "cover" }}
                     src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
                       .split("/")
                       .pop()}`}
+                    className="w-full h-32 rounded-lg shadow-lg"
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
-                  />
+                  ></iframe>
+                </div>
+              )} */}
+              {/* Like Button */}
+
+              <div className="flex flex-col space-y-4">
+                {entry.suggestedSong.spotifyLink && (
+                  <iframe
+                    src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
+                      .split("/")
+                      .pop()}`}
+                    className="w-full max-w-[200px] md:max-w-[400px] h-60 self-start overflow-hidden"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  ></iframe>
+
+                  // <iframe
+                  // className="w-full max-w-[200px] md:max-w-[400px] h-60 self-start overflow-hidden"
+                  // style={{ objectFit: "cover" }}
+                  // src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
+                  //   .split("/")
+                  //   .pop()}`}
+                  // allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  // loading="lazy"
+                  // />
                 )}
 
                 {/* Like Button */}
