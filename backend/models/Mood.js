@@ -16,6 +16,14 @@ const CommentSchema = new mongoose.Schema({
   },
 });
 
+CommentSchema.set("toJSON", {
+  transform: (_doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+  },
+});
+
 const MoodSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -64,6 +72,15 @@ const MoodSchema = new mongoose.Schema({
   // Likes and comments from other users
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   comments: [CommentSchema],
+});
+
+// Transform _id to id
+MoodSchema.set("toJSON", {
+  transform: (_doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+  },
 });
 
 export const Comment = mongoose.model("Comment", CommentSchema);

@@ -1,6 +1,5 @@
 export interface User {
   id: string;
-  _id?: string;
   email: string;
   name?: string;
   username: string;
@@ -10,9 +9,9 @@ export interface User {
 }
 
 export interface Comment {
-  _id: string;
+  id: string;
   userId: {
-    _id: string;
+    id: string;
     username: string;
   };
   comment: string;
@@ -36,7 +35,6 @@ export interface MoodEntry {
     previewUrl?: string;
   };
   createdAt: string;
-
   likes: string[];
   comments: Comment[];
 }

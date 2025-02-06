@@ -116,13 +116,13 @@ export const UserProfile: React.FC = () => {
             ) : (
               publicEntries.map((entry) => (
                 <div
-                  key={entry._id}
+                  key={entry.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
                 >
                   {/* Header: User Info & Mood Tag */}
                   <div className="flex items-start justify-between mb-4">
                     <Link
-                      to={`/profile/${entry.userId._id}`}
+                      to={`/profile/${entry.userId.id}`}
                       className="flex items-center space-x-3 group"
                     >
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale-110">

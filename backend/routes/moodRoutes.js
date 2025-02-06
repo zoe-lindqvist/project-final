@@ -15,66 +15,34 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// router.post("/api/moods/like/:id", authenticateUser, async (req, res) => {
-//   console.log("📥 Received Like Request for Mood ID:", req.params.id);
-
-//   try {
-//     const moodEntry = await MoodModel.findById(req.params.id);
-
-//     if (!moodEntry) {
-//       console.log("🚨 Mood entry not found:", req.params.id);
-//       return res.status(404).json({ message: "Mood entry not found" });
-//     }
-
-//     console.log("✅ Found Mood Entry:", moodEntry);
-
-//     // Prevent duplicate likes
-//     if (moodEntry.likes.includes(req.user._id)) {
-//       console.log("❌ User already liked this post:", req.user._id);
-//       return res.status(400).json({ message: "You already liked this post" });
-//     }
-
-//     // ✅ Update likes without triggering full schema validation
-//     const updateResult = await MoodModel.updateOne(
-//       { _id: req.params.id },
-//       { $addToSet: { likes: req.user._id } },
-//       { runValidators: false } // 🔥 Stops Mongoose from enforcing validation on `suggestedSong.genre`
-//     );
-
-//     console.log("🛠 Update Result:", updateResult);
-
-//     res.status(200).json({ message: "Liked successfully" });
-//   } catch (error) {
-//     console.error("🚨 Error updating like:", error);
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = new mongoose.Types.ObjectId(req.user._id); // Ensure it's an ObjectId
+    const userId = req.user.id; // Already a string
 
     const mood = await Mood.findById(id);
     if (!mood) {
       return res.status(404).json({ error: "Mood entry not found" });
     }
 
-    // Check if user has already liked the mood
-    const alreadyLiked = mood.likes.some((like) => like.equals(userId));
+    // Convert likes array to string values before checking
+    const likesArray = mood.likes.map((like) => like.toString());
 
-    if (!alreadyLiked) {
-      mood.likes.push(userId); // Store as ObjectId
+    if (!likesArray.includes(userId)) {
+      mood.likes.push(new mongoose.Types.ObjectId(userId)); // Store as ObjectId
     } else {
-      mood.likes = mood.likes.filter((like) => !like.equals(userId)); //  Properly remove user
+      mood.likes = mood.likes.filter((like) => like.toString() !== userId); // Ensure proper comparison
     }
 
     await mood.save();
+
     res.json({
       success: true,
-      message: alreadyLiked ? "Unliked the mood" : "Liked the mood",
-      likes: mood.likes.map((like) => like.toString()), // Convert ObjectId to string
-      likesCount: mood.likes.length, // Send likes count separately
+      message: mood.likes.map((like) => like.toString()).includes(userId)
+        ? "Liked the mood"
+        : "Unliked the mood",
+      likes: mood.likes.map((like) => like.toString()), // Convert to strings before sending to frontend
+      likesCount: mood.likes.length,
     });
   } catch (error) {
     console.error("Error updating like:", error);
@@ -86,7 +54,7 @@ router.post("/like/:id", authenticateUser, async (req, res) => {
 router.post("/:moodId/comments", authenticateUser, async (req, res) => {
   const { moodId } = req.params;
   const { text } = req.body;
-  const userId = req.user._id; // Get authenticated user
+  const userId = req.user.id; // Get authenticated user
 
   try {
     const mood = await Mood.findById(moodId);
@@ -315,7 +283,7 @@ router.post("/save", authenticateUser, async (req, res) => {
     const { userInput, moodAnalysis, suggestedSong, shared } = req.body;
 
     const moodEntry = new Mood({
-      userId: req.user._id,
+      userId: req.user.id,
       userInput,
       moodAnalysis,
       suggestedSong,
@@ -340,7 +308,7 @@ router.post("/share", authenticateUser, async (req, res) => {
     const { userInput, moodAnalysis, suggestedSong } = req.body;
 
     const moodEntry = new Mood({
-      userId: req.user._id,
+      userId: req.user.id,
       userInput,
       moodAnalysis,
       suggestedSong,
@@ -403,15 +371,15 @@ router.get("/feed", authenticateUser, async (req, res) => {
     let moods;
     if (filter === "following") {
       // Get the logged-in user's following list
-      const user = await User.findById(req.user._id);
+      const user = await User.findById(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       // Fetch moods from followed users
       moods = await Mood.find({ userId: { $in: user.following }, shared: true })
         .sort({ createdAt: -1 })
-        .populate("userId", "username")
-        .populate("comments.userId", "username")
+        .populate("userId", "username id")
+        .populate("comments.userId", "username id")
         .exec();
     } else {
       // Fetch all moods

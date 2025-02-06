@@ -46,9 +46,24 @@ export const Feed: React.FC = () => {
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+  useEffect(() => {
+    console.log("🛠 Zustand user state updated:", useAuthStore.getState().user);
+  }, [useAuthStore.getState().user]);
+
   // Like Functionality
   const handleToggleLike = async (entryId: string) => {
-    if (!user) return;
+    const zustandUser = useAuthStore.getState().user; // Get the user from Zustand
+
+    console.log("🛠 Checking Zustand user state:", zustandUser);
+
+    if (!zustandUser || !zustandUser.id) {
+      console.error("❌ User ID is undefined, cannot like/unlike.");
+      return;
+    }
+
+    console.log(
+      `✅ User ID: ${zustandUser.id}, Attempting to like/unlike mood ${entryId}`
+    );
 
     try {
       const response = await axios.post(
@@ -62,24 +77,25 @@ export const Feed: React.FC = () => {
           },
         }
       );
+
       if (response.status === 200) {
-        const updatedLikes: string[] = Array.isArray(response.data.likes)
-          ? response.data.likes
-          : [];
+        const updatedLikes = response.data.likes || [];
+
+        console.log("🔍 API Response Likes:", updatedLikes);
+
         setEntries((prevEntries) =>
           prevEntries.map((entry) =>
-            entry._id === entryId ? { ...entry, likes: updatedLikes } : entry
+            entry.id === entryId ? { ...entry, likes: updatedLikes } : entry
           )
         );
 
-        // Update `userLiked` state
         setUserLiked((prevLiked) => ({
           ...prevLiked,
-          [entryId]: updatedLikes.includes(user.id || user._id),
+          [entryId]: updatedLikes.includes(zustandUser.id),
         }));
       }
     } catch (error) {
-      console.error("Error liking post:", error);
+      console.error("❌ Error liking post:", error);
     }
   };
 
@@ -109,9 +125,9 @@ export const Feed: React.FC = () => {
         if (!lastComment) return;
 
         const newComment: Comment = {
-          _id: lastComment._id,
+          id: lastComment.id,
           userId: {
-            _id: lastComment.userId._id,
+            id: lastComment.userId.id,
             username: lastComment.userId.username || "Unknown",
           },
           comment: lastComment.comment,
@@ -151,10 +167,10 @@ export const Feed: React.FC = () => {
         const commentsMap: { [key: string]: Comment[] } = {};
 
         response.data.forEach((entry: any) => {
-          commentsMap[entry._id] = entry.comments.map((comment: any) => ({
-            _id: comment._id,
+          commentsMap[entry.id] = entry.comments.map((comment: any) => ({
+            id: comment.id,
             userId: {
-              _id: comment.userId._id,
+              id: comment.userId.id,
               username: comment.userId.username || "Unknown", // Ensure username is included
             },
             comment: comment.comment,
@@ -189,18 +205,18 @@ export const Feed: React.FC = () => {
           }
         );
 
-        setEntries([...response.data]);
+        setEntries(response.data);
 
         // Check which moods the user has already liked
         const likedMoods = response.data.reduce(
           (
             acc: { [key: string]: boolean },
-            mood: { _id: string; likes: string[] }
+            mood: { id: string; likes: string[] }
           ) => {
-            acc[mood._id] = mood.likes.includes(user.id || user._id); // Check if user is in the likes array
+            acc[mood.id] = mood.likes.some((like) => like === user.id);
             return acc;
           },
-          {} // Initial value
+          {}
         );
 
         setUserLiked(likedMoods); // Store liked moods in state
@@ -276,8 +292,8 @@ export const Feed: React.FC = () => {
                 {searchResults.length > 0 ? (
                   searchResults.map((user) => (
                     <Link
-                      key={user._id}
-                      to={`/profile/${user._id}`}
+                      key={user.id}
+                      to={`/profile/${user.id}`}
                       className="flex items-center space-x-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => {
                         setSearchQuery("");
@@ -362,12 +378,12 @@ export const Feed: React.FC = () => {
         {filteredEntries.length > 0 ? (
           filteredEntries.map((entry) => (
             <div
-              key={entry._id}
+              key={entry.id}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
             >
               <div className="flex items-start justify-between mb-4">
                 <Link
-                  to={`/profile/${entry.userId._id}`}
+                  to={`/profile/${entry.userId.id}`}
                   className="flex items-center space-x-3 group"
                 >
                   <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale.110">
@@ -412,12 +428,12 @@ export const Feed: React.FC = () => {
 
               {/* Like Button */}
               <button
-                onClick={() => handleToggleLike(entry._id)}
+                onClick={() => handleToggleLike(entry.id)}
                 className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
               >
                 <Heart
                   className={`h-5 w-5 ${
-                    userLiked[entry._id] ? "fill-current text-purple-600" : ""
+                    userLiked[entry.id] ? "fill-current text-purple-600" : ""
                   }`}
                 />
                 <span>{entry.likes.length}</span>
@@ -426,16 +442,16 @@ export const Feed: React.FC = () => {
               {/* Comments Section */}
               <div className="mt-4">
                 {/* Display existing comments */}
-                {comments[entry._id]?.length > 0 && (
+                {comments[entry.id]?.length > 0 && (
                   <div className="space-y-2">
                     {/* Handle different sorting for collapsed vs. expanded */}
-                    {(expandedComments[entry._id]
-                      ? [...comments[entry._id]] // Copy array for expanded view (oldest to newest)
-                      : [...comments[entry._id]].slice(-2)
+                    {(expandedComments[entry.id]
+                      ? [...comments[entry.id]] // Copy array for expanded view (oldest to newest)
+                      : [...comments[entry.id]].slice(-2)
                     ) // Copy last 2 comments and reverse them (second most recent on top)
                       .map((comment, index) => (
                         <div
-                          key={comment._id || index}
+                          key={comment.id || index}
                           className="flex items-start space-x-3"
                         >
                           <div className="p-2 bg-gray-100 dark:bg-gray-700/50 rounded-full">
@@ -460,17 +476,17 @@ export const Feed: React.FC = () => {
                       ))}
 
                     {/* Expand/Collapse Button */}
-                    {comments[entry._id].length > 2 && (
+                    {comments[entry.id].length > 2 && (
                       <button
                         onClick={() =>
                           setExpandedComments((prev) => ({
                             ...prev,
-                            [entry._id]: !prev[entry._id], // Toggle state
+                            [entry.id]: !prev[entry.id], // Toggle state
                           }))
                         }
                         className="flex items-center text-sm text-purple-600 dark:text-purple-400 mt-2"
                       >
-                        {expandedComments[entry._id] ? (
+                        {expandedComments[entry.id] ? (
                           <>
                             <span>Show less</span>
                             <ChevronUp className="h-4 w-4 ml-1" />
@@ -478,7 +494,7 @@ export const Feed: React.FC = () => {
                         ) : (
                           <>
                             <span>
-                              Show all {comments[entry._id].length} comments
+                              Show all {comments[entry.id].length} comments
                             </span>
                             <ChevronDown className="h-4 w-4 ml-1" />
                           </>
@@ -492,17 +508,17 @@ export const Feed: React.FC = () => {
                 {user && (
                   <div className="relative mt-3">
                     <TextareaAutosize
-                      value={commentText[entry._id] || ""}
+                      value={commentText[entry.id] || ""}
                       onChange={(e) =>
                         setCommentText({
                           ...commentText,
-                          [entry._id]: e.target.value,
+                          [entry.id]: e.target.value,
                         })
                       }
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault(); // Prevents newline when pressing Enter
-                          handleCommentSubmit(entry._id); // Triggers comment submit
+                          handleCommentSubmit(entry.id); // Triggers comment submit
                         }
                       }}
                       placeholder="Add a comment..."
@@ -510,7 +526,7 @@ export const Feed: React.FC = () => {
                     />
                     <button
                       onClick={() => {
-                        handleCommentSubmit(entry._id);
+                        handleCommentSubmit(entry.id);
                       }}
                       className="absolute right-2 top-1/2 -translate-y-1/2"
                     >

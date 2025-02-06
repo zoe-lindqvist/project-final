@@ -27,7 +27,7 @@ router.post("/register", async (req, res) => {
     res.status(201).json({
       success: true,
       message: "User registered successfully!",
-      id: user._id,
+      id: user.id,
       accessToken: user.accessToken,
     });
   } catch (error) {
@@ -51,7 +51,7 @@ router.post("/login", async (req, res) => {
       res.json({
         success: true,
         message: "Login successful",
-        id: user._id,
+        id: user.id,
         accessToken: user.accessToken,
       });
     } else {
@@ -84,16 +84,16 @@ router.get("/profile", authenticateUser, (req, res) => {
 router.post("/follow/:id", authenticateUser, async (req, res) => {
   try {
     const userToFollow = await User.findById(req.params.id);
-    const currentUser = await User.findById(req.user._id);
+    const currentUser = await User.findById(req.user.id);
 
     if (!userToFollow || !currentUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Prevent duplicate follow
-    if (!currentUser.following.includes(userToFollow._id)) {
-      currentUser.following.push(userToFollow._id);
-      userToFollow.followers.push(currentUser._id);
+    if (!currentUser.following.includes(userToFollow.id)) {
+      currentUser.following.push(userToFollow.id);
+      userToFollow.followers.push(currentUser.id);
       await currentUser.save();
       await userToFollow.save();
       res.json({ message: `You are now following ${userToFollow.username}` });
@@ -109,7 +109,7 @@ router.post("/follow/:id", authenticateUser, async (req, res) => {
 router.post("/unfollow/:id", authenticateUser, async (req, res) => {
   try {
     const userToUnfollow = await User.findById(req.params.id);
-    const currentUser = await User.findById(req.user._id);
+    const currentUser = await User.findById(req.user.id);
 
     if (!userToUnfollow || !currentUser) {
       return res.status(404).json({ message: "User not found" });
@@ -120,7 +120,7 @@ router.post("/unfollow/:id", authenticateUser, async (req, res) => {
       (id) => id.toString() !== userToUnfollow._id.toString()
     );
     userToUnfollow.followers = userToUnfollow.followers.filter(
-      (id) => id.toString() !== currentUser._id.toString()
+      (id) => id.toString() !== currentUser.id.toString()
     );
 
     await currentUser.save();
