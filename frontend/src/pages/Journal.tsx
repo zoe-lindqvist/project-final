@@ -19,12 +19,11 @@ import { MoodCategory } from "../types";
 import { mapToCategory } from "../utils/moodUtils";
 import { triggerConfetti } from "../utils/confetti";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
   const [content, setContent] = useState("");
+
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   const navigate = useNavigate();
 

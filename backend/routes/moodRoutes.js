@@ -15,6 +15,41 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+router.post("/api/moods/like/:id", authenticateUser, async (req, res) => {
+  console.log("📥 Received Like Request for Mood ID:", req.params.id);
+
+  try {
+    const moodEntry = await MoodModel.findById(req.params.id);
+
+    if (!moodEntry) {
+      console.log("🚨 Mood entry not found:", req.params.id);
+      return res.status(404).json({ message: "Mood entry not found" });
+    }
+
+    console.log("✅ Found Mood Entry:", moodEntry);
+
+    // Prevent duplicate likes
+    if (moodEntry.likes.includes(req.user._id)) {
+      console.log("❌ User already liked this post:", req.user._id);
+      return res.status(400).json({ message: "You already liked this post" });
+    }
+
+    // ✅ Update likes without triggering full schema validation
+    const updateResult = await MoodModel.updateOne(
+      { _id: req.params.id },
+      { $addToSet: { likes: req.user._id } },
+      { runValidators: false } // 🔥 Stops Mongoose from enforcing validation on `suggestedSong.genre`
+    );
+
+    console.log("🛠 Update Result:", updateResult);
+
+    res.status(200).json({ message: "Liked successfully" });
+  } catch (error) {
+    console.error("🚨 Error updating like:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
@@ -329,31 +364,65 @@ router.post("/share", authenticateUser, async (req, res) => {
 });
 
 // GET route to display mood entries to feed (either all or only from followed users)
+// router.get("/feed", authenticateUser, async (req, res) => {
+//   try {
+//     const { filter } = req.query; // Check for query parameter
+//     let moods;
+
+//     if (filter === "following") {
+//       // Get the logged-in user's following list
+//       const user = await User.findById(req.user._id);
+//       if (!user) {
+//         return res.status(404).json({ message: "User not found" });
+//       }
+
+//       // Fetch moods from only followed users
+//       moods = await Mood.find({ userId: { $in: user.following }, shared: true })
+//         .sort({ createdAt: -1 })
+//         .populate("userId", "username")
+//         .populate("comments.userId", "username");
+//     } else {
+//       // Fetch all moods (default)
+//       moods = await Mood.find({ shared: true })
+//         .sort({ createdAt: -1 })
+//         .populate("userId", "username")
+//         .populate("comments.userId", "username");
+//     }
+
+//     res.status(200).json(moods);
+//   } catch (error) {
+//     console.error("Error fetching mood feed:", error);
+//     res.status(500).json({ error: "Failed to fetch mood feed" });
+//   }
+// });
+
+// GET route to display mood entries to feed (either all or only from followed users)
 router.get("/feed", authenticateUser, async (req, res) => {
   try {
-    const { filter } = req.query; // Check for query parameter
+    const { filter } = req.query;
     let moods;
-
     if (filter === "following") {
       // Get the logged-in user's following list
       const user = await User.findById(req.user._id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      // Fetch moods from only followed users
+      // Fetch moods from followed users
       moods = await Mood.find({ userId: { $in: user.following }, shared: true })
         .sort({ createdAt: -1 })
         .populate("userId", "username")
-        .populate("comments.userId", "username");
+        .populate("comments.userId", "username")
+        .exec();
     } else {
-      // Fetch all moods (default)
+      // Fetch all moods
       moods = await Mood.find({ shared: true })
         .sort({ createdAt: -1 })
         .populate("userId", "username")
-        .populate("comments.userId", "username");
+        .populate("comments.userId", "username")
+        .exec();
     }
-
+    // :white_check_mark: Filter out moods where `userId` is null (due to deleted users)
+    moods = moods.filter((mood) => mood.userId !== null);
     res.status(200).json(moods);
   } catch (error) {
     console.error("Error fetching mood feed:", error);

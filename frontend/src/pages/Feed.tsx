@@ -44,8 +44,7 @@ export const Feed: React.FC = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [following, setFollowing] = useState<string[]>([]); // Store the following list
 
-  const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   // Like Functionality
   const handleToggleLike = async (entryId: string) => {
@@ -76,7 +75,7 @@ export const Feed: React.FC = () => {
         // Update `userLiked` state
         setUserLiked((prevLiked) => ({
           ...prevLiked,
-          [entryId]: updatedLikes.includes(user.id),
+          [entryId]: updatedLikes.includes(user._id),
         }));
       }
     } catch (error) {
@@ -243,7 +242,7 @@ export const Feed: React.FC = () => {
   }, [searchQuery]);
 
   const filteredEntries = entries.filter((entry) => {
-    const entryGenre = entry.suggestedSong?.genre || "mixed";
+    const entryGenre = entry.suggestedSong?.genre;
     const mappedGenre = mapToGenreCategory(entryGenre);
     const matchesMood =
       moodFilter === "all" ||
@@ -277,8 +276,8 @@ export const Feed: React.FC = () => {
                 {searchResults.length > 0 ? (
                   searchResults.map((user) => (
                     <Link
-                      key={user.id}
-                      to={`/profile/${user.id}`}
+                      key={user._id}
+                      to={`/profile/${user._id}`}
                       className="flex items-center space-x-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => {
                         setSearchQuery("");

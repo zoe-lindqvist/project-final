@@ -10,6 +10,12 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "under pressure",
     "tense",
     "scared",
+    "terrified",
+    "help",
+    "jittery",
+    "uncertain",
+    "uneasy",
+    "doubtful",
   ],
   angry: [
     "angry",
@@ -19,8 +25,9 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "irritated",
     "enraged",
     "livid",
+    "triggered",
   ],
-  calm: ["calm", "peaceful", "relaxed", "serene", "tranquil", "mellow"],
+  calm: ["calm", "peaceful", "relaxed", "serene", "tranquil", "mellow", "cool"],
   confident: [
     "confident",
     "self-assured",
@@ -32,7 +39,10 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "superb",
     "terrific",
     "wonderful",
+    "adventurous",
+    "proud",
   ],
+  confused: ["confused", "puzzled"],
   excited: [
     "excited",
     "thrilled",
@@ -42,6 +52,10 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "enthusiastic",
     "pumped",
     "anticipating",
+    "celebrating",
+    "celebration",
+    "amazed",
+    "upbeat",
   ],
   frustrated: [
     "frustrated",
@@ -50,12 +64,23 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "disheartened",
     "stuck",
     "conflicted",
-    "confused",
   ],
   grateful: ["grateful", "thankful", "appreciative", "blessed", "fortunate"],
-  happy: ["happy", "joyful", "ecstatic", "content", "cheerful", "overjoyed"],
-  hopeful: ["hopeful", "optimistic", "encouraged", "positive"],
-  lonely: ["lonely", "isolated", "alone", "abandoned", "unwanted"],
+  happy: [
+    "happy",
+    "joyful",
+    "ecstatic",
+    "content",
+    "cheerful",
+    "overjoyed",
+    "friday",
+    "fab",
+    "super",
+    "optimistic",
+    "positive",
+  ],
+  hopeful: ["hopeful", "optimistic", "encouraged", "positive", "curious"],
+  lonely: ["lonely", "isolated", "alone", "abandoned", "unwanted", "cold"],
   motivated: [
     "motivated",
     "driven",
@@ -65,10 +90,17 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "energetic",
     "inspired",
   ],
-  nervous: ["nervous", "anxious", "jittery", "uncertain", "uneasy", "doubtful"],
   relaxed: ["relaxed", "calm", "serene", "chill"],
-  sad: ["sad", "depressed", "heartbroken", "melancholy", "blue"],
-  tired: ["tired", "exhausted", "drained", "weary"],
+  sad: [
+    "sad",
+    "depressed",
+    "heartbroken",
+    "melancholy",
+    "blue",
+    "bad",
+    "melancholic",
+  ],
+  tired: ["tired", "exhausted", "drained", "weary", "indifferent"],
   mixed: ["mixed", "unsettled"],
 };
 
@@ -87,7 +119,17 @@ export const filterByCategory = (
   entries: MoodEntry[],
   selectedCategory: MoodCategory
 ) => {
-  const keywords = moodCategories[selectedCategory]; // TypeScript now knows this is safe
+  if (selectedCategory === "mixed") {
+    return entries.filter(
+      (entry) =>
+        !Object.values(moodCategories).some((keywords) =>
+          keywords.some((keyword) =>
+            entry.moodAnalysis.toLowerCase().includes(keyword)
+          )
+        )
+    );
+  }
+  const keywords = moodCategories[selectedCategory];
   return entries.filter((entry) =>
     keywords.some((keyword) =>
       entry.moodAnalysis.toLowerCase().includes(keyword)

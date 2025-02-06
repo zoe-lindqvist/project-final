@@ -58,7 +58,7 @@ export type MoodCategory =
   | "tired"
   | "lonely"
   | "grateful"
-  | "nervous"
+  | "confused"
   | "relaxed"
   | "motivated"
   | "mixed";
