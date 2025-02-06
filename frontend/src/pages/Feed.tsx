@@ -75,7 +75,7 @@ export const Feed: React.FC = () => {
         // Update `userLiked` state
         setUserLiked((prevLiked) => ({
           ...prevLiked,
-          [entryId]: updatedLikes.includes(user._id),
+          [entryId]: updatedLikes.includes(user.id || user._id),
         }));
       }
     } catch (error) {
@@ -197,7 +197,7 @@ export const Feed: React.FC = () => {
             acc: { [key: string]: boolean },
             mood: { _id: string; likes: string[] }
           ) => {
-            acc[mood._id] = mood.likes.includes(user.id); // Check if user is in the likes array
+            acc[mood._id] = mood.likes.includes(user.id || user._id); // Check if user is in the likes array
             return acc;
           },
           {} // Initial value

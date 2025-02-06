@@ -52,7 +52,13 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const userData = await response.json();
-          set({ user: userData }); // Store updated user data, including badges
+          set({
+            user: {
+              id: userData.id || userData._id, // Normalize ID for frontend consistency
+              username: userData.username,
+              email: userData.email,
+            },
+          });
         } catch (error) {
           console.error("Error fetching user:", error);
         }
@@ -78,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: {
-              id: data.id,
+              id: data._id,
               username: data.username, // Ensure username is included
               email: data.email,
             },
@@ -111,7 +117,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: {
-              id: data.id,
+              id: data._id,
               username: data.username,
               email: data.email,
             },

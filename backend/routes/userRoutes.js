@@ -172,7 +172,11 @@ router.get("/:id", authenticateUser, async (req, res) => {
 
     const user = await User.findById(req.params.id)
       .select("-password")
-      .populate("badges");
+      .populate("badges")
+      .lean();
+
+    // 🔥 Log immediately after fetching
+    console.log("Fetched User:", user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

@@ -15,40 +15,40 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-router.post("/api/moods/like/:id", authenticateUser, async (req, res) => {
-  console.log("📥 Received Like Request for Mood ID:", req.params.id);
+// router.post("/api/moods/like/:id", authenticateUser, async (req, res) => {
+//   console.log("📥 Received Like Request for Mood ID:", req.params.id);
 
-  try {
-    const moodEntry = await MoodModel.findById(req.params.id);
+//   try {
+//     const moodEntry = await MoodModel.findById(req.params.id);
 
-    if (!moodEntry) {
-      console.log("🚨 Mood entry not found:", req.params.id);
-      return res.status(404).json({ message: "Mood entry not found" });
-    }
+//     if (!moodEntry) {
+//       console.log("🚨 Mood entry not found:", req.params.id);
+//       return res.status(404).json({ message: "Mood entry not found" });
+//     }
 
-    console.log("✅ Found Mood Entry:", moodEntry);
+//     console.log("✅ Found Mood Entry:", moodEntry);
 
-    // Prevent duplicate likes
-    if (moodEntry.likes.includes(req.user._id)) {
-      console.log("❌ User already liked this post:", req.user._id);
-      return res.status(400).json({ message: "You already liked this post" });
-    }
+//     // Prevent duplicate likes
+//     if (moodEntry.likes.includes(req.user._id)) {
+//       console.log("❌ User already liked this post:", req.user._id);
+//       return res.status(400).json({ message: "You already liked this post" });
+//     }
 
-    // ✅ Update likes without triggering full schema validation
-    const updateResult = await MoodModel.updateOne(
-      { _id: req.params.id },
-      { $addToSet: { likes: req.user._id } },
-      { runValidators: false } // 🔥 Stops Mongoose from enforcing validation on `suggestedSong.genre`
-    );
+//     // ✅ Update likes without triggering full schema validation
+//     const updateResult = await MoodModel.updateOne(
+//       { _id: req.params.id },
+//       { $addToSet: { likes: req.user._id } },
+//       { runValidators: false } // 🔥 Stops Mongoose from enforcing validation on `suggestedSong.genre`
+//     );
 
-    console.log("🛠 Update Result:", updateResult);
+//     console.log("🛠 Update Result:", updateResult);
 
-    res.status(200).json({ message: "Liked successfully" });
-  } catch (error) {
-    console.error("🚨 Error updating like:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
+//     res.status(200).json({ message: "Liked successfully" });
+//   } catch (error) {
+//     console.error("🚨 Error updating like:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
