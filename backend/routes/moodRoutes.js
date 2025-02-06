@@ -331,38 +331,20 @@ router.post("/share", authenticateUser, async (req, res) => {
   }
 });
 
-// GET route to display mood entries to feed (either all or only from followed users)
-// router.get("/feed", authenticateUser, async (req, res) => {
+// -------------------------------------------------------------------
+// Fetch the latest 10 moods (Specific Route)
+// router.get("/latest", async (req, res) => {
 //   try {
-//     const { filter } = req.query; // Check for query parameter
-//     let moods;
-
-//     if (filter === "following") {
-//       // Get the logged-in user's following list
-//       const user = await User.findById(req.user._id);
-//       if (!user) {
-//         return res.status(404).json({ message: "User not found" });
-//       }
-
-//       // Fetch moods from only followed users
-//       moods = await Mood.find({ userId: { $in: user.following }, shared: true })
-//         .sort({ createdAt: -1 })
-//         .populate("userId", "username")
-//         .populate("comments.userId", "username");
-//     } else {
-//       // Fetch all moods (default)
-//       moods = await Mood.find({ shared: true })
-//         .sort({ createdAt: -1 })
-//         .populate("userId", "username")
-//         .populate("comments.userId", "username");
-//     }
-
-//     res.status(200).json(moods);
+//     const latestMoods = await Mood.find({ shared: true })
+//       .sort({ createdAt: -1 }) // sort by newest first
+//       .limit(10); // limit to 10 moods
+//     res.status(200).json(latestMoods);
 //   } catch (error) {
-//     console.error("Error fetching mood feed:", error);
-//     res.status(500).json({ error: "Failed to fetch mood feed" });
+//     console.error("Error fetching latest moods:", error);
+//     res.status(500).json({ error: "Failed to fetch latest moods" });
 //   }
 // });
+//----------------------------------------------------------
 
 // GET route to display mood entries to feed (either all or only from followed users)
 router.get("/feed", authenticateUser, async (req, res) => {

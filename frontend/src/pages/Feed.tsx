@@ -32,6 +32,7 @@ export const Feed: React.FC = () => {
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({}); //store comments per entry
   const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
+  const [visibleEntries, setVisibleEntries] = useState(10); // Start with 10 posts
 
   const [expandedComments, setExpandedComments] = useState<{
     [key: string]: boolean;
@@ -204,8 +205,12 @@ export const Feed: React.FC = () => {
             },
           }
         );
+        //-----------------------------------------------------------------
+        // setEntries(response.data);
+        // const latestPosts = response.data.slice(0, 10);
 
-        setEntries(response.data);
+        // setEntries(latestPosts);
+        //------------------------------
 
         // Check which moods the user has already liked
         const likedMoods = response.data.reduce(
@@ -376,7 +381,7 @@ export const Feed: React.FC = () => {
 
       <div className="space-y-6">
         {filteredEntries.length > 0 ? (
-          filteredEntries.map((entry) => (
+          filteredEntries.slice(0, visibleEntries).map((entry) => (
             <div
               key={entry.id}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
@@ -543,6 +548,15 @@ export const Feed: React.FC = () => {
           </p>
         )}
       </div>
+
+      {filteredEntries.length > visibleEntries && (
+        <button
+          onClick={() => setVisibleEntries(visibleEntries + 10)} // Load 10 more posts
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-purple-700 transition block mx-auto"
+        >
+          View More
+        </button>
+      )}
     </div>
   );
 };

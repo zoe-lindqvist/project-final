@@ -7,6 +7,7 @@ export const Profile: React.FC = () => {
   const { user, fetchUser } = useAuthStore();
   const { entries, streak, getMoodStats, getUserEntries } = useMoodStore();
   const [weeklyStats, setWeeklyStats] = useState<{ [key: string]: number }>({});
+  const [visibleEntries, setVisibleEntries] = useState(10); // Start with 10 posts
 
   useEffect(() => {
     if (user?.id) {
@@ -98,7 +99,7 @@ export const Profile: React.FC = () => {
           My Journal Entries
         </h3>
         <div className="space-y-6">
-          {entries.map((entry) => (
+          {entries.slice(-visibleEntries).map((entry) => (
             <div
               key={entry.id}
               className="border-b border-gray-100 dark:border-gray-700 last:border-0 pb-6 last:pb-0"
@@ -138,6 +139,16 @@ export const Profile: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* View More Button */}
+        {visibleEntries < entries.length && (
+          <button
+            onClick={() => setVisibleEntries(visibleEntries + 10)} // Load 10 more
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-purple-700 transition"
+          >
+            View More
+          </button>
+        )}
       </div>
 
       {/* Badges */}
