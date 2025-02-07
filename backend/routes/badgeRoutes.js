@@ -1,3 +1,12 @@
+/**
+ * Badge Routes - Manages badge-related API operations.
+ *
+ * - GET  /api/badges  → Retrieve all badges.
+ * - POST /api/badges  → Create a new badge.
+ *
+ * Uses Mongoose for database interactions and includes basic error handling.
+ */
+
 import express from "express";
 import Badge from "../models/Badge.js";
 

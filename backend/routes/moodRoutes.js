@@ -1,3 +1,24 @@
+/**
+ * Mood Routes - Manages mood-related API operations.
+ *
+ * Endpoints:
+ *  - POST /like/:id          → Like or unlike a mood entry.
+ *  - POST /:moodId/comments  → Add a comment to a mood.
+ *  - GET /:moodId/comments   → Retrieve all comments for a mood.
+ *  - GET /profile/:userId    → Fetch all mood entries for a specific user.
+ *  - GET /public-profile/:userId → Retrieve public profile & shared moods.
+ *  - POST /analyze           → AI-based mood analysis with song suggestion.
+ *  - POST /save              → Save a mood entry privately.
+ *  - POST /share             → Share a mood entry to the public feed.
+ *  - GET /latest             → Fetch the latest shared moods (paginated).
+ *  - GET /feed               → Retrieve public mood feed (all or following users).
+ *
+ * Features:
+ *  - Uses Mongoose for database interactions.
+ *  - Integrates OpenAI for mood analysis & Spotify for song recommendations.
+ *  - Includes authentication middleware for user-specific actions.
+ */
+
 import express from "express";
 import OpenAI from "openai";
 import axios from "axios";
@@ -18,7 +39,7 @@ const openai = new OpenAI({
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id; // Already a string
+    const userId = req.user.id;
 
     const mood = await Mood.findById(id);
     if (!mood) {
@@ -73,7 +94,7 @@ router.post("/:moodId/comments", authenticateUser, async (req, res) => {
     mood.comments.push(newComment);
     await mood.save();
 
-    // Re-fetch mood with populated `userId.username`
+    // Re-fetch mood with populated userId.username
     const updatedMood = await Mood.findById(moodId)
       .populate("comments.userId", "username") // Ensure username is populated
       .exec();
@@ -331,27 +352,6 @@ router.post("/share", authenticateUser, async (req, res) => {
   }
 });
 
-// Fetch the latest 10 moods (Specific Route)
-// Fetch the latest 10 moods with user and comment details
-// router.get("/latest", async (req, res) => {
-//   try {
-//     const latestMoods = await Mood.find({ shared: true })
-//       .sort({ createdAt: -1 }) // Sort by newest first
-//       .limit(10) // Limit to 10 moods
-//       .populate("userId", "username id") // Populate user data
-//       .populate("comments.userId", "username id") // Populate comment user data
-//       .exec();
-
-//     // Ensure moods with deleted users are removed
-//     const filteredMoods = latestMoods.filter((mood) => mood.userId !== null);
-
-//     res.status(200).json(filteredMoods);
-//   } catch (error) {
-//     console.error("Error fetching latest moods:", error);
-//     res.status(500).json({ error: "Failed to fetch latest moods" });
-//   }
-// });
-
 router.get("/latest", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -401,7 +401,7 @@ router.get("/feed", authenticateUser, async (req, res) => {
         .populate("comments.userId", "username")
         .exec();
     }
-    // :white_check_mark: Filter out moods where `userId` is null (due to deleted users)
+    // Filter out moods where `userId` is null (due to deleted users)
     moods = moods.filter((mood) => mood.userId !== null);
     res.status(200).json(moods);
   } catch (error) {

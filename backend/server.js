@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import listEndpoints from "express-list-endpoints";
 
 import userRoutes from "./routes/userRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
@@ -32,7 +33,10 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello Technigo!");
+  res.json({
+    message: "Welcome to the Mood Melody API!",
+    endpoints: listEndpoints(app),
+  });
 });
 
 app.use("/api/users", userRoutes);
