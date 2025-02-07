@@ -31,8 +31,8 @@ export const Feed: React.FC = () => {
 
   const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
 
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [filterType, setFilterType] = useState("");
+  // const [showFilterMenu, setShowFilterMenu] = useState(false);
+  // const [filterType, setFilterType] = useState("");
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
@@ -43,7 +43,7 @@ export const Feed: React.FC = () => {
     [key: string]: boolean;
   }>({});
 
-  const [likes, setLikes] = useState<{ [key: string]: Comment[] }>({});
+  // const [likes, setLikes] = useState<{ [key: string]: Comment[] }>({});
   const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
 
   const [searchQuery, setSearchQuery] = useState(""); // search input

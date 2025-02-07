@@ -1,3 +1,25 @@
+/**
+ * User Routes - Manages user authentication, profiles, and social interactions.
+ *
+ * Endpoints:
+ *  - POST /register       → Register a new user.
+ *  - POST /login          → Authenticate user and return access token.
+ *  - GET /profile         → Retrieve the logged-in user's profile (protected).
+ *  - POST /follow/:id     → Follow another user (protected).
+ *  - POST /unfollow/:id   → Unfollow a user (protected).
+ *  - GET /users           → Retrieve a list of all users.
+ *  - GET /search          → Search users by username (case insensitive).
+ *  - GET /:id             → Get a specific user profile by ID (protected).
+ *  - PATCH /:id/badges    → Unlock a badge for a user.
+ *
+ * Features:
+ *  - Uses Mongoose for database interactions.
+ *  - Hashes passwords using bcrypt for security.
+ *  - Includes authentication middleware for protected routes.
+ *  - Allows following/unfollowing users.
+ *  - Supports user profile lookup and badge unlocking.
+ */
+
 import express from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
