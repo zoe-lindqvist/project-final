@@ -99,53 +99,6 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error("❌ Login error:", error);
         }
-
-        //     set({
-        //       user: {
-        //         id: userData.id,
-        //         username: userData.username,
-        //         email: userData.email,
-        //       },
-        //     });
-        //   } catch (error) {
-        //     console.error("Error fetching user:", error);
-        //   }
-        // },
-
-        // // Login function that interacts with the backend API
-        // login: async (email, password) => {
-        //   try {
-        //     const response = await fetch(`${API_URL}/api/users/login`, {
-        //       method: "POST",
-        //       headers: { "Content-Type": "application/json" },
-        //       body: JSON.stringify({ email, password }),
-        //     });
-
-        //     const data = await response.json();
-
-        //     if (!response.ok) {
-        //       throw new Error(data.message || "Failed to login");
-        //     }
-
-        //     // Clear previous user's mood data
-        //     useMoodStore.getState().resetMoodData();
-
-        //     set({
-        //       user: {
-        //         id: data.id,
-        //         username: data.username, // Ensure username is included
-        //         email: data.email,
-        //       },
-        //       isAuthenticated: true,
-        //       accessToken: data.accessToken,
-        //       following: data.following || [],
-        //     });
-
-        //     // Save token to local storage
-        //     localStorage.setItem("accessToken", data.accessToken);
-        //   } catch (error) {
-        //     throw error;
-        //   }
       },
 
       // Register function that interacts with the backend API
