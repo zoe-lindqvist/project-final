@@ -1,3 +1,21 @@
+/**
+ * User Profile Page
+ *
+ * Displays a user's profile, including their public mood journal entries and an option to follow/unfollow.
+ *
+ * Features:
+ * - **Profile Overview**: Shows the user's name, mood entries, and follow/unfollow functionality.
+ * - **Public Mood Entries**: Displays all public journal entries with mood analysis and suggested music.
+ * - **Follow System**: Allows authenticated users to follow or unfollow others.
+ * - **Spotify Integration**: Embeds a Spotify player for song recommendations.
+ * - **Accessibility Enhancements**:
+ *   - `role="region"` and `aria-labelledby` for structured screen reader navigation.
+ *   - `aria-live="polite"` ensures updates (loading, new entries) are announced dynamically.
+ *   - `tabIndex={0}` on key sections for better keyboard accessibility.
+ *   - `aria-label` on buttons and links to improve clarity for assistive technologies.
+ * - **Responsive Design**: Optimized for mobile and desktop with Tailwind CSS.
+ */
+
 import React from "react";
 import { useEffect, useState } from "react";
 import { User } from "lucide-react";
@@ -67,6 +85,7 @@ export const UserProfile: React.FC = () => {
       <Link
         to="/feed"
         className="inline-flex items-center space-x-2 text-purple-600 dark:text-purple-400 mb-8 hover:text-purple-700 dark:hover:text-purple-300"
+        aria-label="Go back to feed"
       >
         <ArrowLeft className="h-5 w-5" />
         <span>Back to Feed</span>
@@ -74,11 +93,20 @@ export const UserProfile: React.FC = () => {
 
       {profileUser ? (
         <>
-          <div className="flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 w-full max-w-3xl mx-auto">
+          {/* Profile Header */}
+          <div
+            className="flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 w-full max-w-3xl mx-auto"
+            role="region"
+            aria-labelledby="profile-heading"
+            tabIndex={0}
+          >
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center space-x-3">
                 <Music2 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3
+                  id="profile-heading"
+                  className="text-lg font-semibold text-gray-900 dark:text-white"
+                >
                   {profileUser?.username || "User"}'s Profile
                 </h3>
               </div>
@@ -90,6 +118,7 @@ export const UserProfile: React.FC = () => {
                       ? "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                       : "bg-purple-600 dark:bg-purple-500 text-white hover:bg-purple-700 dark:hover:bg-purple-600"
                   }`}
+                  aria-label={isFollowing ? "Unfollow user" : "Follow user"}
                 >
                   {isFollowing ? (
                     <>
@@ -108,9 +137,17 @@ export const UserProfile: React.FC = () => {
           </div>
 
           {/* Public Mood Entries */}
-          <div className="space-y-6">
+          <div
+            className="space-y-6"
+            role="region"
+            aria-labelledby="public-entries-heading"
+            tabIndex={0}
+          >
             {publicEntries.length === 0 ? (
-              <p className="text-gray-500 dark:text-gray-400">
+              <p
+                className="text-gray-500 dark:text-gray-400"
+                aria-live="polite"
+              >
                 No public mood entries available.
               </p>
             ) : (
@@ -118,18 +155,25 @@ export const UserProfile: React.FC = () => {
                 <div
                   key={entry.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+                  role="article"
+                  aria-labelledby={`entry-${entry.id}-title`}
+                  tabIndex={0}
                 >
                   {/* Header: User Info & Mood Tag */}
                   <div className="flex items-start justify-between mb-4">
                     <Link
                       to={`/profile/${entry.userId.id}`}
                       className="flex items-center space-x-3 group"
+                      aria-label={`View ${profileUser.username}'s profile`}
                     >
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale-110">
                         <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                        <h3
+                          id={`entry-${entry.id}-title`}
+                          className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400"
+                        >
                           {profileUser.username || "Unknown User"}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -138,7 +182,10 @@ export const UserProfile: React.FC = () => {
                       </div>
                     </Link>
 
-                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize">
+                    <span
+                      className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize"
+                      role="status"
+                    >
                       {entry.moodAnalysis}
                     </span>
                   </div>
@@ -176,7 +223,10 @@ export const UserProfile: React.FC = () => {
           </div>
         </>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400 text-center">
+        <p
+          className="text-gray-500 dark:text-gray-400 text-center"
+          aria-live="polite"
+        >
           Loading user profile...
         </p>
       )}

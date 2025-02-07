@@ -8,6 +8,7 @@ import { Journal } from "../pages/Journal";
 import { Feed } from "../pages/Feed";
 import { Profile } from "../pages/Profile";
 import { UserProfile } from "../pages/UserProfile";
+import { Contact } from "../pages/Contact";
 
 export const routes = (
   <Routes>
@@ -20,6 +21,7 @@ export const routes = (
       <Route path="feed" element={<Feed />} />
       <Route path="profile" element={<Profile />} />
       <Route path="profile/:userId" element={<UserProfile />} />
+      <Route path="contact" element={<Contact />} />
     </Route>
 
     {/* Route for login page */}

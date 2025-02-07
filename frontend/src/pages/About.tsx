@@ -1,16 +1,34 @@
+/**
+ * About Page
+ *
+ * Renders a page with sections for the app's purpose, mission, key features and team members.
+ *
+ * Technical Features:
+ * - Uses `role="region"` and `aria-labelledby` for screen reader navigation.
+ * - Implements `tabIndex={0}` to make key sections keyboard-focusable.
+ * - Dynamically maps mission features and team members for scalability.
+ * - Responsive grid layout with Tailwind CSS, supporting dark mode.
+ * - External links include `target="_blank"` with security attributes.
+ */
+
 import { Music2, Heart, Users, Sparkles } from "lucide-react";
 
 export const About: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-16 py-12">
       {/* Hero Section */}
-      <div className="text-center mb-16">
+      <div
+        className="text-center mb-16"
+        role="region" // Defines this as a meaningful section
+        aria-labelledby="about-heading"
+      >
         <h1 className="text-4xl font-bold text-text-light dark:text-white mb-6">
           About MoodMelody
         </h1>
         <p
           className="text-xl text-text-light dark:text-text-dark max-w-3xl mx-auto"
-          aria-label="MoodMelody's purpose and mission" // Added to describe content meaningfully
+          aria-label="MoodMelody's purpose and mission"
+          tabIndex={0} // Added to describe content meaningfully
         >
           We believe in the power of music to enhance our emotional well-being
           and create meaningful connections through shared experiences.
@@ -21,7 +39,8 @@ export const About: React.FC = () => {
       <div
         className="grid md:grid-cols-2 gap-12 items-center mb-16"
         role="region" // Helps screen readers recognize this as an important section
-        aria-labelledby="mission-heading" // Links to the heading for context
+        aria-labelledby="mission-heading"
+        tabIndex={0} // Makes the whole section keyboard-focusabl
       >
         <div>
           <h2
@@ -115,7 +134,7 @@ export const About: React.FC = () => {
               role: "Lead Developer",
               bio: "Crafting digital experiences with code",
               linkedin: "https://www.linkedin.com/in/zoe-lindqvist/",
-              image: "/headshots/zoe-lindqvist.jpg",
+              image: "/headshots/zoe-lindqvist-2.jpg",
             },
           ].map((member, index) => (
             <div

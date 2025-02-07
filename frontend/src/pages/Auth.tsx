@@ -1,3 +1,30 @@
+/**
+ * Auth Page
+ *
+ * Handles user authentication by providing a sign-in and sign-up form with form validation, error handling and dynamic UI updates.
+ *
+ * Technical Features:
+ * - **State Management**:
+ *   - Tracks authentication mode (sign-in or sign-up).
+ *   - Manages loading and error states.
+ *
+ * - **Authentication Logic**:
+ *   - Uses `useAuthStore` for authentication actions (`register` and `login`).
+ *   - Handles form submission with client-side validation.
+ *   - Navigates to `/journal` upon successful authentication.
+ *
+ * - **Accessibility Enhancements**:
+ *   - Uses `aria-busy={isLoading}` to indicate loading state.
+ *   - Associates error messages with inputs using `role="alert"` and `aria-live="assertive"`.
+ *   - Implements `aria-labels` for form inputs and buttons.
+ *   - Toggles authentication mode with an accessible button (`aria-pressed={isSignUp}`).
+ *
+ * - **UI & Theming**:
+ *   - Uses Tailwind CSS for responsive layout and dark mode support.
+ *   - Includes animated visual elements (hover effects, scaling, and transitions).
+ *   - Displays a loading spinner while processing authentication.
+ */
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
@@ -87,7 +114,11 @@ export const Auth: React.FC = () => {
               </div>
 
               {/* Authentication Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-6"
+                aria-busy={isLoading} // Indicates form is busy during loading state
+              >
                 <div className="space-y-4">
                   {/* Conditionally render the Username field for Sign Up */}
                   {isSignUp && (
@@ -107,6 +138,7 @@ export const Auth: React.FC = () => {
                           required
                           className="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                           placeholder="Choose a username"
+                          aria-label="Enter your username"
                         />
                       </div>
                     </div>
@@ -128,6 +160,7 @@ export const Auth: React.FC = () => {
                         required
                         className="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                         placeholder="your@email.com"
+                        aria-label="Enter your email address"
                       />
                     </div>
                   </div>
@@ -149,6 +182,7 @@ export const Auth: React.FC = () => {
                         required
                         className="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                         placeholder="••••••••"
+                        aria-label="Enter your password"
                       />
                     </div>
                   </div>
@@ -168,7 +202,10 @@ export const Auth: React.FC = () => {
                   className="w-full bg-purple-600 dark:bg-purple-500 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 dark:hover:bg-purple-600 transition-all"
                 >
                   {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    <Loader2
+                      className="h-5 w-5 animate-spin mx-auto"
+                      aria-hidden="true"
+                    />
                   ) : (
                     <>
                       {isSignUp ? "Create Account" : "Sign In"}

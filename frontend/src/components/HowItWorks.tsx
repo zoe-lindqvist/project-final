@@ -7,8 +7,7 @@ export const HowItWorks: React.FC = () => {
         <BookOpen className="h-8 w-8 text-primary-accent dark:text-primary" />
       ),
       title: "Express Your Feelings",
-      description:
-        "Write about your day and emotions in your personal journal space",
+      description: "Write about your day and emotions in your personal journal",
       gradient: "bg-logo-text-light dark:bg-logo-text-dark",
     },
     {

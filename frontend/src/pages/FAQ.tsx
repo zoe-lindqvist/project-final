@@ -1,3 +1,23 @@
+/**
+ * FAQ Page
+ *
+ * Displays a list of frequently asked questions with answers in a structured and accessible format.
+ *
+ * Features:
+ * - **Static FAQ Layout**:
+ *   - Presents questions and answers in a visually organized way.
+ *   - Uses a responsive container for optimal display.
+ *
+ * - **Accessibility Enhancements**:
+ *   - Uses `role="region"` and `aria-labelledby` to improve screen reader navigation.
+ *   - Associates each question with its corresponding answer using `aria-describedby`.
+ *   - Allows keyboard users to navigate through FAQs.
+ *
+ * - **UI & Theming**:
+ *   - Styled with Tailwind CSS for light and dark mode support.
+ *   - Uses Lucide icons to enhance visual appeal.
+ */
+
 import { HelpCircle } from "lucide-react";
 
 export const FAQ: React.FC = () => {
@@ -27,7 +47,10 @@ export const FAQ: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <div className="text-center mb-12">
-        <HelpCircle className="h-12 w-12 text-purple-600 dark:text-purple-400 mx-auto mb-4" />
+        <HelpCircle
+          className="h-12 w-12 text-purple-600 dark:text-purple-400 mx-auto mb-4"
+          id="faq-heading"
+        />
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
           Frequently Asked Questions
         </h1>
@@ -36,16 +59,25 @@ export const FAQ: React.FC = () => {
         </p>
       </div>
 
-      <div className="space-y-6">
+      {/* FAQ Section */}
+      <div role="region" aria-labelledby="faq-heading" className="space-y-6">
         {faqs.map((faq, index) => (
           <div
             key={index}
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+            role="region"
+            aria-labelledby={`faq-question-${index}`}
+            aria-describedby={`faq-answer-${index}`}
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
               {faq.question}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">{faq.answer}</p>
+            <p
+              id={`faq-answer-${index}`}
+              className="text-gray-600 dark:text-gray-300"
+            >
+              {faq.answer}
+            </p>
           </div>
         ))}
       </div>
