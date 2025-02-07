@@ -5,14 +5,10 @@ import {
   Filter,
   MessageCircle,
   Music,
-  Play,
-  Pause,
   User,
   Search,
   ChevronUp,
   ChevronDown,
-  X,
-  Sliders,
 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { moodCategories, filterByCategory } from "../utils/moodUtils";
@@ -22,54 +18,128 @@ import TextareaAutosize from "react-textarea-autosize";
 import axios from "axios";
 
 export const Feed: React.FC = () => {
-  const [entries, setEntries] = useState<any[]>([]); // Store entries from API
-  const [page, setPage] = useState(1);
+  const [entries, setEntries] = useState<any[]>([]);
+  const [filteredEntries, setFilteredEntries] = useState<any[]>([]);
+  const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
-
-  // const [showFilterMenu, setShowFilterMenu] = useState(false);
-  // const [filterType, setFilterType] = useState("");
+  const { user, accessToken } = useAuthStore();
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
-  const [commentText, setCommentText] = useState<{ [key: string]: string }>({}); //store comments per entry
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
-
   const [expandedComments, setExpandedComments] = useState<{
     [key: string]: boolean;
   }>({});
-
-  // const [likes, setLikes] = useState<{ [key: string]: Comment[] }>({});
+  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
   const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
-
-  const [searchQuery, setSearchQuery] = useState(""); // search input
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [following, setFollowing] = useState<string[]>([]); // Store the following list
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+  // Fetch all Moods from /feed (unless following button is toggled on)
   useEffect(() => {
-    console.log("🛠 Zustand user state updated:", useAuthStore.getState().user);
-  }, [useAuthStore.getState().user]);
+    if (!user) return;
 
-  // Like Functionality
+    const fetchAllMoods = async () => {
+      try {
+        const filterQuery = showFollowingOnly ? "?filter=following" : ""; // ✅ Add filter condition
+        const response = await axios.get(
+          `${API_BASE_URL}/api/moods/feed${filterQuery}`,
+          {
+            headers: {
+              Authorization: `Bearer ${
+                accessToken || localStorage.getItem("accessToken")
+              }`,
+            },
+          }
+        );
+        setEntries([...response.data]);
+
+        // Check which moods the user has already liked
+        const likedMoods = response.data.reduce(
+          (
+            acc: { [key: string]: boolean },
+            mood: { id: string; likes: string[] }
+          ) => {
+            acc[mood.id] = mood.likes.includes(user.id); // Check if user is in the likes array
+            return acc;
+          },
+          {} // Initial value
+        );
+
+        setUserLiked(likedMoods); // Store liked moods in state
+      } catch (error) {
+        console.error("Error fetching feed:", error);
+      }
+    };
+
+    fetchAllMoods();
+  }, [user, showFollowingOnly]); // Refetches whenever following mode changes
+
+  // Filter moods based on user selection
+  useEffect(() => {
+    const applyFilters = () => {
+      const filtered = entries.filter((entry) => {
+        const entryGenre = entry.suggestedSong?.genre;
+        const mappedGenre = mapToGenreCategory(entryGenre);
+        const matchesMood =
+          moodFilter === "all" ||
+          filterByCategory([entry], moodFilter as MoodCategory).length > 0;
+        const matchesGenre =
+          genreFilter === "all" || mappedGenre === genreFilter;
+
+        return matchesMood && matchesGenre;
+      });
+
+      setFilteredEntries(filtered);
+      setVisibleEntries(filtered.slice(0, 10));
+      setHasMore(filtered.length > 10);
+    };
+
+    applyFilters();
+  }, [entries, moodFilter, genreFilter]);
+
+  // Infinite scroll - Load more moods
+  const fetchMoreMoods = useCallback(() => {
+    if (!hasMore || loading) return;
+
+    setLoading(true);
+    setTimeout(() => {
+      setVisibleEntries((prev) => [
+        ...prev,
+        ...filteredEntries.slice(prev.length, prev.length + 10),
+      ]);
+      setHasMore(filteredEntries.length > visibleEntries.length + 10);
+      setLoading(false);
+    }, 1000);
+  }, [filteredEntries, hasMore, loading, visibleEntries]);
+
+  const lastMoodRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading || !hasMore) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            fetchMoreMoods();
+          }
+        },
+        { threshold: 1 }
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, fetchMoreMoods]
+  );
+
+  // Likes Functionality
   const handleToggleLike = async (entryId: string) => {
-    const zustandUser = useAuthStore.getState().user; // Get the user from Zustand
-
-    console.log("🛠 Checking Zustand user state:", zustandUser);
-
-    if (!zustandUser || !zustandUser.id) {
-      console.error("❌ User ID is undefined, cannot like/unlike.");
-      return;
-    }
-
-    console.log(
-      `✅ User ID: ${zustandUser.id}, Attempting to like/unlike mood ${entryId}`
-    );
+    if (!user || !user.id) return;
 
     try {
       const response = await axios.post(
@@ -77,18 +147,13 @@ export const Feed: React.FC = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${
-              accessToken || localStorage.getItem("accessToken")
-            }`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
 
       if (response.status === 200) {
         const updatedLikes = response.data.likes || [];
-
-        console.log("🔍 API Response Likes:", updatedLikes);
-
         setEntries((prevEntries) =>
           prevEntries.map((entry) =>
             entry.id === entryId ? { ...entry, likes: updatedLikes } : entry
@@ -97,11 +162,11 @@ export const Feed: React.FC = () => {
 
         setUserLiked((prevLiked) => ({
           ...prevLiked,
-          [entryId]: updatedLikes.includes(zustandUser.id),
+          [entryId]: updatedLikes.includes(user.id),
         }));
       }
     } catch (error) {
-      console.error("❌ Error liking post:", error);
+      console.error("Error liking post:", error);
     }
   };
 
@@ -193,138 +258,7 @@ export const Feed: React.FC = () => {
     fetchComments();
   }, [user]);
 
-  // Fetch feed
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const fetchFeed = async () => {
-  //     try {
-  //       const filterQuery = showFollowingOnly ? "?filter=following" : "";
-  //       const response = await axios.get(
-  //         `${API_BASE_URL}/api/moods/latest${filterQuery}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${
-  //               accessToken || localStorage.getItem("accessToken")
-  //             }`,
-  //           },
-  //         }
-  //       );
-
-  //       setEntries(response.data);
-
-  //       // Check which moods the user has already liked
-  //       const likedMoods = response.data.reduce(
-  //         (
-  //           acc: { [key: string]: boolean },
-  //           mood: { id: string; likes: string[] }
-  //         ) => {
-  //           acc[mood.id] = mood.likes.some((like) => like === user.id);
-  //           return acc;
-  //         },
-  //         {}
-  //       );
-
-  //       setUserLiked(likedMoods); // Store liked moods in state
-  //     } catch (error) {
-  //       console.error("Error fetching feed:", error);
-  //     }
-  //   };
-
-  //   fetchFeed();
-  // }, [user, showFollowingOnly]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchInitialFeed = async () => {
-      try {
-        const filterQuery = showFollowingOnly ? "?filter=following" : "";
-        const response = await axios.get(
-          `${API_BASE_URL}/api/moods/latest?page=1&limit=10${filterQuery}`,
-          {
-            headers: {
-              Authorization: `Bearer ${
-                accessToken || localStorage.getItem("accessToken")
-              }`,
-            },
-          }
-        );
-
-        setEntries(response.data.moods); // Set initial entries
-        setPage(2); // Prepare for next page
-        setHasMore(response.data.hasMore);
-
-        // Check which moods the user has already liked
-        const likedMoods = response.data.moods.reduce(
-          (
-            acc: { [key: string]: boolean },
-            mood: { id: string; likes: string[] }
-          ) => {
-            acc[mood.id] = mood.likes.some((like) => like === user.id);
-            return acc;
-          },
-          {}
-        );
-
-        setUserLiked(likedMoods); // Store liked moods in state
-      } catch (error) {
-        console.error("Error fetching feed:", error);
-      }
-    };
-
-    fetchInitialFeed();
-  }, [user, showFollowingOnly]);
-
-  const fetchMoreMoods = useCallback(async () => {
-    if (!hasMore || loading) return;
-
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/moods/latest?page=${page}&limit=10`,
-        {
-          headers: {
-            Authorization: `Bearer ${
-              accessToken || localStorage.getItem("accessToken")
-            }`,
-          },
-        }
-      );
-
-      if (response.data.moods.length === 0) {
-        setHasMore(false); // No more data
-      } else {
-        setEntries((prev) => [...prev, ...response.data.moods]); // Append new moods
-        setPage((prev) => prev + 1); // Increment page number
-      }
-    } catch (error) {
-      console.error("Error fetching more moods:", error);
-      setHasMore(false); // Stop infinite scrolling on error
-    }
-    setLoading(false);
-  }, [page, hasMore, loading]);
-
-  const lastMoodRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (loading || !hasMore) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
-            fetchMoreMoods();
-          }
-        },
-        { threshold: 1 }
-      );
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore, fetchMoreMoods]
-  );
-
-  //Search Functionality
+  // Search Functionality
   useEffect(() => {
     const searchUsers = async () => {
       if (!searchQuery) {
@@ -352,17 +286,6 @@ export const Feed: React.FC = () => {
 
     searchUsers();
   }, [searchQuery]);
-
-  const filteredEntries = entries.filter((entry) => {
-    const entryGenre = entry.suggestedSong?.genre;
-    const mappedGenre = mapToGenreCategory(entryGenre);
-    const matchesMood =
-      moodFilter === "all" ||
-      filterByCategory([entry], moodFilter as MoodCategory).length > 0;
-    const matchesGenre = genreFilter === "all" || mappedGenre === genreFilter;
-
-    return matchesMood && matchesGenre;
-  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -393,7 +316,7 @@ export const Feed: React.FC = () => {
                       className="flex items-center space-x-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => {
                         setSearchQuery("");
-                        setSearchResults([]); // Clears search results properly
+                        setSearchResults([]); // Clears search results
                       }}
                     >
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
@@ -470,9 +393,9 @@ export const Feed: React.FC = () => {
         </div>
       </div>
       <div className="space-y-6">
-        {filteredEntries.length > 0 ? (
-          filteredEntries.map((entry, index) => {
-            const isLastEntry = index === filteredEntries.length - 1; // Check if this is the last entry
+        {visibleEntries.length > 0 ? (
+          visibleEntries.map((entry, index) => {
+            const isLastEntry = index === visibleEntries.length - 1;
 
             return (
               <div

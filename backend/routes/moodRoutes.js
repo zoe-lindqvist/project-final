@@ -36,6 +36,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Like/unlike a mood entry
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
