@@ -37,6 +37,7 @@ export interface MoodEntry {
   createdAt: string;
   likes: string[];
   comments: Comment[];
+  regionId?: string;
 }
 
 export interface SearchResult {

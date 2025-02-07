@@ -331,38 +331,50 @@ router.post("/share", authenticateUser, async (req, res) => {
   }
 });
 
-// GET route to display mood entries to feed (either all or only from followed users)
-// router.get("/feed", authenticateUser, async (req, res) => {
+// Fetch the latest 10 moods (Specific Route)
+// Fetch the latest 10 moods with user and comment details
+// router.get("/latest", async (req, res) => {
 //   try {
-//     const { filter } = req.query; // Check for query parameter
-//     let moods;
+//     const latestMoods = await Mood.find({ shared: true })
+//       .sort({ createdAt: -1 }) // Sort by newest first
+//       .limit(10) // Limit to 10 moods
+//       .populate("userId", "username id") // Populate user data
+//       .populate("comments.userId", "username id") // Populate comment user data
+//       .exec();
 
-//     if (filter === "following") {
-//       // Get the logged-in user's following list
-//       const user = await User.findById(req.user._id);
-//       if (!user) {
-//         return res.status(404).json({ message: "User not found" });
-//       }
+//     // Ensure moods with deleted users are removed
+//     const filteredMoods = latestMoods.filter((mood) => mood.userId !== null);
 
-//       // Fetch moods from only followed users
-//       moods = await Mood.find({ userId: { $in: user.following }, shared: true })
-//         .sort({ createdAt: -1 })
-//         .populate("userId", "username")
-//         .populate("comments.userId", "username");
-//     } else {
-//       // Fetch all moods (default)
-//       moods = await Mood.find({ shared: true })
-//         .sort({ createdAt: -1 })
-//         .populate("userId", "username")
-//         .populate("comments.userId", "username");
-//     }
-
-//     res.status(200).json(moods);
+//     res.status(200).json(filteredMoods);
 //   } catch (error) {
-//     console.error("Error fetching mood feed:", error);
-//     res.status(500).json({ error: "Failed to fetch mood feed" });
+//     console.error("Error fetching latest moods:", error);
+//     res.status(500).json({ error: "Failed to fetch latest moods" });
 //   }
 // });
+
+router.get("/latest", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const latestMoods = await Mood.find({ shared: true })
+      .sort({ createdAt: -1 })
+      .skip(skip) // Skip previously fetched items
+      .limit(limit) // Limit results per page
+      .populate("userId", "username id")
+      .populate("comments.userId", "username id")
+      .exec();
+
+    const totalMoods = await Mood.countDocuments({ shared: true });
+    const hasMore = skip + limit < totalMoods; // Check if more moods exist
+
+    res.status(200).json({ moods: latestMoods, hasMore });
+  } catch (error) {
+    console.error("Error fetching latest moods:", error);
+    res.status(500).json({ error: "Failed to fetch latest moods" });
+  }
+});
 
 // GET route to display mood entries to feed (either all or only from followed users)
 router.get("/feed", authenticateUser, async (req, res) => {

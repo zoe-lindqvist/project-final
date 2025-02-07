@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   Heart,
@@ -23,6 +23,12 @@ import axios from "axios";
 
 export const Feed: React.FC = () => {
   const [entries, setEntries] = useState<any[]>([]); // Store entries from API
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+
   const { user, accessToken } = useAuthStore(); // Access user and token from Zustand store
 
   const [showFilterMenu, setShowFilterMenu] = useState(false);
@@ -188,14 +194,54 @@ export const Feed: React.FC = () => {
   }, [user]);
 
   // Fetch feed
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   const fetchFeed = async () => {
+  //     try {
+  //       const filterQuery = showFollowingOnly ? "?filter=following" : "";
+  //       const response = await axios.get(
+  //         `${API_BASE_URL}/api/moods/latest${filterQuery}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${
+  //               accessToken || localStorage.getItem("accessToken")
+  //             }`,
+  //           },
+  //         }
+  //       );
+
+  //       setEntries(response.data);
+
+  //       // Check which moods the user has already liked
+  //       const likedMoods = response.data.reduce(
+  //         (
+  //           acc: { [key: string]: boolean },
+  //           mood: { id: string; likes: string[] }
+  //         ) => {
+  //           acc[mood.id] = mood.likes.some((like) => like === user.id);
+  //           return acc;
+  //         },
+  //         {}
+  //       );
+
+  //       setUserLiked(likedMoods); // Store liked moods in state
+  //     } catch (error) {
+  //       console.error("Error fetching feed:", error);
+  //     }
+  //   };
+
+  //   fetchFeed();
+  // }, [user, showFollowingOnly]);
+
   useEffect(() => {
     if (!user) return;
 
-    const fetchFeed = async () => {
+    const fetchInitialFeed = async () => {
       try {
         const filterQuery = showFollowingOnly ? "?filter=following" : "";
         const response = await axios.get(
-          `${API_BASE_URL}/api/moods/feed${filterQuery}`,
+          `${API_BASE_URL}/api/moods/latest?page=1&limit=10${filterQuery}`,
           {
             headers: {
               Authorization: `Bearer ${
@@ -205,10 +251,12 @@ export const Feed: React.FC = () => {
           }
         );
 
-        setEntries(response.data);
+        setEntries(response.data.moods); // Set initial entries
+        setPage(2); // Prepare for next page
+        setHasMore(response.data.hasMore);
 
         // Check which moods the user has already liked
-        const likedMoods = response.data.reduce(
+        const likedMoods = response.data.moods.reduce(
           (
             acc: { [key: string]: boolean },
             mood: { id: string; likes: string[] }
@@ -225,8 +273,56 @@ export const Feed: React.FC = () => {
       }
     };
 
-    fetchFeed();
+    fetchInitialFeed();
   }, [user, showFollowingOnly]);
+
+  const fetchMoreMoods = useCallback(async () => {
+    if (!hasMore || loading) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/moods/latest?page=${page}&limit=10`,
+        {
+          headers: {
+            Authorization: `Bearer ${
+              accessToken || localStorage.getItem("accessToken")
+            }`,
+          },
+        }
+      );
+
+      if (response.data.moods.length === 0) {
+        setHasMore(false); // No more data
+      } else {
+        setEntries((prev) => [...prev, ...response.data.moods]); // Append new moods
+        setPage((prev) => prev + 1); // Increment page number
+      }
+    } catch (error) {
+      console.error("Error fetching more moods:", error);
+      setHasMore(false); // Stop infinite scrolling on error
+    }
+    setLoading(false);
+  }, [page, hasMore, loading]);
+
+  const lastMoodRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading || !hasMore) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            fetchMoreMoods();
+          }
+        },
+        { threshold: 1 }
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, fetchMoreMoods]
+  );
 
   //Search Functionality
   useEffect(() => {
@@ -373,83 +469,83 @@ export const Feed: React.FC = () => {
           </div>
         </div>
       </div>
-
       <div className="space-y-6">
         {filteredEntries.length > 0 ? (
-          filteredEntries.map((entry) => (
-            <div
-              key={entry.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <Link
-                  to={`/profile/${entry.userId.id}`}
-                  className="flex items-center space-x-3 group"
-                >
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale.110">
-                    <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
-                      {entry.userId.username || "Unknown User"}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(entry.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </Link>
-                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize">
-                  {entry.moodAnalysis}
-                </span>
-              </div>
+          filteredEntries.map((entry, index) => {
+            const isLastEntry = index === filteredEntries.length - 1; // Check if this is the last entry
 
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {entry.userInput}
-              </p>
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {entry.suggestedSong.genre}
-                </p>
-              </div>
-
-              {/* Spotify Embedded Player */}
-              {entry.suggestedSong.spotifyLink && (
-                <div className="mt-6">
-                  <iframe
-                    src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
-                      .split("/")
-                      .pop()}`}
-                    className="w-full h-32 rounded-lg shadow-lg"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                  ></iframe>
-                </div>
-              )}
-
-              {/* Like Button */}
-              <button
-                onClick={() => handleToggleLike(entry.id)}
-                className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+            return (
+              <div
+                key={entry.id}
+                ref={isLastEntry ? lastMoodRef : null} // Attach lastMoodRef to the last entry
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
               >
-                <Heart
-                  className={`h-5 w-5 ${
-                    userLiked[entry.id] ? "fill-current text-purple-600" : ""
-                  }`}
-                />
-                <span>{entry.likes.length}</span>
-              </button>
+                <div className="flex items-start justify-between mb-4">
+                  <Link
+                    to={`/profile/${entry.userId.id}`}
+                    className="flex items-center space-x-3 group"
+                  >
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full transform transition-transform group-hover:scale.110">
+                      <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                        {entry.userId.username || "Unknown User"}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(entry.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </Link>
+                  <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium capitalize">
+                    {entry.moodAnalysis}
+                  </span>
+                </div>
 
-              {/* Comments Section */}
-              <div className="mt-4">
-                {/* Display existing comments */}
-                {comments[entry.id]?.length > 0 && (
-                  <div className="space-y-2">
-                    {/* Handle different sorting for collapsed vs. expanded */}
-                    {(expandedComments[entry.id]
-                      ? [...comments[entry.id]] // Copy array for expanded view (oldest to newest)
-                      : [...comments[entry.id]].slice(-2)
-                    ) // Copy last 2 comments and reverse them (second most recent on top)
-                      .map((comment, index) => (
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  {entry.userInput}
+                </p>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {entry.suggestedSong.genre}
+                  </p>
+                </div>
+
+                {/* Spotify Embedded Player */}
+                {entry.suggestedSong.spotifyLink && (
+                  <div className="mt-6">
+                    <iframe
+                      src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
+                        .split("/")
+                        .pop()}`}
+                      className="w-full h-32 rounded-lg shadow-lg"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                )}
+
+                {/* Like Button */}
+                <button
+                  onClick={() => handleToggleLike(entry.id)}
+                  className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+                >
+                  <Heart
+                    className={`h-5 w-5 ${
+                      userLiked[entry.id] ? "fill-current text-purple-600" : ""
+                    }`}
+                  />
+                  <span>{entry.likes.length}</span>
+                </button>
+
+                {/* Comments Section */}
+                <div className="mt-4">
+                  {comments[entry.id]?.length > 0 && (
+                    <div className="space-y-2">
+                      {(expandedComments[entry.id]
+                        ? [...comments[entry.id]]
+                        : [...comments[entry.id]].slice(-2)
+                      ).map((comment, index) => (
                         <div
                           key={comment.id || index}
                           className="flex items-start space-x-3"
@@ -475,74 +571,77 @@ export const Feed: React.FC = () => {
                         </div>
                       ))}
 
-                    {/* Expand/Collapse Button */}
-                    {comments[entry.id].length > 2 && (
-                      <button
-                        onClick={() =>
-                          setExpandedComments((prev) => ({
-                            ...prev,
-                            [entry.id]: !prev[entry.id], // Toggle state
-                          }))
-                        }
-                        className="flex items-center text-sm text-purple-600 dark:text-purple-400 mt-2"
-                      >
-                        {expandedComments[entry.id] ? (
-                          <>
-                            <span>Show less</span>
-                            <ChevronUp className="h-4 w-4 ml-1" />
-                          </>
-                        ) : (
-                          <>
-                            <span>
-                              Show all {comments[entry.id].length} comments
-                            </span>
-                            <ChevronDown className="h-4 w-4 ml-1" />
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                )}
+                      {comments[entry.id].length > 2 && (
+                        <button
+                          onClick={() =>
+                            setExpandedComments((prev) => ({
+                              ...prev,
+                              [entry.id]: !prev[entry.id], // Toggle state
+                            }))
+                          }
+                          className="flex items-center text-sm text-purple-600 dark:text-purple-400 mt-2"
+                        >
+                          {expandedComments[entry.id] ? (
+                            <>
+                              <span>Show less</span>
+                              <ChevronUp className="h-4 w-4 ml-1" />
+                            </>
+                          ) : (
+                            <>
+                              <span>
+                                Show all {comments[entry.id].length} comments
+                              </span>
+                              <ChevronDown className="h-4 w-4 ml-1" />
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  )}
 
-                {/* Comment Input */}
-                {user && (
-                  <div className="relative mt-3">
-                    <TextareaAutosize
-                      value={commentText[entry.id] || ""}
-                      onChange={(e) =>
-                        setCommentText({
-                          ...commentText,
-                          [entry.id]: e.target.value,
-                        })
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault(); // Prevents newline when pressing Enter
-                          handleCommentSubmit(entry.id); // Triggers comment submit
+                  {user && (
+                    <div className="relative mt-3">
+                      <TextareaAutosize
+                        value={commentText[entry.id] || ""}
+                        onChange={(e) =>
+                          setCommentText({
+                            ...commentText,
+                            [entry.id]: e.target.value,
+                          })
                         }
-                      }}
-                      placeholder="Add a comment..."
-                      className="w-full min-h-[2.5rem] px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
-                    />
-                    <button
-                      onClick={() => {
-                        handleCommentSubmit(entry.id);
-                      }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
-                    >
-                      <MessageCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                    </button>
-                  </div>
-                )}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleCommentSubmit(entry.id);
+                          }
+                        }}
+                        placeholder="Add a comment..."
+                        className="w-full min-h-[2.5rem] px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+                      />
+                      <button
+                        onClick={() => {
+                          handleCommentSubmit(entry.id);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                      >
+                        <MessageCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-center text-gray-600 dark:text-gray-400">
-            No moods shared yet.
+            {loading ? "Loading moods..." : "No more moods to load!"}
           </p>
         )}
+        {loading && (
+          <p className="text-center text-gray-500">Loading more...</p>
+        )}
       </div>
+      ;
     </div>
   );
 };
