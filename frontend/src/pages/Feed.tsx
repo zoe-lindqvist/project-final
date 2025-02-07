@@ -26,6 +26,7 @@ export const Feed: React.FC = () => {
   const observer = useRef<IntersectionObserver | null>(null);
 
   const { user, accessToken } = useAuthStore();
+
   const [moodFilter, setMoodFilter] = useState<string>("all");
   const [genreFilter, setGenreFilter] = useState<string>("all");
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
@@ -46,7 +47,7 @@ export const Feed: React.FC = () => {
 
     const fetchAllMoods = async () => {
       try {
-        const filterQuery = showFollowingOnly ? "?filter=following" : ""; // ✅ Add filter condition
+        const filterQuery = showFollowingOnly ? "?filter=following" : "";
         const response = await axios.get(
           `${API_BASE_URL}/api/moods/feed${filterQuery}`,
           {
@@ -302,6 +303,8 @@ export const Feed: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 bg-transparent focus:outline-none text-gray-900 dark:text-white"
+                aria-label="Search for users"
+                aria-live="polite"
               />
             </div>
 
@@ -318,6 +321,8 @@ export const Feed: React.FC = () => {
                         setSearchQuery("");
                         setSearchResults([]); // Clears search results
                       }}
+                      role="button"
+                      tabIndex={0}
                     >
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
                         <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -347,6 +352,8 @@ export const Feed: React.FC = () => {
                 value={moodFilter}
                 onChange={(e) => setMoodFilter(e.target.value)}
                 className="pl-12 pr-6 py-3 md:py-3.5 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0 w-full md:w-auto appearance-none"
+                aria-label="Filter by mood"
+                aria-live="polite"
               >
                 <option value="all">Moods</option>
                 {Object.keys(moodCategories).map((category) => (
@@ -367,6 +374,8 @@ export const Feed: React.FC = () => {
                 value={genreFilter}
                 onChange={(e) => setGenreFilter(e.target.value)}
                 className="pl-12 pr-6 py-3 md:py-3.5 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-0 w-full md:w-auto appearance-none"
+                aria-label="Filter by genre"
+                aria-live="polite"
               >
                 <option value="all">Genres</option>
                 {Object.keys(genreCategories).map((genre) => (
@@ -385,13 +394,20 @@ export const Feed: React.FC = () => {
                   ? "bg-purple-600 dark:bg-purple-500 text-white"
                   : "bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
               }`}
+              aria-pressed={showFollowingOnly} // Indicates toggle state
+              aria-label={
+                showFollowingOnly ? "Show All Users" : "Show Following Only"
+              }
             >
               <User className="h-5 w-5" />
-              <span>Following</span>
+              <span>
+                {showFollowingOnly ? "Show All Users" : "Show Following Only"}
+              </span>
             </button>
           </div>
         </div>
       </div>
+      {/* Mood entries feed */}
       <div className="space-y-6">
         {visibleEntries.length > 0 ? (
           visibleEntries.map((entry, index) => {
@@ -452,6 +468,10 @@ export const Feed: React.FC = () => {
                 <button
                   onClick={() => handleToggleLike(entry.id)}
                   className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+                  aria-pressed={userLiked[entry.id]}
+                  aria-label={
+                    userLiked[entry.id] ? "Unlike this post" : "Like this post"
+                  }
                 >
                   <Heart
                     className={`h-5 w-5 ${
@@ -462,7 +482,7 @@ export const Feed: React.FC = () => {
                 </button>
 
                 {/* Comments Section */}
-                <div className="mt-4">
+                <div className="mt-4" aria-live="polite">
                   {comments[entry.id]?.length > 0 && (
                     <div className="space-y-2">
                       {(expandedComments[entry.id]
@@ -503,6 +523,12 @@ export const Feed: React.FC = () => {
                             }))
                           }
                           className="flex items-center text-sm text-purple-600 dark:text-purple-400 mt-2"
+                          aria-expanded={expandedComments[entry.id]} //  Announces expanded/collapsed state
+                          aria-label={
+                            expandedComments[entry.id]
+                              ? `Collapse all comments for ${entry.userId.username}`
+                              : `Expand all comments for ${entry.userId.username}`
+                          }
                         >
                           {expandedComments[entry.id] ? (
                             <>
@@ -546,6 +572,8 @@ export const Feed: React.FC = () => {
                           handleCommentSubmit(entry.id);
                         }}
                         className="absolute right-2 top-1/2 -translate-y-1/2"
+                        aria-label="Submit comment"
+                        aria-controls={`comment-section-${entry.id}`}
                       >
                         <MessageCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                       </button>
