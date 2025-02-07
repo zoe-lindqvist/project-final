@@ -39,8 +39,8 @@ export const useMoodStore = create<MoodState>()(
       // Reset mood data when a new user logs in
       resetMoodData: () => {
         set({
-          entries: [], // ✅ Clear mood entries
-          streak: 0, // ✅ Reset streak
+          entries: [], // Clear mood entries
+          streak: 0, // Reset streak
           moodSuggestion: null,
           songSuggestion: null,
         });
