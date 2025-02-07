@@ -1,14 +1,17 @@
 /**
- * About Page
+ * **About Page**
  *
- * Renders a page with sections for the app's purpose, mission, key features and team members.
+ * Overview of the app’s purpose, mission, and team.
  *
- * Technical Features:
- * - Uses `role="region"` and `aria-labelledby` for screen reader navigation.
- * - Implements `tabIndex={0}` to make key sections keyboard-focusable.
- * - Dynamically maps mission features and team members for scalability.
- * - Responsive grid layout with Tailwind CSS, supporting dark mode.
- * - External links include `target="_blank"` with security attributes.
+ * **Features:**
+ * - **Mission & Vision**: Explains the app’s goal of using music for emotional well-being.
+ * - **Team Section**: Highlights key contributors.
+ * - **Accessibility**:
+ *   - `aria-labelledby` for better navigation.
+ *   - `tabIndex={0}` for keyboard focusability.
+ * - **Responsive UI**:
+ *   - Tailwind CSS for layout and theming.
+ *   - Dark mode support.
  */
 
 import { Music2, Heart, Users, Sparkles } from "lucide-react";

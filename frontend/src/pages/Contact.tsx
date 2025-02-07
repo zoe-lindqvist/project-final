@@ -1,22 +1,17 @@
 /**
- * Contact Page
+ * **Contact Page**
  *
- * It allows users to submit inquiries or feedback.
+ * Allows users to submit inquiries or feedback.
  *
- * Features:
- * - **Form Handling**:
- *   - Captures user inputs (name, email, message) and resets after submission.
- *   - Displays a success message after submission.
- *
+ * **Features:**
+ * - **Form Handling**: Captures name, email, and message with success confirmation.
  * - **Accessibility**:
- *   - Uses `aria-label` for clear screen reader descriptions.
- *   - Implements `role="alert"` and `aria-live="assertive"` to announce the success message.
- *   - `aria-required="true"` ensures required fields are properly indicated.
- *   - Submit button includes `aria-disabled` to prevent multiple submissions.
- *
- * - **UI & Theming**:
- *   - Uses Tailwind CSS for styling, including dark mode support.
- *   - Features a responsive layout and smooth transition effects.
+ *   - `aria-live="polite"` for form updates.
+ *   - `aria-required="true"` ensures required fields are recognized.
+ *   - `role="alert"` announces success messages.
+ * - **Responsive UI**:
+ *   - Styled with Tailwind CSS, supporting dark mode.
+ *   - Smooth transitions and form validation feedback.
  */
 
 import { useState } from "react";

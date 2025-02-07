@@ -1,22 +1,20 @@
 /**
- * Profile Page
+ * **Journal Page**
  *
- * Displays user statistics, journal entries, and earned badges, providing an overview of their engagement.
+ * Enables users to write journal entries, analyze their mood, and get music recommendations.
  *
- * Features:
- * - **User Stats**: Shows the user's current streak, total journal entries, and earned badges.
- * - **Weekly Mood Summary**: Provides a breakdown of mood trends over the past week with a progress bar.
- * - **Journal Entries**: Lists user-created journal logs, including mood analysis, user input, and suggested songs.
- * - **Badges Section**: Displays earned badges with icons and descriptions.
+ * **Features:**
+ * - **Mood Analysis**: AI evaluates journal entries and suggests a mood.
+ * - **Music Recommendations**: Provides mood-matching song suggestions.
+ * - **Saving & Sharing**: Entries can be saved or shared with the community.
  *
- * Accessibility Enhancements:
- * - `role="region"` and `aria-labelledby` for structured navigation and better screen reader support.
- * - `role="progressbar"` with `aria-valuenow` for mood statistics visualization.
- * - `role="list"` and `role="listitem"` for journal entries and badges to enhance keyboard navigation.
- * - `aria-labels` for improved assistive technology interaction.
+ * **Accessibility Enhancements:**
+ * - Uses `aria-labelledby` and `role="region"` for better screen reader navigation.
+ * - `aria-live="polite"` announces mood analysis results dynamically.
+ * - Buttons include `aria-label` and `aria-disabled` for improved usability.
  *
- * Responsive Design:
- * - Uses Tailwind CSS for a fully responsive layout across desktop and mobile devices.
+ * **Responsive UI:**
+ * - Styled with Tailwind CSS, supporting both desktop and mobile layouts.
  */
 
 import React, { useEffect, useState } from "react";

@@ -1,17 +1,20 @@
 /**
- * Journal Page
+ * **Journal Page**
  *
- * Allows users to write journal entries, analyze their mood, and receive personalized music recommendations.
+ * Enables users to write journal entries, analyze their mood, and get music recommendations.
  *
- * Features:
- * - **Mood Analysis**: Uses AI to analyze user-written journal entries and suggest relevant moods.
- * - **Music Recommendations**: Suggests songs that match the detected mood.
- * - **Saving & Sharing**: Users can save their journal entries or share them with the community.
- * - **Accessibility Enhancements**:
- *   - `aria-labelledby` and `role="region"` for improved screen reader navigation.
- *   - `aria-live="polite"` ensures mood analysis results are announced dynamically.
- *   - Buttons include `aria-label` and `aria-disabled` for better keyboard navigation.
- * - **Responsive Design**: Optimized for both desktop and mobile screens using Tailwind CSS.
+ * **Features:**
+ * - **Mood Analysis**: AI evaluates journal entries and suggests a mood.
+ * - **Music Recommendations**: Provides mood-matching song suggestions.
+ * - **Saving & Sharing**: Entries can be saved or shared with the community.
+ *
+ * **Accessibility Enhancements:**
+ * - Uses `aria-labelledby` and `role="region"` for better screen reader navigation.
+ * - `aria-live="polite"` announces mood analysis results dynamically.
+ * - Buttons include `aria-label` and `aria-disabled` for improved usability.
+ *
+ * **Responsive UI:**
+ * - Styled with Tailwind CSS, supporting both desktop and mobile layouts.
  */
 
 import { useState } from "react";

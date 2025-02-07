@@ -1,28 +1,20 @@
 /**
- * Auth Page
+ * **Auth Page**
  *
- * Handles user authentication by providing a sign-in and sign-up form with form validation, error handling and dynamic UI updates.
+ * Provides user authentication with sign-in and sign-up options.
  *
- * Technical Features:
- * - **State Management**:
- *   - Tracks authentication mode (sign-in or sign-up).
- *   - Manages loading and error states.
- *
- * - **Authentication Logic**:
- *   - Uses `useAuthStore` for authentication actions (`register` and `login`).
- *   - Handles form submission with client-side validation.
- *   - Navigates to `/journal` upon successful authentication.
- *
- * - **Accessibility Enhancements**:
- *   - Uses `aria-busy={isLoading}` to indicate loading state.
- *   - Associates error messages with inputs using `role="alert"` and `aria-live="assertive"`.
- *   - Implements `aria-labels` for form inputs and buttons.
- *   - Toggles authentication mode with an accessible button (`aria-pressed={isSignUp}`).
- *
- * - **UI & Theming**:
- *   - Uses Tailwind CSS for responsive layout and dark mode support.
- *   - Includes animated visual elements (hover effects, scaling, and transitions).
- *   - Displays a loading spinner while processing authentication.
+ * **Features:**
+ * - **User Authentication**: Login or register using `useAuthStore`.
+ * - **Form Handling**:
+ *   - Tracks authentication state, errors, and loading.
+ *   - Client-side validation with dynamic UI updates.
+ * - **Accessibility**:
+ *   - `aria-live="assertive"` for error messages.
+ *   - `aria-busy={isLoading}` to indicate loading state.
+ *   - `aria-labels` for input fields.
+ * - **Responsive UI**:
+ *   - Tailwind CSS styling with dark mode support.
+ *   - Animated elements for improved UX.
  */
 
 import { useState } from "react";

@@ -1,19 +1,22 @@
 /**
- * User Profile Page
+ * **User Profile Page**
  *
- * Displays a user's profile, including their public mood journal entries and an option to follow/unfollow.
+ * Displays a user's public journal entries and provides follow/unfollow functionality.
  *
- * Features:
- * - **Profile Overview**: Shows the user's name, mood entries, and follow/unfollow functionality.
- * - **Public Mood Entries**: Displays all public journal entries with mood analysis and suggested music.
- * - **Follow System**: Allows authenticated users to follow or unfollow others.
- * - **Spotify Integration**: Embeds a Spotify player for song recommendations.
- * - **Accessibility Enhancements**:
- *   - `role="region"` and `aria-labelledby` for structured screen reader navigation.
- *   - `aria-live="polite"` ensures updates (loading, new entries) are announced dynamically.
- *   - `tabIndex={0}` on key sections for better keyboard accessibility.
- *   - `aria-label` on buttons and links to improve clarity for assistive technologies.
- * - **Responsive Design**: Optimized for mobile and desktop with Tailwind CSS.
+ * **Features:**
+ * - **Profile Overview**: Shows the user's name and public mood entries.
+ * - **Follow System**: Enables authenticated users to follow/unfollow others.
+ * - **Public Mood Entries**: Displays mood logs with analysis and song recommendations.
+ * - **Spotify Integration**: Embeds a Spotify player for suggested tracks.
+ *
+ * **Accessibility Enhancements:**
+ * - Uses `role="region"` and `aria-labelledby` for structured screen reader navigation.
+ * - `aria-live="polite"` announces updates (loading, new entries) dynamically.
+ * - `tabIndex={0}` improves keyboard navigation on key sections.
+ * - Buttons and links include `aria-label` for better clarity.
+ *
+ * **Responsive UI:**
+ * - Built with Tailwind CSS for an optimized experience across devices.
  */
 
 import React from "react";

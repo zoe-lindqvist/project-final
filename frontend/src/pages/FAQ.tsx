@@ -1,21 +1,16 @@
 /**
- * FAQ Page
+ * **FAQ Page**
  *
- * Displays a list of frequently asked questions with answers in a structured and accessible format.
+ * Displays common questions with answers in a structured layout.
  *
- * Features:
- * - **Static FAQ Layout**:
- *   - Presents questions and answers in a visually organized way.
- *   - Uses a responsive container for optimal display.
- *
- * - **Accessibility Enhancements**:
- *   - Uses `role="region"` and `aria-labelledby` to improve screen reader navigation.
- *   - Associates each question with its corresponding answer using `aria-describedby`.
- *   - Allows keyboard users to navigate through FAQs.
- *
- * - **UI & Theming**:
- *   - Styled with Tailwind CSS for light and dark mode support.
- *   - Uses Lucide icons to enhance visual appeal.
+ * **Features:**
+ * - **Static FAQ List**: Organized questions & answers.
+ * - **Accessible Design**:
+ *   - `aria-labelledby` & `aria-describedby` for screen readers.
+ *   - Keyboard-friendly navigation.
+ * - **Theming & UI**:
+ *   - Tailwind CSS for light/dark mode.
+ *   - Lucide icons for visual enhancement.
  */
 
 import { HelpCircle } from "lucide-react";

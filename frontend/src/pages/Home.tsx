@@ -1,19 +1,18 @@
 /**
- * Home Page
+ * **Home Page**
  *
- * Renders the main landing page with multiple sections, including a hero banner,
- * a featured album carousel, an explanation of the platform and community statistics.
+ * Renders the main landing page with:
+ * - **Hero Section** (`<HeroSection />`): Introduces the platform.
+ * - **Album Carousel** (`<Carousel />`): Scrollable top 10 albums.
+ * - **How It Works** (`<HowItWorks />`): Explains platform functionality.
+ * - **Community Stats** (`<Community />`): Highlights user engagement.
  *
- * Features:
- * - **Hero Section**: Introduces the platform.
- * - **Album Carousel**: Displays a scrollable selection of top albums.
- * - **How It Works**: Explains the platform’s functionality in a structured way.
- * - **Community Stats**: Highlights user engagement and platform impact.
+ * **Accessibility Enhancements**
+ * - Uses `aria-labelledby` & `aria-label` for better screen reader support.
+ * - Implements `overflow-x-auto` for carousel navigation.
  *
- * Accessibility Enhancements:
- * - Uses `role="region"` and `aria-labelledby` for better screen reader navigation.
- * - Implements `aria-label` and `aria-describedby` for improved context.
- * - Supports responsive layouts with Tailwind CSS for optimal viewing on all devices.
+ * **Responsive Design**
+ * - Tailwind breakpoints ensure mobile & desktop adaptability.
  */
 
 import { HeroSection } from "../components/HeroSection";
