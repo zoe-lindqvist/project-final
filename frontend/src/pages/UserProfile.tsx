@@ -19,7 +19,6 @@
  * - Built with Tailwind CSS for an optimized experience across devices.
  */
 
-import React from "react";
 import { useEffect, useState } from "react";
 import { User } from "lucide-react";
 import axios from "axios";
