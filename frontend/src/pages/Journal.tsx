@@ -253,12 +253,12 @@ export const Journal: React.FC = () => {
 
                 {/* Spotify Embedded Player */}
                 {songSuggestion.spotifyUrl && (
-                  <div className="mt-6">
+                  <div className="w-full mt-6 mb-0 flex justify-start">
                     <iframe
                       src={`https://open.spotify.com/embed/track/${songSuggestion.spotifyUrl
                         .split("/")
                         .pop()}`}
-                      className="w-full h-32 rounded-lg shadow-lg"
+                      className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg shadow-lg"
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
                       title="Spotify Player"
