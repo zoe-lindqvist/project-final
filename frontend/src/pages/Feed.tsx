@@ -289,7 +289,7 @@ export const Feed: React.FC = () => {
   }, [searchQuery]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-2 md:px-4 lg:px-6 py-8">
       {/* Search and Filter Bar */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4">
