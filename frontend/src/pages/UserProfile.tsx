@@ -1,3 +1,4 @@
+
 /**
  * **User Profile Page**
  *
@@ -19,30 +20,16 @@
  * - Built with Tailwind CSS for an optimized experience across devices.
  */
 
+
 import { useEffect, useState } from "react";
-import { User } from "lucide-react";
+import { User, Music2, ArrowLeft, UserPlus, UserMinus } from "lucide-react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
-import {
-  Music2,
-  Calendar,
-  Music,
-  ArrowLeft,
-  UserPlus,
-  UserMinus,
-} from "lucide-react";
-import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 
 export const UserProfile: React.FC = () => {
   const { userId } = useParams();
-  const {
-    user: currentUser,
-    following,
-    followUser,
-    unfollowUser,
-    users,
-  } = useAuthStore();
+  const { user: currentUser } = useAuthStore();
   const [profileUser, setProfileUser] = useState<any>(null);
   const [publicEntries, setPublicEntries] = useState<any[]>([]);
 
@@ -52,7 +39,6 @@ export const UserProfile: React.FC = () => {
     const fetchUserProfile = async () => {
       try {
         const apiUrl = `${API_BASE_URL}/api/moods/public-profile/${userId}`;
-
         const response = await axios.get(apiUrl, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -72,13 +58,38 @@ export const UserProfile: React.FC = () => {
   }, [userId]);
 
   const isOwnProfile = currentUser?.id === userId;
-  const isFollowing = following.includes(userId || "");
+  const isFollowing =
+    currentUser &&
+    profileUser?.followers?.some(
+      (follower: { id: string }) => follower.id === currentUser.id
+    );
 
   const handleFollowToggle = async () => {
-    if (isFollowing) {
-      await unfollowUser(userId || "");
-    } else {
-      await followUser(userId || "");
+    try {
+      const url = isFollowing
+        ? `${API_BASE_URL}/api/users/unfollow/${userId}`
+        : `${API_BASE_URL}/api/users/follow/${userId}`;
+
+      console.log("📡 Sending request to:", url);
+
+      await axios.post(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      setProfileUser((prev: { followers: { id: string }[] }) => ({
+        ...prev,
+        followers: isFollowing
+          ? prev.followers.filter((follower) => follower.id !== currentUser!.id) // Remove follower
+          : [...prev.followers, { id: currentUser!.id }], // Add follower
+      }));
+    } catch (error) {
+      console.error("Error toggling follow state:", error);
     }
   };
 
@@ -92,7 +103,6 @@ export const UserProfile: React.FC = () => {
         <ArrowLeft className="h-5 w-5" />
         <span>Back to Feed</span>
       </Link>
-
       {profileUser ? (
         <>
           {/* Profile Header */}

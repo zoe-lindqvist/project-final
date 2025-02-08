@@ -41,6 +41,7 @@ export const moodCategories: Record<MoodCategory, string[]> = {
     "wonderful",
     "adventurous",
     "proud",
+    "explore",
   ],
   confused: ["confused", "puzzled"],
   excited: [

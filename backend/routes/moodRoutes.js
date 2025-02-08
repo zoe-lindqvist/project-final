@@ -36,6 +36,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Like/unlike a mood entry
 router.post("/like/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
@@ -213,7 +214,11 @@ router.get("/public-profile/:userId", async (req, res) => {
     });
 
     // Fetch the user (excluding private info like email)
-    const user = await User.findById(userId).select("username badges");
+    const user = await User.findById(userId)
+      .select("username badges followers following")
+      .populate("followers", "id")
+      .populate("followers", "id")
+      .exec();
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
