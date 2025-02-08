@@ -1,3 +1,22 @@
+/**
+ * **Journal Page**
+ *
+ * Enables users to write journal entries, analyze their mood, and get music recommendations.
+ *
+ * **Features:**
+ * - **Mood Analysis**: AI evaluates journal entries and suggests a mood.
+ * - **Music Recommendations**: Provides mood-matching song suggestions.
+ * - **Saving & Sharing**: Entries can be saved or shared with the community.
+ *
+ * **Accessibility Enhancements:**
+ * - Uses `aria-labelledby` and `role="region"` for better screen reader navigation.
+ * - `aria-live="polite"` announces mood analysis results dynamically.
+ * - Buttons include `aria-label` and `aria-disabled` for improved usability.
+ *
+ * **Responsive UI:**
+ * - Styled with Tailwind CSS, supporting both desktop and mobile layouts.
+ */
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
@@ -117,8 +136,13 @@ export const Journal: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
+      {/* Page Title */}
+
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1
+          id="journal-title"
+          className="text-3xl font-bold text-gray-900 dark:text-white"
+        >
           Your Mood Journal
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mt-2">
@@ -126,10 +150,19 @@ export const Journal: React.FC = () => {
         </p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8">
+      {/* Journal Section */}
+      <div
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8"
+        role="region"
+        aria-labelledby="journal-entry-heading"
+      >
         <div className="flex items-center space-x-3 mb-6">
           <PenLine className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2
+            id="journal-entry-heading"
+            className="text-2xl font-bold text-gray-900 dark:text-white"
+            tabIndex={0} // Makes it focusable for keyboard users
+          >
             How are you feeling?
           </h2>
         </div>
@@ -141,6 +174,8 @@ export const Journal: React.FC = () => {
           placeholder="Write your thoughts or feelings..."
           className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent resize-none"
           minRows={4}
+          aria-label="Journal Entry"
+          aria-required="true"
         />
 
         {/* Analyze Mood Button */}
@@ -149,6 +184,8 @@ export const Journal: React.FC = () => {
             onClick={handleAnalyze}
             disabled={!content.trim() || analyzing}
             className="inline-flex items-center space-x-2 bg-purple-600 dark:bg-purple-500 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Analyze Mood"
+            aria-disabled={analyzing}
           >
             {analyzing ? (
               <>
@@ -166,9 +203,17 @@ export const Journal: React.FC = () => {
 
         {/* Mood and Song Suggestions */}
         {moodSuggestion && (
-          <div className="mt-8 space-y-6">
+          <div
+            className="mt-8 space-y-6"
+            role="region"
+            aria-labelledby="mood-analysis-heading"
+            aria-live="polite"
+          >
             <div className="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h2
+                id="mood-analysis-heading"
+                className="text-lg font-semibold text-gray-900 dark:text-white mb-2"
+              >
                 Your Mood Analysis
               </h2>
               <p className="text-purple-600 dark:text-purple-400 text-2xl font-bold capitalize">
@@ -177,10 +222,17 @@ export const Journal: React.FC = () => {
             </div>
 
             {songSuggestion && (
-              <div className="p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+              <div
+                className="p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
+                role="region"
+                aria-labelledby="song-suggestion-heading"
+              >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    <h2
+                      id="song-suggestion-heading"
+                      className="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+                    >
                       Recommended Song
                     </h2>
                     <div className="space-y-1">
@@ -209,6 +261,7 @@ export const Journal: React.FC = () => {
                       className="w-full h-32 rounded-lg shadow-lg"
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
+                      title="Spotify Player"
                     ></iframe>
                   </div>
                 )}
