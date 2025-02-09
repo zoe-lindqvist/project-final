@@ -91,7 +91,8 @@ export const useAuthStore = create<AuthState>()(
           });
           localStorage.setItem("accessToken", data.accessToken);
         } catch (error) {
-          console.error("❌ Login error:", error);
+          console.error("Login error:", error);
+          throw error;
         }
       },
 
