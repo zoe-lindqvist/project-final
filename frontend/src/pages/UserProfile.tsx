@@ -221,7 +221,7 @@ export const UserProfile: React.FC = () => {
                         src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
                           .split("/")
                           .pop()}`}
-                        className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg shadow-lg"
+                        className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg"
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
                       ></iframe>
