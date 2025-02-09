@@ -52,9 +52,6 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const userData = await response.json();
-
-          console.log("✅ Fetched user data:", userData);
-
           set({
             user: {
               id: userData.id,
@@ -82,8 +79,6 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(data.message || "Failed to login");
           }
 
-          console.log("Successfully logged in:", data);
-
           set({
             user: {
               id: data.id,
@@ -94,7 +89,6 @@ export const useAuthStore = create<AuthState>()(
             accessToken: data.accessToken,
             following: data.following || [],
           });
-
           localStorage.setItem("accessToken", data.accessToken);
         } catch (error) {
           console.error("❌ Login error:", error);

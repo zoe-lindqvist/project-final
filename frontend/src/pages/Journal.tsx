@@ -34,9 +34,9 @@ import {
 import axios from "axios";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { MoodCategory } from "../types";
 import { mapToCategory } from "../utils/moodUtils";
 import { triggerConfetti } from "../utils/confetti";
+import { checkForNewBadges } from "../utils/badgeUtils";
 
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
@@ -57,14 +57,12 @@ export const Journal: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // Function to save the journal entry to the store
-
+    // Function to save the journal entry to the backend
     const user = useAuthStore.getState().user;
     if (!user || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before saving.");
       return;
     }
-
     await useMoodStore.getState().saveMoodEntry({
       userId: user.id,
       userInput: content,
@@ -72,9 +70,7 @@ export const Journal: React.FC = () => {
       mood: moodSuggestion,
       content: content,
       category: mapToCategory(moodSuggestion),
-
       shared: false,
-
       suggestedSong: {
         title: songSuggestion.title || "Unknown",
         artist: songSuggestion.artist || "Unknown",
@@ -82,7 +78,6 @@ export const Journal: React.FC = () => {
         spotifyUrl: songSuggestion.spotifyUrl || "#",
       },
     });
-
     triggerConfetti();
 
     // Reset form after saving
@@ -126,7 +121,6 @@ export const Journal: React.FC = () => {
       triggerConfetti();
       const sharedMoodEntry = response.data;
       useMoodStore.getState().saveMoodEntry(sharedMoodEntry);
-
       navigate("/feed");
     } catch (error) {
       console.error("Error sharing mood:", error);

@@ -27,12 +27,12 @@ export const Profile: React.FC = () => {
   const { entries, streak, getMoodStats, getUserEntries } = useMoodStore();
   const [weeklyStats, setWeeklyStats] = useState<{ [key: string]: number }>({});
 
+  // Fetch mood entries for the user
   useEffect(() => {
     if (user?.id) {
       getUserEntries(user.id); // Fetch mood entries for the logged-in user
-      fetchUser(user.id); // Fetch user data including badges
     }
-  }, [user, getUserEntries, fetchUser]);
+  }, [user?.id, getUserEntries]);
 
   // Calculate weekly mood stats
   useEffect(() => {
@@ -119,7 +119,15 @@ export const Profile: React.FC = () => {
           Weekly Mood Summary
         </h3>
         <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-          {entries.length} mood entries logged in the past 7 days.
+          {
+            entries.filter((entry) => {
+              const entryDate = new Date(entry.createdAt).getTime();
+              const cutoffDate = new Date();
+              cutoffDate.setDate(cutoffDate.getDate() - 7); // 7 days ago
+              return entryDate >= cutoffDate.getTime(); // Only count entries from the past 7 days
+            }).length
+          }{" "}
+          mood entries logged in the past 7 days.
         </p>
 
         <div

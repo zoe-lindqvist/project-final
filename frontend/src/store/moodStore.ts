@@ -162,14 +162,15 @@ export const useMoodStore = create<MoodState>()(
       },
 
       getMoodStats: (days: number) => {
-        const entries = get().entries; // Access current user's mood entries
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - days);
+        const entries = get().entries;
 
-        // Filter entries from the last `days`
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days); // Calculate the cutoff date
+
+        // Filter entries for the past `days`
         const recentEntries = entries.filter((entry) => {
-          const entryDate = new Date(entry.createdAt);
-          return entryDate >= cutoffDate;
+          const entryDate = new Date(entry.createdAt).getTime();
+          return entryDate >= cutoffDate.getTime(); // Compare timestamps
         });
 
         // Count occurrences of each mapped mood category
@@ -177,7 +178,6 @@ export const useMoodStore = create<MoodState>()(
 
         recentEntries.forEach((entry) => {
           const category = mapToCategory(entry.moodAnalysis); // Convert mood text to category
-
           moodCounts[category] = (moodCounts[category] || 0) + 1;
         });
 
@@ -193,7 +193,6 @@ export const useMoodStore = create<MoodState>()(
             (moodCounts[mood] / totalEntries) * 100
           );
         });
-
         return moodCounts;
       },
     }),

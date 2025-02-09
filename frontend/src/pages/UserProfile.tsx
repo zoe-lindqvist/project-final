@@ -68,8 +68,6 @@ export const UserProfile: React.FC = () => {
         ? `${API_BASE_URL}/api/users/unfollow/${userId}`
         : `${API_BASE_URL}/api/users/follow/${userId}`;
 
-      console.log("📡 Sending request to:", url);
-
       await axios.post(
         url,
         {},

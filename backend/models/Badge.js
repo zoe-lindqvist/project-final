@@ -11,10 +11,11 @@
 import mongoose from "mongoose";
 
 const badgeSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
   icon: { type: String, required: true },
-  unlockedAt: { type: Date, required: true },
+  unlockedAt: { type: Date, required: false },
 });
 
 const Badge = mongoose.model("Badge", badgeSchema);

@@ -48,7 +48,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.set("toJSON", {
   transform: (_doc, ret) => {
     if (ret._id) {
-      ret.id = ret._id.toString(); // ✅ Only convert `_id` if it exists
+      ret.id = ret._id.toString();
       delete ret._id;
     }
     delete ret.__v;
