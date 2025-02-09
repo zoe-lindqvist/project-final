@@ -50,4 +50,4 @@ Mood Melody combines journaling, AI-powered mood analysis, and Spotify integrati
 ## **🌍 View It Live**
 
 🔗 **Frontend**: [Mood Melody](https://mood-melody.netlify.app/)  
-🔗 **Backend API**: [Deployed Link Here](#)
+🔗 **Backend API**: [Deployed Link Here](https://project-final-fo1y.onrender.com)

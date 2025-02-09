@@ -59,6 +59,7 @@ export const Feed: React.FC = () => {
           }
         );
         setEntries([...response.data]);
+        console.log("Fetched entries:", response.data);
 
         // Check which moods the user has already liked
         const likedMoods = response.data.reduce(
@@ -140,6 +141,7 @@ export const Feed: React.FC = () => {
 
   // Likes Functionality
   const handleToggleLike = async (entryId: string) => {
+    console.log("Entry ID passed to handleToggleLike:", entryId);
     if (!user || !user.id) return;
 
     try {
@@ -411,6 +413,7 @@ export const Feed: React.FC = () => {
       <div className="space-y-6">
         {visibleEntries.length > 0 ? (
           visibleEntries.map((entry, index) => {
+            console.log("Entry ID", entry.id);
             const isLastEntry = index === visibleEntries.length - 1;
 
             return (
