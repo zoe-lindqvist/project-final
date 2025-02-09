@@ -1,3 +1,27 @@
+/**
+ * **Feed Page**
+ *
+ *  Showcases user-generated mood entries and suggests AI-powered music recommendations.
+ *
+ * **Features:**
+ * - **Mood-Based Entries**: Users share their moods with recommended songs.
+ * - **Engagement**:
+ *   - Like and comment on mood entries.
+ *   - View others' interactions.
+ * - **Filters & Search**:
+ *   - Filter moods by category and genre.
+ *   - Search for users by username.
+ * - **Following Feed**: Toggle between all moods or only those from followed users.
+ * - **Infinite Scroll**: Automatically loads more moods while scrolling.
+ * - **Accessibility**:
+ *   - `aria-live` for dynamic content updates.
+ *   - `aria-pressed` and `aria-expanded` for interactive elements.
+ *   - `tabIndex={0}` for keyboard focusability.
+ * - **Responsive UI**:
+ *   - Tailwind CSS for flexible layout and theming.
+ *   - Dark mode support.
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -397,14 +421,10 @@ export const Feed: React.FC = () => {
                   : "bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
               }`}
               aria-pressed={showFollowingOnly} // Indicates toggle state
-              aria-label={
-                showFollowingOnly ? "Show All Users" : "Show Following Only"
-              }
+              aria-label={showFollowingOnly ? "All Users" : "Followers"}
             >
               <User className="h-5 w-5" />
-              <span>
-                {showFollowingOnly ? "Show All Users" : "Show Following Only"}
-              </span>
+              <span>{showFollowingOnly ? "All Users" : "Followers"}</span>
             </button>
           </div>
         </div>
@@ -455,12 +475,12 @@ export const Feed: React.FC = () => {
 
                 {/* Spotify Embedded Player */}
                 {entry.suggestedSong.spotifyLink && (
-                  <div className="w-full mt-6 mb-0 flex justify-start">
+                  <div className="w-full mt-8 -mb-6 flex justify-start ">
                     <iframe
                       src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
                         .split("/")
                         .pop()}`}
-                      className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg shadow-lg"
+                      className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg block"
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
                     ></iframe>
@@ -475,6 +495,7 @@ export const Feed: React.FC = () => {
                   aria-label={
                     userLiked[entry.id] ? "Unlike this post" : "Like this post"
                   }
+                  aria-controls={`like-count-${entry.id}`} // Connects button to the like count
                 >
                   <Heart
                     className={`h-5 w-5 ${
@@ -485,7 +506,12 @@ export const Feed: React.FC = () => {
                 </button>
 
                 {/* Comments Section */}
-                <div className="mt-2" aria-live="polite">
+                <div
+                  className="mt-2"
+                  id={`comment-section-${entry.id}`}
+                  aria-labelledby={`mood-${entry.id}`} // Announces the mood entry
+                  aria-live="polite"
+                >
                   {comments[entry.id]?.length > 0 && (
                     <div className="space-y-2">
                       {(expandedComments[entry.id]
