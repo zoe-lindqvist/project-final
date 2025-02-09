@@ -591,7 +591,6 @@ export const Feed: React.FC = () => {
           <p className="text-center text-gray-500">Loading more...</p>
         )}
       </div>
-      ;
     </div>
   );
 };
