@@ -21,7 +21,7 @@ interface AuthState {
   followUser: (userId: string) => void;
   unfollowUser: (userId: string) => void;
 }
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
           const token =
             get().accessToken || localStorage.getItem("accessToken");
 
-          const response = await fetch(`${API_URL}/api/users/${userId}`, {
+          const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (email, password) => {
         try {
-          const response = await fetch(`${API_URL}/api/users/login`, {
+          const response = await fetch(`${API_BASE_URL}/api/users/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -104,7 +104,7 @@ export const useAuthStore = create<AuthState>()(
       // Register function that interacts with the backend API
       register: async (username, email, password) => {
         try {
-          const response = await fetch(`${API_URL}/api/users/register`, {
+          const response = await fetch(`${API_BASE_URL}/api/users/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, email, password }),
@@ -156,7 +156,7 @@ export const useAuthStore = create<AuthState>()(
           const token = localStorage.getItem("accessToken");
 
           const response = await fetch(
-            `${API_URL}/api/users/follow/${userId}`,
+            `${API_BASE_URL}/api/users/follow/${userId}`,
             {
               method: "POST",
               headers: {
@@ -190,7 +190,7 @@ export const useAuthStore = create<AuthState>()(
 
           const token = localStorage.getItem("accessToken");
           const response = await fetch(
-            `${API_URL}/api/users/unfollow/${userId}`,
+            `${API_BASE_URL}/api/users/unfollow/${userId}`,
             {
               method: "POST",
               headers: {

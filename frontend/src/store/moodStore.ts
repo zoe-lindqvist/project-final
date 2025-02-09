@@ -4,7 +4,7 @@ import { useAuthStore } from "./useAuthStore";
 import type { MoodEntry, Badge } from "../types";
 import { moodCategories, mapToCategory } from "../utils/moodUtils";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 interface MoodState {
   entries: MoodEntry[];
@@ -53,7 +53,7 @@ export const useMoodStore = create<MoodState>()(
         set({ analyzing: true });
 
         try {
-          const response = await fetch(`${API_URL}/api/moods/analyze`, {
+          const response = await fetch(`${API_BASE_URL}/api/moods/analyze`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userInput }),
@@ -96,7 +96,7 @@ export const useMoodStore = create<MoodState>()(
 
           const category = mapToCategory(entry.moodAnalysis);
 
-          const response = await fetch(`${API_URL}/api/moods/save`, {
+          const response = await fetch(`${API_BASE_URL}/api/moods/save`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export const useMoodStore = create<MoodState>()(
 
         try {
           const response = await fetch(
-            `${API_URL}/api/moods/profile/${userId}`,
+            `${API_BASE_URL}/api/moods/profile/${userId}`,
             {
               method: "GET",
               headers: {
