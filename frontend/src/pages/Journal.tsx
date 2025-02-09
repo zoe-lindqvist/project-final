@@ -63,44 +63,31 @@ export const Journal: React.FC = () => {
       alert("Please analyze your mood before saving.");
       return;
     }
+    await useMoodStore.getState().saveMoodEntry({
+      userId: user.id,
+      userInput: content,
+      moodAnalysis: moodSuggestion,
+      mood: moodSuggestion,
+      content: content,
+      category: mapToCategory(moodSuggestion),
+      shared: false,
+      suggestedSong: {
+        title: songSuggestion.title || "Unknown",
+        artist: songSuggestion.artist || "Unknown",
+        genre: songSuggestion.genre || "Unknown",
+        spotifyUrl: songSuggestion.spotifyUrl || "#",
+      },
+    });
+    triggerConfetti();
 
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/moods/save`, // Target the /save endpoint
-        {
-          userInput: content,
-          moodAnalysis: moodSuggestion,
-          category: mapToCategory(moodSuggestion),
-          shared: false, // Explicitly set shared to false
-          suggestedSong: {
-            title: songSuggestion.title || "Unknown",
-            artist: songSuggestion.artist || "Unknown",
-            genre: songSuggestion.genre || "Unknown",
-            spotifyLink: songSuggestion.spotifyUrl || "#",
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.status === 201) {
-        setContent(""); // Clear input after saving
-        useMoodStore.getState().saveMoodEntry(response.data.mood); // Save locally
-        triggerConfetti();
-        navigate("/profile");
-      }
-    } catch (error) {
-      console.error("Error saving mood:", error);
-      alert("Failed to save mood.");
-    }
+    // Reset form after saving
+    setContent("");
+    useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
+    navigate("/profile");
   };
 
   const handleShareToFeed = async () => {
-    const user = useAuthStore.getState().user;
-    if (!user || !content.trim() || !moodSuggestion || !songSuggestion) {
+    if (!content.trim() || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before sharing.");
       return;
     }

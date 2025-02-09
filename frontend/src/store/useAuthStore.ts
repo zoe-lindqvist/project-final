@@ -53,7 +53,11 @@ export const useAuthStore = create<AuthState>()(
 
           const userData = await response.json();
           set({
-            user: userData,
+            user: {
+              id: userData.id,
+              username: userData.username,
+              email: userData.email,
+            },
             isAuthenticated: true,
           });
         } catch (error) {
@@ -75,8 +79,6 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(data.message || "Failed to login");
           }
 
-          localStorage.setItem("userId", data.id);
-          localStorage.setItem("accessToken", data.accessToken);
           set({
             user: {
               id: data.id,
@@ -87,6 +89,7 @@ export const useAuthStore = create<AuthState>()(
             accessToken: data.accessToken,
             following: data.following || [],
           });
+          localStorage.setItem("accessToken", data.accessToken);
         } catch (error) {
           console.error("❌ Login error:", error);
         }
