@@ -1,4 +1,3 @@
-
 /**
  * **User Profile Page**
  *
@@ -19,7 +18,6 @@
  * **Responsive UI:**
  * - Built with Tailwind CSS for an optimized experience across devices.
  */
-
 
 import { useEffect, useState } from "react";
 import { User, Music2, ArrowLeft, UserPlus, UserMinus } from "lucide-react";
@@ -69,8 +67,6 @@ export const UserProfile: React.FC = () => {
       const url = isFollowing
         ? `${API_BASE_URL}/api/users/unfollow/${userId}`
         : `${API_BASE_URL}/api/users/follow/${userId}`;
-
-      console.log("📡 Sending request to:", url);
 
       await axios.post(
         url,

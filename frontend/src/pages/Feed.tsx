@@ -59,7 +59,6 @@ export const Feed: React.FC = () => {
           }
         );
         setEntries([...response.data]);
-        console.log("Fetched entries:", response.data);
 
         // Check which moods the user has already liked
         const likedMoods = response.data.reduce(
@@ -103,7 +102,7 @@ export const Feed: React.FC = () => {
     };
 
     applyFilters();
-  }, [entries, moodFilter, genreFilter]);
+  }, [entries, moodFilter, genreFilter, userLiked]);
 
   // Infinite scroll - Load more moods
   const fetchMoreMoods = useCallback(() => {
@@ -141,7 +140,6 @@ export const Feed: React.FC = () => {
 
   // Likes Functionality
   const handleToggleLike = async (entryId: string) => {
-    console.log("Entry ID passed to handleToggleLike:", entryId);
     if (!user || !user.id) return;
 
     try {
@@ -157,6 +155,7 @@ export const Feed: React.FC = () => {
 
       if (response.status === 200) {
         const updatedLikes = response.data.likes || [];
+
         setEntries((prevEntries) =>
           prevEntries.map((entry) =>
             entry.id === entryId ? { ...entry, likes: updatedLikes } : entry
@@ -402,9 +401,7 @@ export const Feed: React.FC = () => {
               }
             >
               <User className="h-5 w-5" />
-              <span>
-                {showFollowingOnly ? "Show All Users" : "Show Following Only"}
-              </span>
+              <span>Following</span>
             </button>
           </div>
         </div>
@@ -413,7 +410,6 @@ export const Feed: React.FC = () => {
       <div className="space-y-6">
         {visibleEntries.length > 0 ? (
           visibleEntries.map((entry, index) => {
-            console.log("Entry ID", entry.id);
             const isLastEntry = index === visibleEntries.length - 1;
 
             return (

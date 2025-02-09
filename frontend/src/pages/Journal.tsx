@@ -34,9 +34,9 @@ import {
 import axios from "axios";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { MoodCategory } from "../types";
 import { mapToCategory } from "../utils/moodUtils";
 import { triggerConfetti } from "../utils/confetti";
+import { checkForNewBadges } from "../utils/badgeUtils";
 
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
@@ -57,42 +57,50 @@ export const Journal: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // Function to save the journal entry to the store
-
+    // Function to save the journal entry to the backend
     const user = useAuthStore.getState().user;
     if (!user || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before saving.");
       return;
     }
 
-    await useMoodStore.getState().saveMoodEntry({
-      userId: user.id,
-      userInput: content,
-      moodAnalysis: moodSuggestion,
-      mood: moodSuggestion,
-      content: content,
-      category: mapToCategory(moodSuggestion),
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/moods/save`, // Target the /save endpoint
+        {
+          userInput: content,
+          moodAnalysis: moodSuggestion,
+          category: mapToCategory(moodSuggestion),
+          shared: false, // Explicitly set shared to false
+          suggestedSong: {
+            title: songSuggestion.title || "Unknown",
+            artist: songSuggestion.artist || "Unknown",
+            genre: songSuggestion.genre || "Unknown",
+            spotifyLink: songSuggestion.spotifyUrl || "#",
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
 
-      shared: false,
-
-      suggestedSong: {
-        title: songSuggestion.title || "Unknown",
-        artist: songSuggestion.artist || "Unknown",
-        genre: songSuggestion.genre || "Unknown",
-        spotifyUrl: songSuggestion.spotifyUrl || "#",
-      },
-    });
-
-    triggerConfetti();
-
-    // Reset form after saving
-    setContent("");
-    useMoodStore.setState({ moodSuggestion: null, songSuggestion: null });
-    navigate("/profile");
+      if (response.status === 201) {
+        setContent(""); // Clear input after saving
+        useMoodStore.getState().saveMoodEntry(response.data.mood); // Save locally
+        triggerConfetti();
+        navigate("/profile");
+      }
+    } catch (error) {
+      console.error("Error saving mood:", error);
+      alert("Failed to save mood.");
+    }
   };
 
   const handleShareToFeed = async () => {
-    if (!content.trim() || !moodSuggestion || !songSuggestion) {
+    const user = useAuthStore.getState().user;
+    if (!user || !content.trim() || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before sharing.");
       return;
     }
@@ -126,7 +134,6 @@ export const Journal: React.FC = () => {
       triggerConfetti();
       const sharedMoodEntry = response.data;
       useMoodStore.getState().saveMoodEntry(sharedMoodEntry);
-
       navigate("/feed");
     } catch (error) {
       console.error("Error sharing mood:", error);

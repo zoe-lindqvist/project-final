@@ -201,6 +201,10 @@ router.get("/:id", authenticateUser, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Transform `_id` to `id` for the user
+    user.id = user._id.toString();
+    delete user._id;
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "Error fetching user profile" });
