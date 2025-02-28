@@ -158,7 +158,9 @@ export const Feed: React.FC = () => {
 
         setEntries((prevEntries) =>
           prevEntries.map((entry) =>
-            entry.id === entryId ? { ...entry, likes: updatedLikes } : entry
+            entry.id === entryId
+              ? { ...entry, likes: [...updatedLikes] }
+              : entry
           )
         );
 

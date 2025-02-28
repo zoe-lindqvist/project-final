@@ -7,17 +7,30 @@
  * - `icon`: URL or file reference for the badge icon.
  * - `unlockedAt`: Timestamp indicating when the badge was earned.
  */
-
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const badgeSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  icon: { type: String, required: true },
-  unlockedAt: { type: Date, required: false },
+  id: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  icon: {
+    type: String,
+    required: true,
+  },
+  unlockedAt: {
+    type: Date,
+    required: false,
+  },
 });
 
-const Badge = mongoose.model("Badge", badgeSchema);
-
-export default Badge;
+export const Badge = mongoose.model("Badge", badgeSchema);

@@ -51,6 +51,8 @@ export const Journal: React.FC = () => {
   const moodSuggestion = useMoodStore((state) => state.moodSuggestion);
   const songSuggestion = useMoodStore((state) => state.songSuggestion);
   const analyzing = useMoodStore((state) => state.analyzing);
+  const user = useAuthStore((state) => state.user);
+  const username = user ? user.username : "friend";
 
   const handleAnalyze = async () => {
     await analyzeMood(content);
@@ -88,7 +90,9 @@ export const Journal: React.FC = () => {
 
       if (response.status === 201) {
         setContent(""); // Clear input after saving
-        useMoodStore.getState().saveMoodEntry(response.data.mood); // Save locally
+        useMoodStore.setState((state) => ({
+          entries: [response.data.mood, ...state.entries],
+        }));
         triggerConfetti();
         navigate("/profile");
       }
@@ -170,7 +174,7 @@ export const Journal: React.FC = () => {
             className="text-2xl font-bold text-gray-900 dark:text-white"
             tabIndex={0} // Makes it focusable for keyboard users
           >
-            How are you feeling?
+            Hi, {username}! How are you feeling?
           </h2>
         </div>
 

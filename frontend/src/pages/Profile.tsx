@@ -1,12 +1,12 @@
 /**
- * **Journal Page**
+ * **Profile Page**
  *
- * Enables users to write journal entries, analyze their mood, and get music recommendations.
+ * Displays user statistics, mood analysis, and earned badges.
  *
  * **Features:**
- * - **Mood Analysis**: AI evaluates journal entries and suggests a mood.
- * - **Music Recommendations**: Provides mood-matching song suggestions.
- * - **Saving & Sharing**: Entries can be saved or shared with the community.
+ * - **Mood Tracking**: Shows weekly mood statistics based on journal entries.
+ * - **User Streaks & Achievements**: Tracks journaling streaks and earned badges.
+ * - **Journal Entries**: Displays personal entries with mood analysis and music recommendations.
  *
  * **Accessibility Enhancements:**
  * - Uses `aria-labelledby` and `role="region"` for better screen reader navigation.
@@ -20,7 +20,15 @@
 import React, { useEffect, useState } from "react";
 import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { Award, Calendar, Music, Play, Pause } from "lucide-react";
+import {
+  Award,
+  Calendar,
+  Music,
+  Play,
+  Pause,
+  Users,
+  UserPlus,
+} from "lucide-react";
 
 export const Profile: React.FC = () => {
   const { user, fetchUser } = useAuthStore();
@@ -43,31 +51,20 @@ export const Profile: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-2 md:px-4 lg:px-6 py-8">
+      <div className="text-center mb-8">
+        <h1
+          id="journal-title"
+          className="text-3xl font-bold text-gray-900 dark:text-white"
+        >
+          Your Profile
+        </h1>
+      </div>
       {/* Stats Overview */}
       <div
         className="grid md:grid-cols-3 gap-6 mb-8"
         role="region"
         aria-labelledby="stats-overview"
       >
-        <div
-          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
-          role="region"
-          aria-labelledby="streak-heading"
-        >
-          <div className="flex items-center space-x-3 mb-4">
-            <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-            <h3
-              id="streak-heading"
-              className="text-lg font-semibold text-gray-900 dark:text-white"
-            >
-              Current Streak
-            </h3>
-          </div>
-          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-            {streak} days
-          </p>
-        </div>
-
         <div
           className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
           role="region"
@@ -92,16 +89,34 @@ export const Profile: React.FC = () => {
           aria-labelledby="badges-heading"
         >
           <div className="flex items-center space-x-3 mb-4">
-            <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             <h3
               id="badges-heading"
               className="text-lg font-semibold text-gray-900 dark:text-white"
             >
-              Badges Earned
+              Followers
             </h3>
           </div>
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
             {user?.badges?.length || 0}
+          </p>
+        </div>
+        <div
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          role="region"
+          aria-labelledby="streak-heading"
+        >
+          <div className="flex items-center space-x-3 mb-4">
+            <UserPlus className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <h3
+              id="streak-heading"
+              className="text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              Following
+            </h3>
+          </div>
+          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+            {streak}
           </p>
         </div>
       </div>
@@ -170,7 +185,7 @@ export const Profile: React.FC = () => {
           id="journal-entries-heading"
           className="text-xl font-semibold text-gray-900 dark:text-white mb-6"
         >
-          My Journal Entries
+          Your Journal Entries
         </h3>
         <div role="list" className="space-y-6">
           {entries.map((entry) => (
