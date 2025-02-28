@@ -52,6 +52,8 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const userData = await response.json();
+
+          console.log("Fetched user data:", userData);
           set({
             user: {
               id: userData.id,
@@ -90,6 +92,10 @@ export const useAuthStore = create<AuthState>()(
             following: data.following || [],
           });
           localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("userId", data.id); // Save user ID for persistence
+
+          // 🚀 Fetch full user details after login
+          await get().fetchUser(data.id);
         } catch (error) {
           console.error("Login error:", error);
           throw error;
