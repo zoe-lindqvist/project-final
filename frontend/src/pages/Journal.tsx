@@ -90,9 +90,7 @@ export const Journal: React.FC = () => {
 
       if (response.status === 201) {
         setContent(""); // Clear input after saving
-        useMoodStore.setState((state) => ({
-          entries: [response.data.mood, ...state.entries],
-        }));
+        useMoodStore.getState().saveMoodEntry(response.data.mood); // Save locally
         triggerConfetti();
         navigate("/profile");
       }
@@ -103,8 +101,7 @@ export const Journal: React.FC = () => {
   };
 
   const handleShareToFeed = async () => {
-    const user = useAuthStore.getState().user;
-    if (!user || !content.trim() || !moodSuggestion || !songSuggestion) {
+    if (!content.trim() || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before sharing.");
       return;
     }
@@ -146,9 +143,9 @@ export const Journal: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <div className="max-w-3xl mx-auto px-2 md:px-4 lg:px-6 py-8">
+      {" "}
       {/* Page Title */}
-
       <div className="text-center mb-8">
         <h1
           id="journal-title"
@@ -160,7 +157,6 @@ export const Journal: React.FC = () => {
           Express your feelings and discover music that matches your mood
         </p>
       </div>
-
       {/* Journal Section */}
       <div
         className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8"
@@ -264,12 +260,12 @@ export const Journal: React.FC = () => {
 
                 {/* Spotify Embedded Player */}
                 {songSuggestion.spotifyUrl && (
-                  <div className="w-full mt-6 mb-0 flex justify-start">
+                  <div className="w-full mt-8 -mb-6 flex justify-start">
                     <iframe
                       src={`https://open.spotify.com/embed/track/${songSuggestion.spotifyUrl
                         .split("/")
                         .pop()}`}
-                      className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg shadow-lg"
+                      className="w-full max-w-full h-28 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg"
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
                       title="Spotify Player"

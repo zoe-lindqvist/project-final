@@ -90,7 +90,7 @@ export const UserProfile: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-2 md:px-4 lg:px-6 py-8">
       <Link
         to="/feed"
         className="inline-flex items-center space-x-2 text-purple-600 dark:text-purple-400 mb-8 hover:text-purple-700 dark:hover:text-purple-300"
@@ -214,12 +214,12 @@ export const UserProfile: React.FC = () => {
 
                   {/* Spotify Embedded Player */}
                   {entry.suggestedSong?.spotifyLink && (
-                    <div className="mt-6">
+                    <div className="w-full mt-8 -mb-6 flex justify-start ">
                       <iframe
                         src={`https://open.spotify.com/embed/track/${entry.suggestedSong.spotifyLink
                           .split("/")
                           .pop()}`}
-                        className="w-full h-32 rounded-lg shadow-lg"
+                        className="w-full h-36 sm:w-1/2 sm:h-44 md:w-1/2 md:h-48 lg:w-1/2 lg:h-52 rounded-lg"
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
                       ></iframe>

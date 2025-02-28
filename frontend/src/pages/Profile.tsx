@@ -1,20 +1,32 @@
 /**
  * **Profile Page**
  *
+<<<<<<< HEAD
  * Displays user statistics, mood analysis, and earned badges.
  *
  * **Features:**
  * - **Mood Tracking**: Shows weekly mood statistics based on journal entries.
  * - **User Streaks & Achievements**: Tracks journaling streaks and earned badges.
  * - **Journal Entries**: Displays personal entries with mood analysis and music recommendations.
+=======
+ * Provides an overview of the user's profile, including statistics, journal entries, and badges earned.
+ *
+ * **Features:**
+ * - **Statistics Overview**: Displays current streak, total entries, and badges earned.
+ * - **Weekly Mood Summary**: Analyzes and visualizes weekly mood trends with percentage breakdowns.
+ * - **Personal Journal Entries**: Lists user's journal entries with mood analysis and song suggestions.
+ * - **Badges Display**: Showcases user-earned badges with descriptions and icons.
+>>>>>>> a632b42596be066693d9b6ab694077da8742f264
  *
  * **Accessibility Enhancements:**
- * - Uses `aria-labelledby` and `role="region"` for better screen reader navigation.
- * - `aria-live="polite"` announces mood analysis results dynamically.
- * - Buttons include `aria-label` and `aria-disabled` for improved usability.
+ * - Uses `role="region"` and `aria-labelledby` to group sections and enhance screen reader navigation.
+ * - Progress bars use `aria-valuenow`, `aria-valuemin`, and `aria-valuemax` for clear feedback.
+ * - Entries and badges are rendered with `role="list"` and `role="listitem"` for better list semantics.
+ * - All interactive elements include `aria-label` or text for clear screen reader descriptions.
  *
  * **Responsive UI:**
- * - Styled with Tailwind CSS, supporting both desktop and mobile layouts.
+ * - Tailwind CSS ensures consistent styling for both desktop and mobile layouts.
+ * - Grid-based design adjusts dynamically for different screen sizes.
  */
 
 import React, { useEffect, useState } from "react";
