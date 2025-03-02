@@ -323,7 +323,8 @@ router.post("/save", authenticateUser, async (req, res) => {
       mood: moodEntry,
     });
   } catch (error) {
-    console.error("Error saving mood:", error);
+    console.error("Error saving mood entry:", error);
+
     if (res.headersSent) {
       return;
     }
