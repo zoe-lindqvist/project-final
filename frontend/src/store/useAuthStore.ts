@@ -3,6 +3,10 @@ import { User } from "../types";
 import { persist } from "zustand/middleware";
 import { useMoodStore } from "./moodStore";
 
+export interface UserProfile {
+  id: string;
+  username: string;
+}
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -16,8 +20,8 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
   fetchUser: (userId: string) => Promise<void>;
-  following: string[];
-  followers: string[];
+  following: UserProfile[];
+  followers: UserProfile[];
   followUser: (userId: string) => void;
   unfollowUser: (userId: string) => void;
 }
@@ -54,6 +58,18 @@ export const useAuthStore = create<AuthState>()(
           const userData = await response.json();
 
           console.log("Fetched user data:", userData);
+          const formattedFollowers: UserProfile[] = userData.followers.map(
+            (f: any) =>
+              typeof f === "string"
+                ? { id: f, username: "Unknown" }
+                : { id: f._id, username: f.username }
+          );
+          const formattedFollowing: UserProfile[] = userData.following.map(
+            (f: any) =>
+              typeof f === "string"
+                ? { id: f, username: "Unknown" }
+                : { id: f._id, username: f.username }
+          );
           set({
             user: {
               id: userData.id,
@@ -61,8 +77,8 @@ export const useAuthStore = create<AuthState>()(
               email: userData.email,
             },
             isAuthenticated: true,
-            followers: userData.followers || [],
-            following: userData.following || [],
+            followers: formattedFollowers,
+            following: formattedFollowing,
           });
         } catch (error) {
           console.error("Error fetching user:", error);
@@ -152,7 +168,7 @@ export const useAuthStore = create<AuthState>()(
       followUser: async (userId) => {
         try {
           const state = get();
-          if (state.following.includes(userId)) {
+          if (state.following.some((user) => user.id === userId)) {
             return;
           }
 
@@ -175,8 +191,10 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(errorData.message || "Failed to follow user");
           }
 
+          const followedUser = await response.json(); // Expect full user object
+
           set((state) => ({
-            following: [...state.following, userId],
+            following: [...state.following, followedUser], // ✅ Add full user object
           }));
         } catch (error) {
           console.error("Error following user:", error);
@@ -187,7 +205,7 @@ export const useAuthStore = create<AuthState>()(
       unfollowUser: async (userId) => {
         try {
           const state = get();
-          if (!state.following.includes(userId)) {
+          if (!state.following.some((user) => user.id === userId)) {
             return;
           }
 
@@ -210,7 +228,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set((state) => ({
-            following: state.following.filter((id) => id !== userId),
+            following: state.following.filter((user) => user.id !== userId), // ✅ Filter by id
           }));
         } catch (error) {
           console.error("Error unfollowing user:", error);

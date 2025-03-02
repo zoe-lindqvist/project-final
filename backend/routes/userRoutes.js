@@ -195,6 +195,8 @@ router.get("/:id", authenticateUser, async (req, res) => {
     const user = await User.findById(req.params.id)
       .select("-password")
       .populate("badges")
+      .populate("followers", "id username")
+      .populate("following", "id username")
       .lean();
 
     if (!user) {
