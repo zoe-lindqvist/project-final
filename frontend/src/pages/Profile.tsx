@@ -1,22 +1,12 @@
 /**
  * **Profile Page**
  *
-<<<<<<< HEAD
  * Displays user statistics, mood analysis, and earned badges.
  *
  * **Features:**
  * - **Mood Tracking**: Shows weekly mood statistics based on journal entries.
  * - **User Streaks & Achievements**: Tracks journaling streaks and earned badges.
  * - **Journal Entries**: Displays personal entries with mood analysis and music recommendations.
-=======
- * Provides an overview of the user's profile, including statistics, journal entries, and badges earned.
- *
- * **Features:**
- * - **Statistics Overview**: Displays current streak, total entries, and badges earned.
- * - **Weekly Mood Summary**: Analyzes and visualizes weekly mood trends with percentage breakdowns.
- * - **Personal Journal Entries**: Lists user's journal entries with mood analysis and song suggestions.
- * - **Badges Display**: Showcases user-earned badges with descriptions and icons.
->>>>>>> a632b42596be066693d9b6ab694077da8742f264
  *
  * **Accessibility Enhancements:**
  * - Uses `role="region"` and `aria-labelledby` to group sections and enhance screen reader navigation.
@@ -43,9 +33,16 @@ import {
 } from "lucide-react";
 
 export const Profile: React.FC = () => {
-  const { user, fetchUser } = useAuthStore();
+  const { user, fetchUser, followers, following } = useAuthStore();
   const { entries, streak, getMoodStats, getUserEntries } = useMoodStore();
   const [weeklyStats, setWeeklyStats] = useState<{ [key: string]: number }>({});
+
+  // Fetch user profile data
+  useEffect(() => {
+    if (user?.id) {
+      fetchUser(user.id);
+    }
+  }, [user?.id, fetchUser]);
 
   // Fetch mood entries for the user
   useEffect(() => {
@@ -110,7 +107,7 @@ export const Profile: React.FC = () => {
             </h3>
           </div>
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-            {user?.badges?.length || 0}
+            {followers.length || 0}
           </p>
         </div>
         <div
@@ -128,7 +125,7 @@ export const Profile: React.FC = () => {
             </h3>
           </div>
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-            {streak}
+            {following.length || 0}
           </p>
         </div>
       </div>

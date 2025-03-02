@@ -61,6 +61,8 @@ export const useAuthStore = create<AuthState>()(
               email: userData.email,
             },
             isAuthenticated: true,
+            followers: userData.followers || [],
+            following: userData.following || [],
           });
         } catch (error) {
           console.error("Error fetching user:", error);

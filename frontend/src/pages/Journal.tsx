@@ -54,8 +54,6 @@ export const Journal: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const username = user ? user.username : "friend";
 
-  console.log("user:", user);
-
   const handleAnalyze = async () => {
     await analyzeMood(content);
   };
