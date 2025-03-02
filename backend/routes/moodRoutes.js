@@ -323,7 +323,10 @@ router.post("/save", authenticateUser, async (req, res) => {
       mood: moodEntry,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error saving mood:", error);
+    if (res.headersSent) {
+      return;
+    }
     res.status(500).json({ error: "Failed to save mood entry to profile." });
   }
 });

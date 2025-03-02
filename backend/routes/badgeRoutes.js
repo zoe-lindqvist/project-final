@@ -8,7 +8,7 @@
  */
 
 import express from "express";
-import Badge from "../models/Badge.js";
+import { Badge } from "../models/Badge.js";
 import { User } from "../models/User.js";
 
 const router = express.Router();
