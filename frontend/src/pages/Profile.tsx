@@ -110,7 +110,7 @@ export const Profile: React.FC = () => {
 
         {/* Followers Count */}
         <div
-          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg cursor-pointer"
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           onClick={() => setShowFollowersModal(true)}
         >
           <div className="flex items-center space-x-3 mb-4">
@@ -125,7 +125,7 @@ export const Profile: React.FC = () => {
         </div>
         {/* Following Count */}
         <div
-          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg cursor-pointer"
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           onClick={() => setShowFollowingModal(true)}
         >
           <div className="flex items-center space-x-3 mb-4">
