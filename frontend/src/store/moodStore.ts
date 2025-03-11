@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useAuthStore } from "./useAuthStore";
-import type { MoodEntry, Badge } from "../types";
+import type { MoodEntry } from "../types";
 import { moodCategories, mapToCategory } from "../utils/moodUtils";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";

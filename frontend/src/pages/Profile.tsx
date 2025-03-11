@@ -345,37 +345,6 @@ export const Profile: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Badges */}
-      <div
-        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
-        role="region"
-        aria-labelledby="user-badges-heading"
-      >
-        <h3
-          id="user-badges-heading"
-          className="text-xl font-semibold text-gray-900 dark:text-white mb-6"
-        >
-          Badges
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {user?.badges?.map((badge) => (
-            <div
-              key={badge.id}
-              role="listitem"
-              className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
-            >
-              <span className="text-4xl mb-2 block">{badge.icon}</span>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                {badge.name}
-              </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {badge.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

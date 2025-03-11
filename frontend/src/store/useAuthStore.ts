@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
       following: [],
       followers: [],
 
-      // Fetch User Profile
+      // Fetch logged in User
       fetchUser: async (userId) => {
         try {
           const token =
