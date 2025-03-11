@@ -15,6 +15,7 @@
  */
 
 import { Music2, Heart, Users, Sparkles } from "lucide-react";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
 
 export const About: React.FC = () => {
   return (
@@ -130,14 +131,18 @@ export const About: React.FC = () => {
               role: "Founder & CEO",
               bio: "Musician turned tech entrepreneur",
               linkedin: "https://www.linkedin.com/in/joyce-kuo-dev/",
+              github: "https://github.com/JoyceKuode",
               image: "/headshots/joyce-kuo.jpg",
             },
             {
               name: "Zoe Lindqvist",
               role: "Lead Developer",
               bio: "Crafting digital experiences with code",
-              linkedin: "https://www.linkedin.com/in/zoe-lindqvist/",
+              // linkedin: "https://www.linkedin.com/in/zoe-lindqvist/",
+              // github: "",
               image: "/headshots/zoe-lindqvist-2.jpg",
+              github: "https://github.com/zoelindqvist",
+              linkedin: "https://linkedin.com/in/zoelindqvist",
             },
           ].map((member, index) => (
             <div
@@ -156,7 +161,7 @@ export const About: React.FC = () => {
               <h3 className="text-xl font-semibold text-text-light dark:text-white mb-2">
                 {member.name}
               </h3>
-              <p className="text-primary-accent dark:text-primary font-medium mb-3">
+              <p className="text-text-light dark:text-text-dark font-medium mb-3">
                 {member.role}
               </p>
 
@@ -164,23 +169,30 @@ export const About: React.FC = () => {
                 {member.bio}
               </p>
 
-              {/* LinkedIn Profile Link */}
-              <a
-                href={member.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 flex items-center justify-center text-secondary-accent dark:text-secondary-400 hover:underline"
-                aria-label={`Visit ${member.name}'s LinkedIn profile`}
-              >
-                <svg
-                  className="w-5 h-5 mr-2 transition-transform transform hover:scale-110 hover:text-primary-accent dark:hover:text-primary duration-200"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex items-center justify-center gap-4">
+                {/* LinkedIn Profile Link */}
+                <a
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Visit ${member.name}'s LinkedIn profile`}
+                  className="mt-4 text-primary-accent dark:text-primary
+                  transition-transform transform hover:scale-110 "
                 >
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.79-1.75-1.767s.784-1.767 1.75-1.767 1.75.79 1.75 1.767-.784 1.767-1.75 1.767zm13.5 11.268h-3v-5.4c0-1.285-.027-2.936-1.791-2.936-1.794 0-2.068 1.4-2.068 2.85v5.486h-3v-10h2.892v1.369h.041c.404-.765 1.391-1.573 2.864-1.573 3.064 0 3.646 2.015 3.646 4.634v5.57z" />
-                </svg>
-              </a>
+                  <FaLinkedin className="w-6 h-6" />
+                </a>
+
+                {/* GitHub */}
+                <a
+                  href={member.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 text-primary-accent dark:text-primary transition-transform transform hover:scale-110"
+                  aria-label={`Visit ${member.name}'s GitHub profile`}
+                >
+                  <FaGithub className="w-6 h-6" />
+                </a>
+              </div>
             </div>
           ))}
         </div>
