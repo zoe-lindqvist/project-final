@@ -1,7 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Music2 } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+
+  const handleStartJourney = () => {
+    if (isAuthenticated) {
+      navigate("/journal");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <section className="relative py-24 overflow-hidden">
       {/* Background Gradient Circles */}
@@ -28,12 +40,12 @@ export const HeroSection = () => {
         </p>
 
         <div className="flex items-center justify-center gap-4">
-          <Link
-            to="/login"
+          <button
+            onClick={handleStartJourney}
             className="bg-primary-accent dark:bg-primary-default text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-dark dark:hover-bg-primary-accent transition-all hover:scale-105 shadow-lg hover:shadow-primary-accent/25"
           >
             Start Your Journey
-          </Link>
+          </button>
           <Link
             to="/about"
             className="text-text-light dark:text-text-dark px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border-2 border-gray-200 dark:border-gray-700"

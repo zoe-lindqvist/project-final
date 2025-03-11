@@ -128,21 +128,20 @@ export const About: React.FC = () => {
           {[
             {
               name: "Joyce Kuo",
-              role: "Founder & CEO",
-              bio: "Musician turned tech entrepreneur",
+              role: "Software Engineer",
+              bio: "Technigo Bootcamp graduate",
+              // bio: "Musician turned tech entrepreneur",
               linkedin: "https://www.linkedin.com/in/joyce-kuo-dev/",
               github: "https://github.com/JoyceKuode",
               image: "/headshots/joyce-kuo.jpg",
             },
             {
               name: "Zoe Lindqvist",
-              role: "Lead Developer",
-              bio: "Crafting digital experiences with code",
-              // linkedin: "https://www.linkedin.com/in/zoe-lindqvist/",
-              // github: "",
+              role: "Software Engineer",
+              bio: "Technigo Bootcamp graduate",
+              linkedin: "https://www.linkedin.com/in/zoe-lindqvist/",
+              github: "https://github.com/zoe-lindqvist",
               image: "/headshots/zoe-lindqvist-2.jpg",
-              github: "https://github.com/zoelindqvist",
-              linkedin: "https://linkedin.com/in/zoelindqvist",
             },
           ].map((member, index) => (
             <div
