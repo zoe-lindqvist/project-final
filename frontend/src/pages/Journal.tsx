@@ -35,16 +35,16 @@ import { useAuthStore } from "../store/useAuthStore";
 import { mapToCategory } from "../utils/moodUtils";
 import { triggerConfetti } from "../utils/confetti";
 
-
 export const Journal: React.FC = () => {
-  // State to store user input in the textarea
+  // useState för att lagra användarinmatning i textfältet
   const [content, setContent] = useState("");
 
+  // API_BASE_URL från miljövariabler, localhost om den saknas
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   const navigate = useNavigate();
 
-  // Zustand store functions for analyzing mood and fetching suggestions
+  // Zustand-store funktioner för att analysera humöret och hämta musikrekommendationer
   const analyzeMood = useMoodStore((state) => state.analyzeMood);
   const moodSuggestion = useMoodStore((state) => state.moodSuggestion);
   const songSuggestion = useMoodStore((state) => state.songSuggestion);
@@ -52,12 +52,13 @@ export const Journal: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const username = user ? user.username : "friend";
 
+  // Funktioner för att analysera humöret
   const handleAnalyze = async () => {
     await analyzeMood(content);
   };
 
+  // Funktion för att spara journal innput till backend
   const handleSave = async () => {
-    // Function to save the journal entry to the backend
     const user = useAuthStore.getState().user;
     if (!user || !moodSuggestion || !songSuggestion) {
       alert("Please analyze your mood before saving.");
@@ -87,8 +88,8 @@ export const Journal: React.FC = () => {
       );
 
       if (response.status === 201) {
-        setContent(""); // Clear input after saving
-        useMoodStore.getState().saveMoodEntry(response.data.mood); // Save locally
+        setContent(""); // Rensa inmatningsfältet efter sparning
+        useMoodStore.getState().saveMoodEntry(response.data.mood); // Spara lokalt
         triggerConfetti();
         navigate("/profile");
       }
