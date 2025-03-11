@@ -2,10 +2,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Music2 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
+// HeroSection-komponenten
 export const HeroSection = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
+  // Funktion för att navigera till Journal-sidan om användaren är inloggad
   const handleStartJourney = () => {
     if (isAuthenticated) {
       navigate("/journal");
@@ -14,19 +16,21 @@ export const HeroSection = () => {
     }
   };
 
+  //
   return (
     <section className="relative py-24 overflow-hidden">
-      {/* Background Gradient Circles */}
+      {/* Bakgrundsgradientcirkel */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-logo-glow-light dark:bg-logo-glow-dark rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-logo-glow-light dark:bg-logo-glow-dark rounded-full blur-3xl -z-10" />
 
+      {/* Logotyp som animerar */}
       <div className="text-center relative">
         <div className="inline-block animate-bounce-slow mb-8">
           <div className="bg-logo-icon-light dark:bg-logo-icon-dark p-4 rounded-full">
             <Music2 className="h-12 w-12 text-purple-600  dark:text-primary-light" />
           </div>
         </div>
-
+{/* Huvudtitel */}
         <h1 className="text-5xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
           Your Emotions,
           <br />

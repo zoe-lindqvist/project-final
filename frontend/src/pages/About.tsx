@@ -44,7 +44,7 @@ export const About: React.FC = () => {
         className="grid md:grid-cols-2 gap-12 items-center mb-16"
         role="region" // Helps screen readers recognize this as an important section
         aria-labelledby="mission-heading"
-        tabIndex={0} // Makes the whole section keyboard-focusabl
+        tabIndex={0} // Makes the whole section keyboard-focusable
       >
         <div>
           <h2
@@ -97,6 +97,7 @@ export const About: React.FC = () => {
                   ),
                   label: "Personal Discovery",
                 },
+              
               ].map((item, index) => (
                 <div>
                   <div
@@ -115,7 +116,7 @@ export const About: React.FC = () => {
         </div>
       </div>
 
-      {/* Team Section */}
+      {/* Our Team Section */}
       <div
         className="text-center mb-16"
         role="region" // Added to define a meaningful section for screen readers

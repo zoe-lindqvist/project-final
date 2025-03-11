@@ -1,6 +1,7 @@
 import { BookOpen, Headphones, Users } from "lucide-react";
 
 export const HowItWorks: React.FC = () => {
+  // Array med objekt som beskriver hur tjänsten fungerar
   const features = [
     {
       icon: (
@@ -30,6 +31,7 @@ export const HowItWorks: React.FC = () => {
 
   return (
     <section className="py-24">
+      {/* Sektionstitel och beskrivning */}
       <div className="text-center mb-16">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
           How It Works
@@ -39,16 +41,21 @@ export const HowItWorks: React.FC = () => {
           with our innovative platform
         </p>
       </div>
+      {/* Grid-layout för att visa funktionerna */}
       <div className="grid md:grid-cols-3 gap-12">
         {features.map((feature, index) => (
           <div key={index} className="relative group">
+            {/* Bakgrundseffekt vid hover */}
             <div
               className={`absolute inset-0 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300 -z-10 ${feature.gradient}`}
             />
+            {/* Individuellt kort för varje funktion */}
             <div className="p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+              {/* Ikonsymbol */}
               <div className="bg-primary-light dark:bg-primary-dark/50 p-4 rounded-xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 {feature.icon}
               </div>
+              {/* Titel och beskrivning */}
               <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                 {feature.title}
               </h3>

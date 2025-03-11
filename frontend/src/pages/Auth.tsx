@@ -31,28 +31,28 @@ import {
 } from "lucide-react";
 
 export const Auth: React.FC = () => {
-  // State to track if user is signing up or logging in
+  // useState för att spåra om användaren registrerar sig eller loggar in
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // State to track loading state during authentication
+  // useState för att hantera laddningsstatus under autentisering
   const [isLoading, setIsLoading] = useState(false);
 
-  // State to store and display error messages
+  // useState för att spåra felmeddelanden under autentisering
   const [error, setError] = useState<string | null>(null);
 
-  // Hook to navigate to different pages (/journal after successful login)
+  // useNavigate-hook för att navigera mellan sidor
   const navigate = useNavigate();
 
   const register = useAuthStore((state) => state.register);
   const login = useAuthStore((state) => state.login);
 
-  // Form submission handler
+  // Funktion för att hantera formulärinlämning
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null); // Clear any previous error messages
-    setIsLoading(true); // Set loading state to true
+    setError(null); // Rensar tidigare felmeddelanden
+    setIsLoading(true); // Visar laddningsstatus
 
-    // Get form data
+    // Hämtar formulärdata
     const formData = new FormData(e.currentTarget);
     const username = formData.get("username") as string;
     const email = formData.get("email") as string;
@@ -65,7 +65,7 @@ export const Auth: React.FC = () => {
         await login(email, password);
       }
 
-      navigate("/journal"); // Navigate after successful login/signup
+      navigate("/journal"); // Navigera efter lyckad inloggning/registrering
     } catch (err: any) {
       setError(err.message || "Authentication failed. Please try again.");
     } finally {
@@ -75,12 +75,12 @@ export const Auth: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 px-4 py-8">
-      {/* Logo that links back to the homepage */}
+      {/* Logotyp som länkar tillbaka till hemsidan */}
       <Link to="/" className="mb-12 group" aria-label="Return to homepage">
         <div className="relative">
-          {/* Glowing background effect */}
+          {/* Glowing bakgrundseffekt  */}
           <div className="absolute inset-0 bg-gradient-to-r from-purple-400/30 to-blue-400/30 dark:from-purple-400/20 dark:to-blue-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
-          {/* Music icon inside the animated logo */}
+          {/* Musikikon inuti animerad logotyp */}
           <div className="relative bg-gradient-to-r p-4 from-purple-100 to-blue-100 dark:from-purple-900/50 dark:to-blue-900/50 rounded-full transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[360deg]">
             <Music2 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
           </div>
@@ -105,11 +105,11 @@ export const Auth: React.FC = () => {
                 </p>
               </div>
 
-              {/* Authentication Form */}
+              {/* Autentiseringsformulär  */}
               <form
                 onSubmit={handleSubmit}
                 className="space-y-6"
-                aria-busy={isLoading} // Indicates form is busy during loading state
+                aria-busy={isLoading} // Autentiseringsformulär during loading state
               >
                 <div className="space-y-4">
                   {/* Conditionally render the Username field for Sign Up */}
@@ -135,7 +135,7 @@ export const Auth: React.FC = () => {
                       </div>
                     </div>
                   )}
-                  {/* Email input field */}
+                  {/* E-postfält */}
                   <div>
                     <label
                       htmlFor="email"
@@ -157,7 +157,7 @@ export const Auth: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Password input field */}
+                  {/* Lösenordsfält  */}
                   <div>
                     <label
                       htmlFor="password"
@@ -180,14 +180,14 @@ export const Auth: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Display error message */}
+                {/* Visar felmeddelande om det finns ett */}
                 {error && (
                   <div className="text-red-500 text-sm text-center">
                     {error}
                   </div>
                 )}
 
-                {/* Submit button with loading state */}
+                {/* Submit button med laddningsstatus */}
                 <button
                   type="submit"
                   disabled={isLoading}

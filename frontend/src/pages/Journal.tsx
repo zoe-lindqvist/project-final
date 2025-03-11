@@ -22,10 +22,8 @@ import { useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import {
   Play,
-  PlayCircle,
   PenLine,
   Loader2,
-  Music2,
   RefreshCcw,
   Share2,
   Check,
@@ -36,7 +34,7 @@ import { useMoodStore } from "../store/moodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { mapToCategory } from "../utils/moodUtils";
 import { triggerConfetti } from "../utils/confetti";
-import { checkForNewBadges } from "../utils/badgeUtils";
+
 
 export const Journal: React.FC = () => {
   // State to store user input in the textarea
