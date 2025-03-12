@@ -37,14 +37,14 @@ import { triggerConfetti } from "../utils/confetti";
 
 export const Journal: React.FC = () => {
   // useState för att lagra användarinmatning i textfältet
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(""); // initierar state med en tom sträng
 
   // API_BASE_URL från env, localhost om den saknas
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook för att navigera till olika sidor
 
-  // Zustand-store funktioner för att analysera humöret och hämta musikrekommendationer
+  // Hämtar funktionen från store
   const analyzeMood = useMoodStore((state) => state.analyzeMood);
   // Lagrar AI:s förslag på vilket humör användaren har
   const moodSuggestion = useMoodStore((state) => state.moodSuggestion);
@@ -57,9 +57,9 @@ export const Journal: React.FC = () => {
   // Om en användare är inloggad visas deras username, annars visas "friend"
   const username = user ? user.username : "friend";
 
-  // Funktioner för att analysera humöret
+  // Funktion för att analysera humöret
   const handleAnalyze = async () => {
-    await analyzeMood(content);
+    await analyzeMood(content); // Anropar funktionen från store
   };
 
   // Funktion för att spara journal innput till backend
@@ -67,7 +67,7 @@ export const Journal: React.FC = () => {
     const user = useAuthStore.getState().user; // Hämtar den inloggade användaren
     // Om saknas, visa alert, avbryt funktionen
     if (!user || !moodSuggestion || !songSuggestion) {
-      alert("Please analyze your mood before saving.");
+      alert("Failed to save the mood.");
       return;
     }
 
@@ -75,7 +75,7 @@ export const Journal: React.FC = () => {
     try {
       // await pausas här tills axios.post har fått ett svar från servern
       const response = await axios.post(
-        `${API_BASE_URL}/api/moods/save`, // Endpoint
+        `${API_BASE_URL}/api/moods/save`, // Backend-endpoint
         {
           userInput: content,
           moodAnalysis: moodSuggestion,
@@ -96,7 +96,7 @@ export const Journal: React.FC = () => {
         }
       );
 
-      // Om sparningen lyckas (status 201)
+      // Om sparningen lyckas
       if (response.status === 201) {
         setContent(""); // Rensa inmatningsfältet efter sparning
         useMoodStore.getState().saveMoodEntry(response.data.mood); // Sparas i store
@@ -112,7 +112,7 @@ export const Journal: React.FC = () => {
     }
   };
 
-  //Funktion för att dela journal entry till feed
+  //Funktion för att dela journal entry/anteckningen till feed
   const handleShareToFeed = async () => {
     // Om saknas, visa alert, avbryt funktionen
     if (!content.trim() || !moodSuggestion || !songSuggestion) {
