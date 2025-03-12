@@ -161,7 +161,7 @@ export const UserProfile: React.FC = () => {
             ) : (
               publicEntries.map((entry) => (
                 <div
-                  key={entry.id}
+                  key={entry.id} // Unique key for each mood entry
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
                   role="article"
                   aria-labelledby={`entry-${entry.id}-title`}

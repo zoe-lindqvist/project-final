@@ -105,10 +105,12 @@ export const Feed: React.FC = () => {
     fetchAllMoods();
   }, [user, showFollowingOnly]); // Refetches whenever following mode changes
 
-  // Filter moods based on user selection
+  // Filter moods and genres based on user selection
   useEffect(() => {
     const applyFilters = () => {
+      // entries is the array of all mood entries fetched from the API.
       const filtered = entries.filter((entry) => {
+        // each individual object (or item) inside the entries array.
         const entryGenre = entry.suggestedSong?.genre;
         const mappedGenre = mapToGenreCategory(entryGenre);
         const matchesMood =
@@ -427,7 +429,6 @@ export const Feed: React.FC = () => {
               <User className="h-5 w-5" />
 
               <span>Following</span>
-
             </button>
           </div>
         </div>
@@ -616,7 +617,7 @@ export const Feed: React.FC = () => {
           })
         ) : (
           <p className="text-center text-gray-600 dark:text-gray-400">
-            {loading ? "Loading moods..." : "No more moods to load!"}
+            {loading ? "Loading moods..." : "Loading moods..."}
           </p>
         )}
         {loading && (

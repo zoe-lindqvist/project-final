@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist } from "zustand/middleware"; // Sparar datan lokalt i webbläsaren
 import { useAuthStore } from "./useAuthStore";
 import type { MoodEntry } from "../types";
 import { moodCategories, mapToCategory } from "../utils/moodUtils";
@@ -9,9 +9,10 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 interface MoodState {
   entries: MoodEntry[];
   streak: number;
-  analyzing: boolean;
-  moodSuggestion: string | null;
+  analyzing: boolean; // Visar om analysen pågår
+  moodSuggestion: string | null; // AI:s förslag på humör
   songSuggestion: {
+    // Rekommenderad låt baserad på humör
     title: string;
     artist: string;
     genre?: string;
@@ -19,19 +20,20 @@ interface MoodState {
   } | null;
 
   resetMoodData: () => void;
-  analyzeMood: (userInput: string) => Promise<void>;
+  analyzeMood: (userInput: string) => Promise<void>; // Funktion för att analysera humöret via API
+  // Funktion för att spara en anteckning
   saveMoodEntry: (
     entry: Omit<MoodEntry, "id" | "createdAt" | "likes" | "comments">
   ) => Promise<void>;
   getMoodStats: (days: number) => { [key: string]: number };
-  getUserEntries: (userId: string) => Promise<void>;
+  getUserEntries: (userId: string) => Promise<void>; // Hämtar användarens entries/anteckningar
 }
 
 export const useMoodStore = create<MoodState>()(
   persist(
     (set, get) => ({
       entries: [],
-      streak: 0, // Initialize streak here
+      streak: 0,
       analyzing: false,
       moodSuggestion: null,
       songSuggestion: null,
