@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { User } from "../types";
 import { persist } from "zustand/middleware";
-import { useMoodStore } from "./moodStore";
+import { useMoodStore } from "./useMoodStore";
 
 export interface UserProfile {
   id: string;

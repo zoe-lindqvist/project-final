@@ -20,7 +20,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { useMoodStore } from "../store/moodStore";
+import { useMoodStore } from "../store/useMoodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { UserProfile } from "../store/useAuthStore";
 import {

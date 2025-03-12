@@ -30,7 +30,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import axios from "axios"; // Gör HTTP-förfrågningar
-import { useMoodStore } from "../store/moodStore";
+import { useMoodStore } from "../store/useMoodStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { mapToCategory } from "../utils/moodUtils";
 import { triggerConfetti } from "../utils/confetti";
