@@ -15,7 +15,7 @@
  */
 
 import { Music2, Heart, Users, Sparkles } from "lucide-react";
-import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { FaLinkedin, FaGithub, FaGlobe } from "react-icons/fa";
 
 export const About: React.FC = () => {
   return (
@@ -97,7 +97,6 @@ export const About: React.FC = () => {
                   ),
                   label: "Personal Discovery",
                 },
-              
               ].map((item, index) => (
                 <div>
                   <div
@@ -134,6 +133,7 @@ export const About: React.FC = () => {
               // bio: "Musician turned tech entrepreneur",
               linkedin: "https://www.linkedin.com/in/joyce-kuo-dev/",
               github: "https://github.com/JoyceKuode",
+              portfolio: "https://joyce-kuo-portfolio.netlify.app/",
               image: "/headshots/joyce-kuo.jpg",
             },
             {
@@ -141,6 +141,7 @@ export const About: React.FC = () => {
               role: "Software Engineer",
               bio: "Technigo Bootcamp graduate",
               linkedin: "https://www.linkedin.com/in/zoe-lindqvist/",
+              portfolio: "https://zoe-lindqvist-portfolio.netlify.app/",
               github: "https://github.com/zoe-lindqvist",
               image: "/headshots/zoe-lindqvist-2.jpg",
             },
@@ -191,6 +192,17 @@ export const About: React.FC = () => {
                   aria-label={`Visit ${member.name}'s GitHub profile`}
                 >
                   <FaGithub className="w-6 h-6" />
+                </a>
+
+                {/* Portfolio */}
+                <a
+                  href={member.portfolio}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 text-primary-accent dark:text-primary transition-transform transform hover:scale-110"
+                  aria-label={`Visit ${member.name}'s portfolio`}
+                >
+                  <FaGlobe className="w-6 h-6" />
                 </a>
               </div>
             </div>

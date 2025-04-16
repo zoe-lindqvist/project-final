@@ -339,7 +339,7 @@ export const Feed: React.FC = () => {
 
             {/* Search Results Dropdown */}
             {searchResults && searchQuery && (
-              <div className="absolute w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50">
+              <div className="absolute w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-10">
                 {searchResults.length > 0 ? (
                   searchResults.slice(0, 8).map((user) => (
                     <Link
