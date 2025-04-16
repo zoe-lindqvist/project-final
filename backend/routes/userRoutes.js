@@ -33,9 +33,29 @@ router.post("/register", async (req, res) => {
     // Destructure request body to get user details
     const { username, email, password } = req.body;
 
-    // Generate salt and hash the password before storing
-    const salt = bcrypt.genSaltSync();
-    const hashedPassword = bcrypt.hashSync(password, salt);
+    console.log("Registering user:", email);
+
+    // Validate input fields
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill in all fields",
+      });
+    }
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Email already in use. Please log in or use a different email.",
+      });
+    }
+
+    // Hash password with async method
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create a new user with hashed password and a generated access token
     const user = new User({
@@ -45,6 +65,8 @@ router.post("/register", async (req, res) => {
     });
 
     await user.save();
+
+    console.log("User registered:", user.email);
 
     res.status(201).json({
       success: true,

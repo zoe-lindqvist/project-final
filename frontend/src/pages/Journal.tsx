@@ -39,12 +39,13 @@ export const Journal: React.FC = () => {
   // useState för att lagra användarinmatning i textfältet
   const [content, setContent] = useState(""); // initierar state med en tom sträng
 
-  // API_BASE_URL från env, localhost om den saknas
+  // Definierar API:ets bas-URL, där backend-anrop görs
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   const navigate = useNavigate(); // Hook för att navigera till olika sidor
 
-  // Hämtar funktionen från store
+  // Hämtar funktioner från Zuztand-store
+  // Anropar funktionen för att analysera humöret
   const analyzeMood = useMoodStore((state) => state.analyzeMood);
   // Lagrar AI:s förslag på vilket humör användaren har
   const moodSuggestion = useMoodStore((state) => state.moodSuggestion);
@@ -54,15 +55,18 @@ export const Journal: React.FC = () => {
   const analyzing = useMoodStore((state) => state.analyzing);
   // Hämtar inloggad användares data från useAuthStore
   const user = useAuthStore((state) => state.user);
+
   // Om en användare är inloggad visas deras username, annars visas "friend"
   const username = user ? user.username : "friend";
 
-  // Funktion för att analysera humöret
+  // Funktion för att analysera användarens inmatning
   const handleAnalyze = async () => {
+    // Funktionen körs lokalt när användaren klickar på knappen - Component-level
     await analyzeMood(content); // Anropar funktionen från store
+    // Funktionen analyserar användarens inmatning och ger förslag på humör och låt
   };
 
-  // Funktion för att spara journal innput till backend
+  // Funktion för att spara användares anteckning till backend
   const handleSave = async () => {
     const user = useAuthStore.getState().user; // Hämtar den inloggade användaren
     // Om saknas, visa alert, avbryt funktionen
@@ -98,6 +102,7 @@ export const Journal: React.FC = () => {
 
       // Om sparningen lyckas
       if (response.status === 201) {
+        //en ny entry har skapats
         setContent(""); // Rensa inmatningsfältet efter sparning
         useMoodStore.getState().saveMoodEntry(response.data.mood); // Sparas i store
         // Konfetti-effekt

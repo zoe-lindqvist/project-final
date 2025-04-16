@@ -4,8 +4,10 @@ import { useAuthStore } from "./useAuthStore";
 import type { MoodEntry } from "../types";
 import { moodCategories, mapToCategory } from "../utils/moodUtils";
 
+// Definierar API:ets bas-URL, där backend-anrop görs
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+// Definierar gränssnittet för Zustand-storen
 interface MoodState {
   entries: MoodEntry[];
   streak: number;
@@ -19,16 +21,16 @@ interface MoodState {
     spotifyUrl?: string;
   } | null;
 
-  resetMoodData: () => void;
-  analyzeMood: (userInput: string) => Promise<void>; // Funktion för att analysera humöret via API
+  resetMoodData: () => void; // Funktion för att återställa lagrade humördata
+  analyzeMood: (userInput: string) => Promise<void>; // Funktionen skickar en förfrågan till API:t för att analysera humöret.
   // Funktion för att spara en anteckning
   saveMoodEntry: (
     entry: Omit<MoodEntry, "id" | "createdAt" | "likes" | "comments">
-  ) => Promise<void>;
-  getMoodStats: (days: number) => { [key: string]: number };
-  getUserEntries: (userId: string) => Promise<void>; // Hämtar användarens entries/anteckningar
+  ) => Promise<void>; // Funktion för att spara en ny humöranteckning
+  getMoodStats: (days: number) => { [key: string]: number }; // Funktion för att beräkna statistik över humördata
+  getUserEntries: (userId: string) => Promise<void>; // Funktion hämta användarens entries/anteckningar
 }
-
+// Skapar en Zustand-store med persistens för att lagra humördata
 export const useMoodStore = create<MoodState>()(
   persist(
     (set, get) => ({
@@ -38,35 +40,38 @@ export const useMoodStore = create<MoodState>()(
       moodSuggestion: null,
       songSuggestion: null,
 
-      // Reset mood data when a new user logs in
+      // Återställer humördata när en ny användare loggar in
       resetMoodData: () => {
         set({
           entries: [], // Clear mood entries
-          streak: 0, // Reset streak
+          streak: 0,
           moodSuggestion: null,
           songSuggestion: null,
         });
       },
 
-      // Analyze mood by calling the backend API
+      // Anropar backend för att analysera användarens humör
       analyzeMood: async (userInput: string) => {
-        if (!userInput.trim() || get().analyzing) return; // Prevent invalid input or duplicate requests
+        // om användaren inte har skrivit något eller analysen redan pågår returneras
+        if (!userInput.trim() || get().analyzing) return; // Förhindrar tom input eller dubletter
 
+        // Visar att analysen pågår
         set({ analyzing: true });
 
+        // Skickar en POST-förfrågan till API:t för att analysera humöret
         try {
           const response = await fetch(`${API_BASE_URL}/api/moods/analyze`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userInput }),
           });
-
+          // Om förfrågan misslyckas kastas ett fel och analysen avbryts
           if (!response.ok) {
             throw new Error("Failed to analyze mood.");
           }
-
+          // Om förfrågan lyckas sparas svaret i variabeln data
           const data = await response.json();
-
+          // Sparar AI:s förslag på humör och rekommenderad låt i storen
           set({
             moodSuggestion: data.mood,
             songSuggestion: data.songRecommendation || {
@@ -76,29 +81,37 @@ export const useMoodStore = create<MoodState>()(
               spotifyUrl: "#",
             },
           });
+          // Om analysen misslyckas visas ett felmeddelande
         } catch (error) {
           console.error("Error analyzing mood:", error);
         } finally {
+          // Döljer att analysen pågår
           set({ analyzing: false });
         }
       },
 
-      // Save mood entry to backend
+      // Sparar en ny mood entry i databasen
       saveMoodEntry: async (entry) => {
+        // Hämtar användaren från autentiseringsstoren
         const user = useAuthStore.getState().user;
+        // Om användaren inte är autentiserad visas ett felmeddelande
         if (!user) {
           console.error("User not authenticated");
+          // Returnerar från funktionen
           return;
         }
 
+        // Hämtar användarens access token från autentiseringsstoren
         try {
           const token =
+            // Hämtar användarens access token från autentiseringsstoren eller localStorage
             useAuthStore.getState().accessToken ||
             localStorage.getItem("accessToken");
 
           const category = mapToCategory(entry.moodAnalysis);
 
           const response = await fetch(`${API_BASE_URL}/api/moods/save`, {
+            // Skickar en POST-förfrågan till API:t för att spara en ny mood entry
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -114,20 +127,21 @@ export const useMoodStore = create<MoodState>()(
                 genre: entry.suggestedSong?.genre || "Unknown Genre",
                 spotifyLink: entry.suggestedSong?.spotifyUrl || "#",
               },
+
               shared: false,
             }),
           });
-
+          // Om förfrågan misslyckas kastas ett fel och sparandet avbryts
           if (!response.ok) {
             throw new Error("Failed to save mood.");
           }
-
+          // Om förfrågan lyckas sparas den sparade mood entryn i variabeln savedEntry
           const savedEntry = await response.json();
-
+          // sparar den sparade mood entryn i storen
           set((state) => ({
             entries: [savedEntry.mood, ...state.entries],
           }));
-
+          // Hämtar användarens entries/anteckningar från databasen
           const { fetchUser } = useAuthStore.getState();
           await fetchUser(user.id);
         } catch (error) {

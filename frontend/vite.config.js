@@ -7,4 +7,7 @@ export default defineConfig({
   define: {
     "import.meta.env": process.env,
   },
+  server: {
+    host: true,
+  },
 });
