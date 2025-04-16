@@ -341,7 +341,7 @@ export const Feed: React.FC = () => {
             {searchResults && searchQuery && (
               <div className="absolute w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50">
                 {searchResults.length > 0 ? (
-                  searchResults.map((user) => (
+                  searchResults.slice(0, 8).map((user) => (
                     <Link
                       key={user.id}
                       to={`/profile/${user.id}`}
