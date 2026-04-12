@@ -1,5 +1,5 @@
 import express from "express";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import axios from "axios";
 import dotenv from "dotenv";
 import { Mood, Comment } from "../models/Mood.js";
@@ -11,8 +11,8 @@ import { authenticateUser } from "../middleware/authMiddleware.js";
 dotenv.config();
 const router = express.Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 router.post("/like/:id", authenticateUser, async (req, res) => {
@@ -185,11 +185,20 @@ router.post("/analyze", async (req, res) => {
     const { userInput } = req.body;
 
     // Construct the AI prompt to analyze the mood and suggest a song
+    const randomSeed = Math.random().toString(36).substring(2, 8);
+
     const prompt = `
-      Analyze the following user input and provide a unique and creative song suggestion each time.
-      Ensure the recommendations vary by genre, artist, and style to avoid repetition.
-      Provide lesser-known or unexpected suggestions alongside popular ones, focusing on the given mood.
-      Format the response as follows:
+      Analyze the following user input and suggest ONE song that matches the mood.
+      Seed: ${randomSeed}
+
+      Rules:
+      - NEVER suggest mainstream or overplayed artists (no Taylor Swift, Ed Sheeran, Adele, Drake, Beyoncé, The Weeknd, etc.)
+      - Prioritize deep cuts, B-sides, album tracks, or songs with under 10 million streams
+      - Draw from a wide range of genres, decades, and cultures — not just English-language pop
+      - Each suggestion must feel surprising and specific to the mood, not generic
+      - Do not repeat artists across suggestions
+
+      Format the response as follows (JSON only, no markdown):
       {
         "mood": "<detected mood>",
         "songRecommendation": {
@@ -202,21 +211,18 @@ router.post("/analyze", async (req, res) => {
       User input: "${userInput}"
     `;
 
-    // Call OpenAI API for mood analysis and song recommendation
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful assistant that outputs JSON.",
-        },
-        { role: "user", content: prompt },
-      ],
-      temperature: 1.1, // Increase randomness for varied suggestions
+    // Call Anthropic API for mood analysis and song recommendation
+    const response = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1024,
+      temperature: 1,
+      system: "You are a music expert with broad knowledge across all genres, decades, and cultures. You output JSON only.",
+      messages: [{ role: "user", content: prompt }],
     });
 
-    // Parse AI response and extract song details
-    const aiResponse = JSON.parse(response.choices[0].message.content.trim());
+    // Parse AI response and extract song details (strip markdown code fences if present)
+    const rawText = response.content[0].text.trim().replace(/^```json\s*/i, "").replace(/```\s*$/i, "");
+    const aiResponse = JSON.parse(rawText);
 
     // Search for the song on Spotify based on AI recommendation
     const spotifyTrack = await searchSpotifyTrack(
@@ -243,7 +249,7 @@ router.post("/analyze", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error with OpenAI API:", error);
+    console.error("Error with Anthropic API:", error);
     res.status(500).json({ error: "Failed to analyze mood" });
   }
 });
