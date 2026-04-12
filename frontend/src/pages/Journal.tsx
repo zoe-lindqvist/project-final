@@ -201,12 +201,10 @@ export const Journal: React.FC = () => {
                 </div>
 
                 {/* Spotify Embedded Player */}
-                {songSuggestion.spotifyUrl && (
+                {songSuggestion.spotifyUrl && songSuggestion.spotifyUrl !== "#" && (
                   <div className="mt-6">
                     <iframe
-                      src={`https://open.spotify.com/embed/track/${songSuggestion.spotifyUrl
-                        .split("/")
-                        .pop()}`}
+                      src={`https://open.spotify.com/embed/track/${songSuggestion.spotifyUrl.split("/").pop()?.split("?")[0]}`}
                       className="w-full h-32 rounded-lg shadow-lg"
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
